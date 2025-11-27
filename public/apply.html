@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    /* ===== RESET ===== */
     *{margin:0;padding:0;box-sizing:border-box}
 
     body{
@@ -16,169 +15,71 @@
       overflow-x:hidden;
     }
 
-    /* ===== NAVIGATION ===== */
     nav{
       padding:18px 55px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
+      display:flex;justify-content:space-between;align-items:center;
       background:rgba(0,0,0,.45);
       backdrop-filter:blur(18px);
       border-bottom:1px solid rgba(255,255,255,.13);
-      position:fixed;top:0;left:0;width:100%;z-index:1000;
+      position:fixed;top:0;width:100%;z-index:1000;
     }
 
     nav a{
-      color:#e4e8ef;
-      text-decoration:none;
-      font-size:15px;
-      margin-right:32px;
-      transition:.25s;
-      letter-spacing:.3px;
+      color:#e4e8ef;text-decoration:none;font-size:15px;margin-right:32px;
+      transition:.25s;letter-spacing:.3px;
     }
+    nav a:hover{color:#4ea3ff;text-shadow:0 0 14px #4ea3ff}
 
-    nav a:hover{
-      color:#4ea3ff;
-      text-shadow:0 0 14px #4ea3ff;
-    }
-
-    /* ===== PAGE ===== */
     main{
-      max-width:750px;
-      margin:0 auto;
-      padding-top:155px;
-      text-align:center;
+      max-width:760px;margin:auto;padding-top:160px;text-align:center;
     }
 
     h1{
-      font-size:3.4rem;
-      font-weight:700;
-      letter-spacing:-1px;
-      margin-bottom:12px;
+      font-size:3.4rem;font-weight:700;margin-bottom:10px;
       text-shadow:0 0 30px rgba(78,163,255,.45);
     }
+    p.lead{opacity:.75;margin-bottom:45px;font-size:1.2rem}
 
-    p.lead{
-      opacity:.75;
-      margin-bottom:45px;
-      font-size:1.2rem;
-    }
-
-    /* ===== FORM CARD ===== */
     form{
-      background:rgba(9,12,18,.75);
-      backdrop-filter:blur(26px);
-      padding:45px;
-      border-radius:14px;
+      background:rgba(9,12,18,.78);backdrop-filter:blur(26px);
+      padding:45px;border-radius:14px;
       border:1px solid rgba(255,255,255,.08);
       box-shadow:0 0 35px rgba(0,0,0,.55);
       text-align:left;
     }
 
-    label{
-      display:block;
-      margin-top:22px;
-      font-size:15px;
-      font-weight:600;
-      opacity:.92;
-      letter-spacing:.3px;
-    }
+    label{display:block;margin-top:22px;font-size:15px;font-weight:600;opacity:.92}
 
     input,select,textarea{
-      width:100%;
-      padding:15px 16px;
-      margin-top:8px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.15);
-      background:#0c111a;
-      color:#fff;
-      font-size:15px;
-      transition:.2s;
-    }
-
-    input:focus,select:focus,textarea:focus{
-      outline:none;
-      border-color:#4ea3ff;
-      box-shadow:0 0 12px #4ea3ff;
-    }
-
-    textarea{resize:none;height:140px}
-
-    /* ===== AGREEMENT BUTTONS ===== */
-    .agreements {
-      margin-top:30px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-
-    .agree-btn {
-      padding:14px;
-      border-radius:10px;
-      background:#111820;
-      border:1px solid rgba(255,255,255,.15);
-      color:#fff;
-      font-size:14px;
-      text-align:left;
-      line-height:1.35;
-      cursor:pointer;
+      width:100%;padding:15px;border-radius:10px;
+      border:1px solid rgba(255,255,255,.18);
+      background:#0c111a;color:#fff;margin-top:8px;font-size:15px;
       transition:.25s;
     }
+    input:focus,select:focus,textarea:focus{
+      border-color:#4ea3ff;box-shadow:0 0 12px #4ea3ff;outline:none;
+    }
+    textarea{resize:none;height:140px}
 
-    .agree-btn:hover {
-      border-color:#4ea3ff;
-      box-shadow:0 0 12px #4ea3ff66;
+    .agreement{
+      margin-top:18px;padding:15px;border:1px solid rgba(255,255,255,.12);
+      border-radius:10px;background:#0b0f18;font-size:14px;line-height:1.5;
     }
 
-    .agree-btn.active {
-      background:#2ecc71;
-      border-color:#1fa85d;
-      box-shadow:0 0 18px #2ecc71aa;
-    }
+    .agreement input{transform:scale(1.3);margin-right:10px;cursor:pointer}
 
-    /* ===== SUBMIT BUTTON ===== */
-    button[type="submit"]{
-      margin-top:32px;
-      padding:16px 36px;
-      border-radius:10px;
-      border:none;
-      background:#4ea3ff;
-      color:#fff;
-      font-size:17px;
-      font-weight:600;
-      cursor:pointer;
-      transition:.28s;
-      width:100%;
-      letter-spacing:.3px;
+    button{
+      margin-top:32px;padding:16px 36px;border-radius:10px;
+      border:none;background:#4ea3ff;color:#fff;font-size:17px;
+      font-weight:600;width:100%;cursor:pointer;letter-spacing:.3px;
+      transition:.3s;
     }
+    button:hover:not(:disabled){transform:translateY(-3px) scale(1.03);box-shadow:0 0 22px #4ea3ff}
+    button:disabled{opacity:.45;cursor:not-allowed}
 
-    button[type="submit"]:disabled{
-      background:#294d6b;
-      cursor:not-allowed;
-      opacity:.55;
-    }
+    #msg{margin-top:22px;font-size:1.15rem;min-height:30px;font-weight:500}
 
-    button[type="submit"]:hover:not(:disabled){
-      transform:translateY(-3px) scale(1.03);
-      box-shadow:0 0 22px #4ea3ff;
-    }
-
-    #msg{
-      margin-top:22px;
-      font-size:1.15rem;
-      min-height:30px;
-      font-weight:500;
-      text-align:center;
-    }
-
-    footer{
-      text-align:center;
-      padding:38px;
-      opacity:.45;
-      margin-top:75px;
-      letter-spacing:.4px;
-      font-size:.9rem;
-    }
+    footer{text-align:center;padding:38px;margin-top:75px;opacity:.45}
   </style>
 </head>
 <body>
@@ -187,7 +88,7 @@
   <div>
     <a href="/">Home</a>
     <a href="/rules.html">Rules</a>
-    <span style="opacity:.5;">Application</span>
+    <span style="opacity:.55;">Application</span>
   </div>
   <a href="/" style="background:#4ea3ff;padding:10px 22px;border-radius:8px;color:#fff;text-decoration:none;">
     ⬅ Back to Home
@@ -196,7 +97,7 @@
 
 <main>
   <h1>Shore Roleplay Whitelist</h1>
-  <p class="lead">Submit your application to be considered for participation in an official roleplay environment.</p>
+  <p class="lead">Submit your application to become a verified member of our roleplay community.</p>
 
   <form id="applyForm">
     <label>Discord Username</label>
@@ -217,17 +118,19 @@
     </select>
 
     <label>Tell us why you want to join</label>
-    <textarea id="reason" placeholder="Provide a detailed explanation of your intent and interests. Submissions lacking clarity or detail may be denied." required></textarea>
+    <textarea id="reason" placeholder="Explain your interest... Must be more than 100 characters." required></textarea>
 
-    <!-- POLICY AGREEMENTS -->
-    <div class="agreements">
-      <button type="button" id="agree1" class="agree-btn">
-        I hereby acknowledge and understand that this application, including all submitted information, will be logged, recorded, and retained for administrative and audit purposes.
-      </button>
+    <!-- AGREEMENTS -->
+    <div class="agreement">
+      <label><input type="checkbox" id="agreeLogging">
+        I acknowledge that my application, personal data, and submitted information may be securely logged and stored for administrative and auditing purposes.
+      </label>
+    </div>
 
-      <button type="button" id="agree2" class="agree-btn">
-        I confirm that I am currently a member of the Shore Roleplay Discord server. I understand that providing false information or failure to be present in the server will result in immediate application denial.
-      </button>
+    <div class="agreement">
+      <label><input type="checkbox" id="agreeDiscord">
+        I confirm that I am an active member of the Shore Roleplay Discord server and understand that providing false information or failing to remain in the server will result in immediate denial.
+      </label>
     </div>
 
     <button id="submitBtn" type="submit" disabled>Submit Application</button>
@@ -240,33 +143,17 @@
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
+const btn = document.getElementById("submitBtn");
 
-let agree1 = false;
-let agree2 = false;
-
-function updateSubmitState() {
-  document.getElementById("submitBtn").disabled = !(agree1 && agree2);
+function checkAgreements(){
+  btn.disabled = !(document.getElementById("agreeLogging").checked && document.getElementById("agreeDiscord").checked);
 }
+document.getElementById("agreeLogging").addEventListener("change", checkAgreements);
+document.getElementById("agreeDiscord").addEventListener("change", checkAgreements);
 
-// Agreement Logic
-document.getElementById("agree1").onclick = function(){
-  agree1 = !agree1;
-  this.classList.toggle("active");
-  updateSubmitState();
-};
-
-document.getElementById("agree2").onclick = function(){
-  agree2 = !agree2;
-  this.classList.toggle("active");
-  updateSubmitState();
-};
-
-// Form Submission
-document.getElementById("applyForm").addEventListener("submit", async (e) =>{
+document.getElementById("applyForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const btn = document.getElementById("submitBtn");
-  btn.disabled = true;
-  btn.textContent = "Submitting...";
+  btn.disabled = true; btn.textContent = "Submitting...";
 
   const body = {
     id: crypto.randomUUID(),
@@ -274,33 +161,26 @@ document.getElementById("applyForm").addEventListener("submit", async (e) =>{
     email: document.getElementById("email").value.trim(),
     department: document.getElementById("department").value,
     reason: document.getElementById("reason").value.trim(),
-    agreedToLogging: agree1,
-    agreedToDiscordRequirement: agree2
+    agreedLogging: true,
+    agreedDiscord: true
   };
 
   const res = await fetch(API + "/apply", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify(body)
+    body:JSON.stringify(body)
   });
 
   const msg = document.getElementById("msg");
-  const data = await res.json();
-
   if(res.ok){
     msg.style.color="#2ecc71";
-    msg.textContent = "Your application has been successfully submitted and will be reviewed by a member of our staff team.";
-    e.target.reset();
-    agree1 = agree2 = false;
-    document.getElementById("agree1").classList.remove("active");
-    document.getElementById("agree2").classList.remove("active");
-    updateSubmitState();
+    msg.textContent = "✔ Application submitted successfully!";
+    e.target.reset(); btn.disabled = true;
   }else{
     msg.style.color="#e74c3c";
-    msg.textContent = data.error || "Your submission could not be processed at this time.";
+    msg.textContent = "❌ Something went wrong — please ensure all fields are valid.";
   }
 
-  btn.disabled = false;
   btn.textContent = "Submit Application";
 });
 </script>
