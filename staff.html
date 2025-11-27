@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <title>Staff Panel – Shore Roleplay</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
       --bg: #05070a;
@@ -11,45 +11,57 @@
       --text: #ffffff;
       --muted: #9ca3af;
       --accent: #1f75ff;
-      --border: #1f2933;
+      --border: #1f2937;
     }
+
     .light {
-      --bg: #f5f7fb;
+      --bg: #f3f4f6;
       --card: #ffffff;
       --text: #111827;
       --muted: #6b7280;
       --accent: #1f75ff;
       --border: #e5e7eb;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: "Segoe UI", sans-serif;
+      font-family: "Segoe UI", system-ui, sans-serif;
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       padding: 24px;
     }
+
     .panel {
       width: 100%;
-      max-width: 840px;
+      max-width: 980px;
       background: var(--card);
-      border: 1px solid var(--border);
       border-radius: 14px;
+      border: 1px solid var(--border);
       padding: 20px 24px;
-      box-shadow: 0 12px 30px rgba(15,23,42,0.35);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.45);
     }
+
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     .logo-circle {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 999px;
       background: #1f75ff;
       display: flex;
@@ -57,27 +69,33 @@
       justify-content: center;
       font-weight: 800;
       color: #fff;
-      font-size: 18px;
-      margin-right: 10px;
+      font-size: 20px;
     }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+
+    .header-title {
+      font-size: 17px;
+      font-weight: 600;
     }
-    .muted { color: var(--muted); font-size: 12px; }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     .toggle-btn {
       border-radius: 999px;
       border: 1px solid var(--border);
-      padding: 6px 12px;
+      padding: 7px 14px;
       font-size: 12px;
       cursor: pointer;
       background: none;
       color: var(--muted);
     }
+
     .login-box {
-      margin-top: 10px;
+      margin-top: 12px;
     }
+
     input {
       border-radius: 8px;
       border: 1px solid var(--border);
@@ -88,47 +106,90 @@
       width: 100%;
       margin-top: 4px;
     }
+
     .btn {
       border-radius: 999px;
       border: none;
-      padding: 8px 16px;
       background: var(--accent);
-      color: white;
+      color: #fff;
+      padding: 8px 16px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       margin-top: 10px;
     }
-    .btn.small { padding: 6px 12px; font-size: 12px; }
+
+    .btn.small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .btn.danger {
+      background: #ef4444;
+    }
+
+    .status-msg {
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
     .apps {
-      margin-top: 18px;
-      max-height: 500px;
+      margin-top: 16px;
+      max-height: 520px;
       overflow-y: auto;
       border-top: 1px solid var(--border);
       padding-top: 10px;
     }
+
     .app-card {
-      border: 1px solid var(--border);
       border-radius: 10px;
+      border: 1px solid var(--border);
       padding: 10px 12px;
       margin-bottom: 10px;
     }
+
     .app-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
     }
+
+    .app-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 4px 0;
+    }
+
     .badge {
       border-radius: 999px;
       padding: 2px 8px;
       font-size: 11px;
       text-transform: uppercase;
     }
-    .badge.pending { background: #f59e0b33; color: #fbbf24; }
-    .badge.accepted { background: #22c55e33; color: #4ade80; }
-    .badge.denied { background: #ef444433; color: #f87171; }
-    .status-msg { font-size: 12px; margin-top: 6px; }
+
+    .badge.pending {
+      background: #f59e0b33;
+      color: #fbbf24;
+    }
+    .badge.accepted {
+      background: #22c55e33;
+      color: #4ade80;
+    }
+    .badge.denied {
+      background: #ef444433;
+      color: #f87171;
+    }
+
+    .field-label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .field-text {
+      font-size: 13px;
+      margin-top: 2px;
+    }
   </style>
 </head>
 <body>
@@ -137,15 +198,15 @@
       <div class="header-left">
         <div class="logo-circle">SR</div>
         <div>
-          <div>ShoreRP Staff Panel</div>
-          <div class="muted">Internal use only</div>
+          <div class="header-title">ShoreRP Staff Panel</div>
+          <div class="muted">Internal use only – application review</div>
         </div>
       </div>
-      <button class="toggle-btn" id="modeToggle">Light mode</button>
+      <button id="modeToggle" class="toggle-btn">Light mode</button>
     </div>
 
     <div id="loginView">
-      <p class="muted">Enter staff password to access applications.</p>
+      <p class="muted">Enter the staff password to access applications.</p>
       <div class="login-box">
         <input type="password" id="staffPw" placeholder="Staff password" />
         <button class="btn" id="loginBtn">Enter Panel</button>
@@ -160,16 +221,17 @@
   </div>
 
   <script>
-    const BACKEND_URL = "https://YOUR-BACKEND-URL"; // <-- replace
-    const STAFF_PASSWORD = "ShoreRPStaff2025";       // must match .env STAFF_PANEL_PASSWORD
+    const BACKEND_URL = "https://YOUR-BACKEND-URL"; // <-- change this
+    const STAFF_PASSWORD = "ShoreRPStaff2028!";      // MUST match STAFF_PANEL_PASSWORD env
 
-    // theme toggle
+    // Theme toggle
     const body = document.body;
     const toggleBtn = document.getElementById("modeToggle");
-    let light = false;
+    let isLight = false;
+
     toggleBtn.addEventListener("click", () => {
-      light = !light;
-      if (light) {
+      isLight = !isLight;
+      if (isLight) {
         body.classList.add("light");
         toggleBtn.textContent = "Dark mode";
       } else {
@@ -189,9 +251,9 @@
     let authKey = null;
 
     loginBtn.addEventListener("click", () => {
-      const value = staffPwInput.value.trim();
-      if (value === STAFF_PASSWORD) {
-        authKey = value;
+      const val = staffPwInput.value.trim();
+      if (val === STAFF_PASSWORD) {
+        authKey = val;
         loginView.style.display = "none";
         panelView.style.display = "block";
         loadApplications();
@@ -202,69 +264,110 @@
     });
 
     async function loadApplications() {
+      panelStatus.style.color = "var(--muted)";
       panelStatus.textContent = "Loading applications...";
       appsList.innerHTML = "";
+
       try {
-        const res = await fetch(`${BACKEND_URL}/api/applications?key=${encodeURIComponent(authKey)}`);
+        const res = await fetch(
+          `${BACKEND_URL}/api/applications?key=${encodeURIComponent(authKey)}`
+        );
         const data = await res.json();
+
         if (!Array.isArray(data)) {
           panelStatus.style.color = "#ef4444";
           panelStatus.textContent = "Error loading applications.";
           return;
         }
-        panelStatus.style.color = "#9ca3af";
+
+        panelStatus.style.color = "var(--muted)";
         panelStatus.textContent = `${data.length} application(s) loaded.`;
 
         data
-          .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
-          .forEach(app => {
+          .sort(
+            (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+          )
+          .forEach((app) => {
             const card = document.createElement("div");
             card.className = "app-card";
 
-            const badgeClass = app.status === "accepted" ? "accepted" :
-                               app.status === "denied" ? "denied" : "pending";
+            const badgeClass =
+              app.status === "accepted"
+                ? "accepted"
+                : app.status === "denied"
+                ? "denied"
+                : "pending";
 
             card.innerHTML = `
               <div class="app-row">
                 <div>
-                  <strong>${app.name}</strong> <span class="muted">(${app.email})</span>
+                  <strong>${app.fullName}</strong>
+                  <span class="muted">(${app.email})</span>
                 </div>
-                <span class="badge ${badgeClass}">${app.status}</span>
+                <div>
+                  <span class="badge ${badgeClass}">${app.status}</span>
+                </div>
               </div>
-              <div class="muted" style="font-size:12px;margin-bottom:6px;">
-                Age: ${app.age || "N/A"} • Discord: ${app.discord || "N/A"} • ID: ${app.id}
+              <div class="app-meta">
+                Department: <strong>${app.department}</strong> •
+                Discord: ${app.discord || "N/A"} •
+                Age: ${app.age || "N/A"} •
+                Timezone: ${app.timezone || "N/A"} •
+                ID: ${app.id}
               </div>
-              <div style="font-size:13px;margin-bottom:8px;">
-                ${app.about}
-              </div>
-              <div>
+
+              <div class="field-label">Experience</div>
+              <div class="field-text">${app.experience || "—"}</div>
+
+              <div class="field-label">Certifications</div>
+              <div class="field-text">${app.certifications || "—"}</div>
+
+              <div class="field-label">Background Consent</div>
+              <div class="field-text">${app.backgroundConsent || "—"}</div>
+
+              <div class="field-label">Why should we pick them?</div>
+              <div class="field-text">${app.motivation || "—"}</div>
+
+              <div class="field-label">Availability</div>
+              <div class="field-text">${app.availability || "—"}</div>
+
+              <div style="margin-top:8px;">
                 <button class="btn small" data-action="accept" data-id="${app.id}">Accept</button>
-                <button class="btn small" style="background:#ef4444;margin-left:6px;" data-action="deny" data-id="${app.id}">Deny</button>
+                <button class="btn small danger" data-action="deny" data-id="${app.id}" style="margin-left:6px;">Deny</button>
               </div>
             `;
 
             const acceptBtn = card.querySelector('[data-action="accept"]');
             const denyBtn = card.querySelector('[data-action="deny"]');
 
-            acceptBtn.addEventListener("click", () => decide(app.id, "accepted"));
+            acceptBtn.addEventListener("click", () =>
+              decide(app.id, "accepted")
+            );
             denyBtn.addEventListener("click", () => decide(app.id, "denied"));
 
             appsList.appendChild(card);
           });
-
       } catch (err) {
         console.error(err);
         panelStatus.style.color = "#ef4444";
-        panelStatus.textContent = "Network error while loading applications.";
+        panelStatus.textContent =
+          "Network error while loading applications.";
       }
     }
 
     async function decide(id, decision) {
-      if (!confirm(`Mark application ${id} as ${decision.toUpperCase()} and send email?`)) return;
+      if (
+        !confirm(
+          `Mark application ${id} as ${decision.toUpperCase()} and send email?`
+        )
+      )
+        return;
 
       try {
         const res = await fetch(
-          `${BACKEND_URL}/api/applications/${encodeURIComponent(id)}/decision?key=${encodeURIComponent(authKey)}`,
+          `${BACKEND_URL}/api/applications/${encodeURIComponent(
+            id
+          )}/decision?key=${encodeURIComponent(authKey)}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -278,7 +381,8 @@
           loadApplications();
         } else {
           panelStatus.style.color = "#ef4444";
-          panelStatus.textContent = json.error || "Error updating application.";
+          panelStatus.textContent =
+            json.error || "Error updating application.";
         }
       } catch (err) {
         console.error(err);
