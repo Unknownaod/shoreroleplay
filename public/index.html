@@ -5,18 +5,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- MAIN STYLE -->
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: #05070a;
-      color: #fff;
+      color: white;
       font-family: "Segoe UI", sans-serif;
       overflow-x: hidden;
     }
 
-    /* ====== NAVBAR ====== */
+    /* NAVBAR */
     nav {
       position: fixed;
       top: 0; left: 0;
@@ -26,26 +25,20 @@
       justify-content: space-between;
       align-items: center;
       padding: 0 55px;
-      background: rgba(0,0,0,0.35);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid rgba(255,255,255,.1);
+      background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(14px);
       z-index: 2000;
-      animation: navFade 1s ease forwards;
     }
 
-    @keyframes navFade {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    nav .links a {
-      margin-right: 35px;
+    nav a {
+      margin-right: 32px;
       text-decoration: none;
       font-size: 16px;
       color: #fff;
       transition: .25s;
     }
-    nav .links a:hover {
+    nav a:hover {
       color: #5EA3F5;
       text-shadow: 0 0 12px #5EA3F5;
     }
@@ -55,12 +48,12 @@
     .avatar {
       width: 34px; height: 34px;
       border-radius: 50%;
-      margin-right: 8px;
       border: 2px solid #5865F2;
       vertical-align: middle;
+      margin-right: 8px;
     }
 
-    /* ====== HERO ====== */
+    /* HERO */
     .hero {
       height: 100vh;
       background: url("https://i.imgur.com/vbt5BPF.jpeg") center/cover no-repeat fixed;
@@ -69,30 +62,19 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      animation: fadeIn 1.5s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(25px); }
-      to { opacity: 1; transform: translateY(0); }
+      padding-top: 65px;
     }
 
     .hero .logo {
       width: 290px;
-      filter: drop-shadow(0 0 28px rgba(0,0,0,.8));
-      animation: pulse 3.5s infinite;
+      filter: drop-shadow(0 0 35px rgba(0,0,0,.8));
       margin-bottom: 18px;
     }
 
-    @keyframes pulse {
-      0%,100% { transform: scale(1); filter: drop-shadow(0 0 18px #1edfff70); }
-      50% { transform: scale(1.05); filter: drop-shadow(0 0 35px #1edfff); }
-    }
-
     .hero h1 {
-      font-size: 4.5rem;
+      font-size: 4.3rem;
       margin-bottom: 10px;
-      text-shadow: 0 0 30px rgba(0,0,0,.7);
+      text-shadow: 0 0 35px rgba(0,0,0,.7);
     }
 
     .hero p {
@@ -101,92 +83,60 @@
       margin-bottom: 40px;
     }
 
-    /* ===== BUTTONS ===== */
     .btn {
       padding: 16px 32px;
-      border-radius: 9px;
+      border-radius: 10px;
       font-size: 19px;
       font-weight: 700;
-      display: inline-block;
       text-decoration: none;
-      transition: 0.3s;
+      display: inline-block;
+      transition: .25s;
     }
 
     .btn-discord {
-      background: linear-gradient(90deg,#4e5aff,#5865F2);
+      background: #5865F2;
       border: 2px solid #3f47c7;
       color: white;
-      box-shadow: 0 0 15px rgba(88,101,242,.45);
+      box-shadow: 0 0 20px rgba(88,101,242,.45);
     }
-
     .btn-discord:hover {
       transform: translateY(-4px) scale(1.04);
-      box-shadow: 0 0 30px rgba(88,101,242,.75);
+      box-shadow: 0 0 30px rgba(88,101,242,.7);
     }
 
     .btn-apply {
-      background: linear-gradient(90deg,#28e07c,#29cb6e);
+      background: #2ecc71;
       border: 2px solid #1c9d51;
       color: white;
-      box-shadow: 0 0 15px rgba(46,204,113,.45);
+      box-shadow: 0 0 20px rgba(46,204,113,.45);
     }
-
     .btn-apply:hover {
       transform: translateY(-4px) scale(1.04);
-      box-shadow: 0 0 30px rgba(46,204,113,.65);
+      box-shadow: 0 0 30px rgba(46,204,113,.75);
     }
 
-    /* ===== SECTION DIVIDER ===== */
-    .wave {
-      margin-top: -1px;
-      width: 100%;
-      display: block;
-    }
+    .wave { width: 100%; display: block; margin-top: -2px; }
 
-    /* ===== INFO SECTION ===== */
     .info {
       text-align: center;
-      padding: 90px 12%;
+      padding: 90px 10%;
       background: #090c12;
     }
+    .info h2 { font-size: 2.8rem; margin-bottom: 20px; }
+    .info p { opacity: .85; max-width: 850px; margin: auto; font-size: 1.2rem; }
 
-    .info h2 {
-      font-size: 2.8rem;
-      margin-bottom: 24px;
-    }
-
-    .info p {
-      font-size: 1.2rem;
-      opacity: .8;
-      max-width: 850px;
-      margin: auto;
-    }
-
-    /* ===== FOOTER ===== */
     footer {
-      text-align: center;
       padding: 22px;
-      background: #05070a;
+      text-align: center;
       opacity: .7;
       margin-top: 55px;
       font-size: 14px;
     }
-
-    .hero-login-btn {
-  margin-top: 20px;
-  animation: buttonFade 1.3s ease forwards;
-}
-
-@keyframes buttonFade {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
+  <!-- NAVBAR -->
   <nav>
     <div class="links">
       <a href="/">Home</a>
@@ -202,56 +152,58 @@
     <h1>Shore Roleplay</h1>
     <p>The next wave of serious FiveM roleplay awaits you.</p>
 
-<a href="https://shoreroleplay.onrender.com/auth" class="btn btn-discord hero-login-btn">
-  <img src="https://cdn.worldvectorlogo.com/logos/discord-icon-svgrepo-com.svg"
-       style="width:26px;vertical-align:middle;margin-right:10px;">
-  Login with Discord
-</a>
+    <div id="hero-button">
+      <a href="https://shoreroleplay.onrender.com/auth" class="btn btn-discord">
+        <img src="https://cdn.worldvectorlogo.com/logos/discord-icon-svgrepo-com.svg"
+             style="width:26px;vertical-align:middle;margin-right:10px;">
+        Login with Discord
+      </a>
+    </div>
   </section>
 
   <!-- DIVIDER -->
   <img src="https://i.imgur.com/rBESTS4.png" class="wave">
 
-  <!-- INFO -->
+  <!-- INFO SECTION -->
   <section class="info">
     <h2>Why Choose ShoreRP?</h2>
     <p>
       A next-generation FiveM community focused on realism, professionalism,
-      and player-driven narrative. Whether you’re LEO, civ, or EMS — you’ll feel at home here.
+      and player-driven narratives. Whether you're LEO, civ, or EMS — this is your home.
     </p>
   </section>
 
-  <!-- FOOTER -->
   <footer>
     © Shore Roleplay — All Rights Reserved
   </footer>
 
-  <!-- LOGIN/APPLY SCRIPT -->
+  <!-- USER STATE SCRIPT -->
   <script>
-    fetch("/user").then(res => res.json()).then(user => {
-      const hero = document.getElementById("hero-button");
-      const auth = document.getElementById("auth");
+    fetch("https://shoreroleplay.onrender.com/user", { credentials: "include" })
+      .then(res => res.json())
+      .then(user => {
+        const auth = document.getElementById("auth");
+        const heroBtn = document.getElementById("hero-button");
 
-      if (!user.id) {
-        // NOT LOGGED IN
-        hero.innerHTML = `<a href="/auth" class="btn btn-discord">
-          <img src="https://cdn.worldvectorlogo.com/logos/discord-icon-svgrepo-com.svg" style="width:25px;vertical-align:middle;margin-right:10px;">
-          Login with Discord
-        </a>`;
-        auth.innerHTML = `<a href="/auth" class="btn-discord">Login</a>`;
-      } else {
-        // LOGGED IN
-        hero.innerHTML = `<a href="/whitelist.html" class="btn btn-apply">Apply Now</a>`;
-        auth.innerHTML = `
-          <img class="avatar" src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64">
-          ${user.username} <a href="/logout" style="margin-left:10px;">Logout</a>
-        `;
-      }
-    });
+        if (!user.id) {
+          // user NOT logged in
+          auth.innerHTML = `<a href="https://shoreroleplay.onrender.com/auth" class="btn-discord">Login</a>`;
+        } else {
+          // user LOGGED IN
+          auth.innerHTML = `
+            <img class="avatar" src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64">
+            ${user.username}
+            <a href="https://shoreroleplay.onrender.com/logout" style="margin-left:12px;color:#ff4d4d;">Logout</a>
+          `;
+
+          heroBtn.innerHTML = `
+            <a href="/whitelist.html" class="btn btn-apply">
+              Apply Now
+            </a>
+          `;
+        }
+      });
   </script>
 
 </body>
 </html>
-
-
-
