@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <title>Apply – Shore Roleplay</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
       --bg: #05070a;
@@ -11,10 +11,11 @@
       --text: #ffffff;
       --muted: #9ca3af;
       --accent: #1f75ff;
-      --border: #1f2933;
+      --border: #1f2937;
     }
+
     .light {
-      --bg: #f5f7fb;
+      --bg: #f3f4f6;
       --card: #ffffff;
       --text: #111827;
       --muted: #6b7280;
@@ -23,32 +24,39 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: "Segoe UI", sans-serif;
+      font-family: "Segoe UI", system-ui, sans-serif;
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       padding: 24px;
     }
 
     .card {
       width: 100%;
-      max-width: 640px;
+      max-width: 780px;
       background: var(--card);
-      border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 24px 26px;
-      box-shadow: 0 12px 30px rgba(15,23,42,0.35);
+      border: 1px solid var(--border);
+      padding: 22px 26px 24px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.45);
     }
 
-    .header {
+    .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
+    }
+
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .logo-circle {
@@ -64,20 +72,21 @@
       font-size: 22px;
     }
 
-    h1 {
-      font-size: 22px;
+    .title {
+      font-size: 18px;
+      font-weight: 600;
     }
 
-    .muted {
+    .subtitle {
+      font-size: 12px;
       color: var(--muted);
-      font-size: 13px;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     .toggle-btn {
       border-radius: 999px;
       border: 1px solid var(--border);
-      padding: 6px 12px;
+      padding: 7px 14px;
       font-size: 12px;
       cursor: pointer;
       background: none;
@@ -85,105 +94,196 @@
     }
 
     form {
-      margin-top: 14px;
+      margin-top: 10px;
       display: grid;
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
     }
 
     label {
-      font-size: 13px;
       font-weight: 600;
-      margin-bottom: 3px;
-      display: block;
     }
 
-    input, textarea {
-      width: 100%;
+    input,
+    select,
+    textarea {
       border-radius: 8px;
       border: 1px solid var(--border);
       background: transparent;
       color: var(--text);
-      padding: 9px 10px;
+      padding: 8px 10px;
       font-size: 14px;
+      width: 100%;
     }
 
     textarea {
-      resize: vertical;
       min-height: 90px;
+      resize: vertical;
+    }
+
+    .full-row {
+      grid-column: 1 / -1;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.18);
+      color: #bfdbfe;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-top: 4px;
+    }
+
+    .submit-row {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
     }
 
     .btn-submit {
-      margin-top: 10px;
-      display: inline-block;
-      background: var(--accent);
-      border: none;
-      padding: 10px 20px;
       border-radius: 999px;
-      color: white;
-      font-weight: 600;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      padding: 9px 22px;
       font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
     }
 
     .btn-submit:hover {
-      filter: brightness(1.1);
+      filter: brightness(1.08);
     }
 
     .status {
-      margin-top: 10px;
       font-size: 13px;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+
+    .required {
+      color: #f97373;
     }
   </style>
 </head>
-<body class="dark">
+<body>
   <div class="card">
-    <div class="header">
-      <div>
+    <div class="card-header">
+      <div class="logo-block">
         <div class="logo-circle">SR</div>
+        <div>
+          <div class="title">Shore Roleplay – Application</div>
+          <div class="subtitle">
+            Fill out the form below. A staff member will review your application and you will
+            receive an email once a decision is made.
+          </div>
+        </div>
       </div>
-      <button class="toggle-btn" id="modeToggle">Light mode</button>
+      <button id="modeToggle" class="toggle-btn">Light mode</button>
     </div>
 
-    <h1>Shore Roleplay Application</h1>
-    <p class="muted">Fill out the form below to apply. You will receive an email once staff have reviewed your application.</p>
+    <span class="badge">Professional Application</span>
 
     <form id="appForm">
-      <div>
-        <label for="name">Full Name *</label>
-        <input id="name" name="name" required />
-      </div>
-      <div>
-        <label for="email">Email *</label>
-        <input id="email" name="email" type="email" required />
-      </div>
-      <div>
-        <label for="age">Age</label>
-        <input id="age" name="age" type="number" min="10" />
-      </div>
-      <div>
-        <label for="discord">Discord (username or ID)</label>
-        <input id="discord" name="discord" />
-      </div>
-      <div>
-        <label for="about">Why do you want to join ShoreRP? *</label>
-        <textarea id="about" name="about" required></textarea>
+      <div class="field">
+        <label for="fullName">Full Name <span class="required">*</span></label>
+        <input id="fullName" name="fullName" required />
       </div>
 
-      <button type="submit" class="btn-submit">Submit Application</button>
-      <div class="status" id="status"></div>
+      <div class="field">
+        <label for="email">Email <span class="required">*</span></label>
+        <input id="email" type="email" name="email" required />
+      </div>
+
+      <div class="field">
+        <label for="discord">Discord Username <span class="required">*</span></label>
+        <input id="discord" name="discord" placeholder="Example: Name#0001" required />
+      </div>
+
+      <div class="field">
+        <label for="department">Department Applying For <span class="required">*</span></label>
+        <select id="department" name="department" required>
+          <option value="">Select department...</option>
+          <option>Communications</option>
+          <option>State Police</option>
+          <option>Police Department</option>
+          <option>Sheriff's Office</option>
+          <option>Fire Department</option>
+          <option>Civilian Operations</option>
+          <option>Media Operations</option>
+          <option>Development Operations</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="age">Age</label>
+        <input id="age" type="number" name="age" min="10" />
+      </div>
+
+      <div class="field">
+        <label for="timezone">Time Zone</label>
+        <input id="timezone" name="timezone" placeholder="Example: EST / PST / GMT+1" />
+      </div>
+
+      <div class="field full-row">
+        <label for="experience">Experience <span class="required">*</span></label>
+        <textarea id="experience" name="experience" required placeholder="Tell us about your roleplay and relevant department experience."></textarea>
+      </div>
+
+      <div class="field full-row">
+        <label for="certifications">Certifications (POST, EMT, etc)</label>
+        <textarea id="certifications" name="certifications" placeholder="List any relevant certifications or training."></textarea>
+      </div>
+
+      <div class="field full-row">
+        <label for="backgroundConsent">Background Check Consent <span class="required">*</span></label>
+        <select id="backgroundConsent" name="backgroundConsent" required>
+          <option value="">Select...</option>
+          <option value="Yes">Yes, I consent to a background check.</option>
+          <option value="No">No, I do not consent.</option>
+        </select>
+      </div>
+
+      <div class="field full-row">
+        <label for="motivation">Why should we pick you over others? <span class="required">*</span></label>
+        <textarea id="motivation" name="motivation" required placeholder="Explain what makes you stand out as a candidate."></textarea>
+      </div>
+
+      <div class="field full-row">
+        <label for="availability">Availability</label>
+        <textarea id="availability" name="availability" placeholder="Days and hours you are typically available."></textarea>
+      </div>
+
+      <div class="submit-row">
+        <button type="submit" class="btn-submit">Submit Application</button>
+        <div class="status" id="status">All fields marked * are required.</div>
+      </div>
     </form>
   </div>
 
   <script>
-    const BACKEND_URL = "https://YOUR-BACKEND-URL"; // <-- replace
+    const BACKEND_URL = "https://YOUR-BACKEND-URL"; // <-- change this
 
-    // Light/dark mode toggle
+    // Theme toggle
     const body = document.body;
     const toggleBtn = document.getElementById("modeToggle");
-    let light = false;
+    let isLight = false;
+
     toggleBtn.addEventListener("click", () => {
-      light = !light;
-      if (light) {
+      isLight = !isLight;
+      if (isLight) {
         body.classList.add("light");
         toggleBtn.textContent = "Dark mode";
       } else {
@@ -197,7 +297,9 @@
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      statusEl.textContent = "Submitting...";
+      statusEl.style.color = "var(--muted)";
+      statusEl.textContent = "Submitting application...";
+
       const formData = new FormData(form);
       const data = Object.fromEntries(formData.entries());
 
@@ -207,10 +309,11 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
+
         const json = await res.json();
         if (json.ok) {
           statusEl.style.color = "#22c55e";
-          statusEl.textContent = "Application submitted! You will receive an email after review.";
+          statusEl.textContent = "Application submitted! You will receive an email once staff review it.";
           form.reset();
         } else {
           statusEl.style.color = "#ef4444";
@@ -219,7 +322,7 @@
       } catch (err) {
         console.error(err);
         statusEl.style.color = "#ef4444";
-        statusEl.textContent = "Network error. Please try again.";
+        statusEl.textContent = "Network error. Please try again in a moment.";
       }
     });
   </script>
