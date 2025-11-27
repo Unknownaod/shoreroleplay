@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shore Roleplay</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/rules.html">Rules</a>
+    <a href="/whitelist.html">Whitelist</a>
+    <span id="auth"></span>
+  </nav>
+
+  <header class="hero">
+    <img src="https://i.imgur.com/kbSHETP.png" class="logo"/>
+    <h1>Shore Roleplay</h1>
+    <p>Welcome to our server!</p>
+  </header>
+
+  <script>
+    fetch("/user").then(r=>r.json()).then(user=>{
+      document.getElementById("auth").innerHTML = user.username
+        ? `Logged in as ${user.username} <a href='/logout'>Logout</a>`
+        : `<a href='/auth'>Login with Discord</a>`;
+    });
+  </script>
+</body>
+</html>
