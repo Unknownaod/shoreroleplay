@@ -245,8 +245,8 @@ Submitted: ${app.submittedAt}
 Reason:
 ${app.reason || "No reason provided"}
 
-Agreed to Logging: ${app.agreedToLogging ? "YES" : "NO"}
-Agreed Discord Requirement: ${app.agreedToDiscordRequirement ? "YES" : "NO"}
+Agreed to Logging: ${app.agreedLogging ? "YES" : "NO"}
+Agreed Discord Requirement: ${app.agreedDiscord ? "YES" : "NO"}
 `;
   document.getElementById("modal").style.display="flex";
 }
