@@ -1,72 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Shore Roleplay | Staff Panel</title>
+  <title>Shore Roleplay | Staff Control Console</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#05070a;color:#fff;font-family:"Segoe UI",sans-serif;}
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#05070a url('https://images.unsplash.com/photo-1526406915894-7bcd65f60845?auto=format&fit=crop&w=1500&q=80') center/cover fixed;
+  color:#fff;
+  font-family:"Segoe UI",sans-serif;
+  overflow-x:hidden;
+}
 
-    nav{
-      padding:18px 55px;
-      display:flex;justify-content:space-between;align-items:center;
-      background:rgba(0,0,0,.35);backdrop-filter:blur(14px);
-      border-bottom:1px solid rgba(255,255,255,.1);
-      position:fixed;top:0;width:100%;z-index:1000;
-    }
-    nav a{color:#fff;text-decoration:none;font-size:15px;margin-right:30px;}
-    nav a:hover{color:#4EA3FF;text-shadow:0 0 10px #4EA3FF;}
+/* NAVIGATION BAR */
+nav{
+  padding:18px 55px;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(0,0,0,.35);backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.12);
+  position:fixed;top:0;width:100%;z-index:1000;
+}
+nav a{
+  color:#dbe6ff;text-decoration:none;font-size:15px;margin-right:32px;
+  transition:.25s;letter-spacing:.4px;
+}
+nav a:hover{color:#4ea3ff;text-shadow:0 0 12px #4ea3ff}
 
-    header{padding-top:120px;text-align:center;}
-    header h1{font-size:3rem;margin-bottom:10px;text-shadow:0 0 20px rgba(0,0,0,.6);}
-    header p{opacity:.7;}
+/* HEADER */
+header{padding-top:135px;text-align:center;}
+header h1{
+  font-size:3.4rem;font-weight:700;
+  margin-bottom:10px;
+  text-shadow:0 0 26px rgba(78,163,255,.45);
+}
+header p{opacity:.75;font-size:1.1rem}
 
-    .login-box{
-      max-width:420px;margin:120px auto;background:#0c0f16;
-      padding:32px;border:1px solid rgba(255,255,255,.08);border-radius:10px;
-      text-align:center;
-    }
-    .login-box input{
-      width:100%;padding:14px;font-size:16px;
-      border-radius:8px;border:1px solid rgba(255,255,255,.18);
-      background:#11151f;color:#fff;margin-top:12px;
-    }
-    .login-box button{
-      margin-top:18px;width:100%;padding:14px;
-      background:#4EA3FF;border:none;border-radius:8px;
-      color:#fff;font-size:17px;font-weight:600;
-      transition:.25s;cursor:pointer;
-    }
-    .login-box button:hover{transform:scale(1.03);box-shadow:0 0 18px #4EA3FF;}
+/* LOGIN */
+.login-box{
+  max-width:450px;margin:80px auto;background:rgba(10,14,22,.78);
+  padding:38px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(28px);
+  text-align:center;
+  box-shadow:0 0 35px rgba(0,0,0,.55);
+}
+.login-box input{
+  width:100%;padding:15px;font-size:16px;
+  border-radius:10px;border:1px solid rgba(255,255,255,.22);
+  background:#0e121c;color:#fff;margin-top:16px;
+  transition:.25s;
+}
+.login-box input:focus{
+  border-color:#4ea3ff;box-shadow:0 0 12px #4ea3ff;outline:none;
+}
+.login-box button{
+  margin-top:22px;width:100%;padding:15px;
+  background:#4ea3ff;border:none;border-radius:10px;
+  color:#fff;font-size:17px;font-weight:600;
+  transition:.25s;cursor:pointer;letter-spacing:.4px;
+}
+.login-box button:hover{
+  transform:translateY(-3px) scale(1.03);
+  box-shadow:0 0 22px #4ea3ff;
+}
 
-    .panel{
-      display:none; /* Hidden until authenticated */
-      max-width:1100px;margin:50px auto;background:#090c12;
-      padding:35px;border-radius:12px;border:1px solid rgba(255,255,255,.06);
-    }
+/* PANEL */
+.panel{
+  display:none;
+  max-width:1250px;margin:60px auto;
+  background:rgba(5,8,14,.75);
+  padding:40px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.07);
+  backdrop-filter:blur(22px);
+  box-shadow:0 0 45px rgba(0,0,0,.65);
+  animation:fadeIn .45s ease forwards;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(30px)}to{opacity:1}}
 
-    table{width:100%;border-collapse:collapse;margin-top:18px;}
-    th,td{padding:14px;border-bottom:1px solid rgba(255,255,255,.08)}
-    th{color:#4EA3FF}
+/* TABLE */
+table{width:100%;border-collapse:collapse;margin-top:25px;}
+th,td{
+  padding:16px;text-align:left;
+  border-bottom:1px solid rgba(255,255,255,.09);
+  font-size:15px;
+}
+th{
+  text-transform:uppercase;font-size:13px;letter-spacing:.8px;
+  color:#4ea3ff;opacity:.9;
+}
 
-    .btn{
-      padding:7px 14px;border-radius:6px;font-size:14px;
-      cursor:pointer;border:none;transition:.2s;
-    }
-    .accept{background:#2ecc71;border:1px solid #1e9d55;}
-    .deny{background:#e74c3c;border:1px solid #b23127;}
-    .accept:hover{background:#45ed8a}
-    .deny:hover{background:#ff6a5e}
+/* STATUS TAGS */
+.status{
+  padding:6px 12px;border-radius:6px;
+  font-size:12px;font-weight:600;text-transform:uppercase;
+}
+.pending{background:#f1c40f33;color:#f1c40f}
+.accepted{background:#2ecc7133;color:#2ecc71}
+.denied{background:#e74c3c33;color:#e74c3c}
 
-    .status{padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;}
-    .pending{background:#f1c40f33;color:#f1c40f}
-    .accepted{background:#2ecc7133;color:#2ecc71}
-    .denied{background:#e74c3c33;color:#e74c3c}
+/* ACTION BUTTONS */
+.btn{
+  padding:8px 14px;border-radius:6px;font-size:14px;
+  cursor:pointer;border:none;transition:.2s;font-weight:600;
+}
+.accept{background:#2ecc71;border:1px solid #1e9d55}
+.accept:hover{background:#45ed8a}
+.deny{background:#e74c3c;border:1px solid #b23127}
+.deny:hover{background:#ff6a5e}
 
-    footer{text-align:center;padding:28px;opacity:.6;margin-top:65px;}
-  </style>
+footer{
+  text-align:center;padding:35px;margin-top:75px;
+  opacity:.55;font-size:.9rem;letter-spacing:.3px;
+}
+</style>
 </head>
 <body>
 
@@ -75,58 +123,61 @@
     <a href="/">Home</a>
     <span style="opacity:.55;">Staff Panel</span>
   </div>
-  <a href="/" style="background:#4ea3ff;padding:10px 22px;border-radius:8px;">⬅ Back to Home</a>
+  <a href="/" style="background:#4ea3ff;padding:10px 22px;border-radius:8px;color:#fff;text-decoration:none;">
+    ⬅ Back to Home
+  </a>
 </nav>
 
 <header>
-  <h1>Staff Operations</h1>
-  <p>Restricted access — authorized personnel only</p>
+  <h1>Staff Operations Console</h1>
+  <p>Tier-3 Access Required — System Logged & Monitored</p>
 </header>
 
 <!-- LOGIN FORM -->
 <div class="login-box" id="loginBox">
-  <h2>Enter Staff Password</h2>
-  <input id="staffPass" type="password" placeholder="Staff Password">
-  <button onclick="login()">Access Panel</button>
-  <p id="error" style="color:#ff5555;margin-top:10px;"></p>
+  <h2 style="margin-bottom:8px;">Authorization Required</h2>
+  <p style="opacity:.6;font-size:.9rem;">Enter your staff access credential</p>
+  <input id="staffPass" type="password" placeholder="Staff Access Password">
+  <button onclick="login()">Access Console</button>
+  <p id="error" style="color:#e74c3c;margin-top:12px;"></p>
 </div>
 
-<!-- STAFF PANEL -->
+<!-- PANEL -->
 <div class="panel" id="panel">
+  <h2 style="margin-bottom:18px;font-weight:600;color:#4ea3ff">Application Review Dashboard</h2>
   <table>
     <thead>
       <tr>
-        <th>Username</th><th>Email</th><th>Department</th><th>Submitted</th><th>Status</th><th>Action</th>
+        <th>USERNAME</th><th>EMAIL</th><th>DEPARTMENT</th><th>SUBMITTED</th><th>STATUS</th><th>ACTION</th>
       </tr>
     </thead>
     <tbody id="apps"></tbody>
   </table>
 </div>
 
-<footer>© Shore Roleplay — Staff Operations</footer>
+<footer>© Shore Roleplay — Staff Operations Command</footer>
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
 
+/* LOGIN */
 async function login() {
   const password = document.getElementById("staffPass").value;
   const error = document.getElementById("error");
 
   const res = await fetch(API + "/staff-auth", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
+    method:"POST",headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ password })
   });
 
-  if (res.ok) {
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("panel").style.display = "block";
+  if(res.ok){
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("panel").style.display="block";
     loadApps();
-  } else {
-    error.textContent = "❌ Incorrect password";
-  }
+  }else error.textContent="❌ Invalid Staff Credential";
 }
 
+/* LOAD APPLICATIONS */
 async function loadApps() {
   const res = await fetch(API + "/applications");
   const data = await res.json();
@@ -137,8 +188,8 @@ async function loadApps() {
       <td>${app.username}</td>
       <td>${app.email}</td>
       <td>${app.department || "N/A"}</td>
-      <td>${app.date}</td>
-      <td><span class="status ${app.status}">${app.status.toUpperCase()}</span></td>
+      <td>${app.submittedAt?.split("T")[0] || "N/A"}</td>
+      <td><span class="status ${app.status}">${app.status}</span></td>
       <td>
         <button class="btn accept" onclick="decide('${app.id}','accepted')">Accept</button>
         <button class="btn deny" onclick="decide('${app.id}','denied')">Deny</button>
@@ -147,14 +198,15 @@ async function loadApps() {
   `).join("");
 }
 
-async function decide(id, status) {
-  if (!confirm(`Confirm marking this application as ${status}?`)) return;
-  await fetch(`${API}/applications/${id}/decision`, {
+/* ACTIONS */
+async function decide(id,status){
+  if(!confirm(`Confirm marking this application as ${status.toUpperCase()}?`)) return;
+  await fetch(`${API}/applications/${id}/decision`,{
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ status })
+    body:JSON.stringify({status})
   });
-  alert("Decision saved & applicant notified!");
+  alert("Decision recorded. Applicant notified.");
   loadApps();
 }
 </script>
