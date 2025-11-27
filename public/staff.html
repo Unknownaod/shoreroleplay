@@ -1,395 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Staff Panel – Shore Roleplay</title>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Panel — Shore Roleplay</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    :root {
-      --bg: #05070a;
-      --card: #0b0f17;
-      --text: #ffffff;
-      --muted: #9ca3af;
-      --accent: #1f75ff;
-      --border: #1f2937;
-    }
-
-    .light {
-      --bg: #f3f4f6;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --accent: #1f75ff;
-      --border: #e5e7eb;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: "Segoe UI", system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 24px;
-    }
-
-    .panel {
-      width: 100%;
-      max-width: 980px;
-      background: var(--card);
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      padding: 20px 24px;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.45);
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-circle {
-      width: 42px;
-      height: 42px;
-      border-radius: 999px;
-      background: #1f75ff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
+      font-family: Arial, sans-serif;
+      background: #05070a;
       color: #fff;
-      font-size: 20px;
+      overflow-x: hidden;
     }
 
-    .header-title {
-      font-size: 17px;
-      font-weight: 600;
+    /* NAV */
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 70px;
+      background: rgba(0,0,0,.35);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(18px);
+      position: fixed; top: 0; width: 100%;
+      z-index: 1000;
+    }
+    nav a {
+      color: #fff; text-decoration: none; margin-right: 30px;
+      font-size: 15px; transition: .25s;
+    }
+    nav a:hover { color: #4ea3ff; text-shadow: 0 0 8px #4ea3ff; }
+
+    /* HEADER */
+    header {
+      text-align: center;
+      padding-top: 130px;
+      margin-bottom: 30px;
+    }
+    header h1 {
+      font-size: 3rem; font-weight: 700;
+    }
+    header p { opacity: .7; }
+
+    /* TABLE */
+    .container {
+      max-width: 1050px;
+      margin: auto; padding: 20px;
+      background: #090c12;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.06);
     }
 
-    .muted {
-      color: var(--muted);
-      font-size: 12px;
+    table {
+      width: 100%; border-collapse: collapse; margin-top: 25px;
     }
-
-    .toggle-btn {
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      padding: 7px 14px;
-      font-size: 12px;
-      cursor: pointer;
-      background: none;
-      color: var(--muted);
+    th, td {
+      padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,.08);
+      text-align: left; font-size: .95rem;
     }
-
-    .login-box {
-      margin-top: 12px;
-    }
-
-    input {
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text);
-      padding: 8px 10px;
-      font-size: 14px;
-      width: 100%;
-      margin-top: 4px;
-    }
+    th { color: #4ea3ff; }
 
     .btn {
-      border-radius: 999px;
-      border: none;
-      background: var(--accent);
-      color: #fff;
-      padding: 8px 16px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 10px;
+      padding: 8px 16px; border-radius: 6px; text-decoration: none;
+      font-size: 14px; font-weight: 600; cursor: pointer;
     }
+    .accept {
+      background: #27ae60; border: 1px solid #1e8a4d; color: white;
+    }
+    .deny {
+      background: #e74c3c; border: 1px solid #b8372e; color: white;
+    }
+    .accept:hover { background: #2ecc71; }
+    .deny:hover { background: #ff5449; }
 
-    .btn.small {
-      padding: 6px 12px;
-      font-size: 12px;
-    }
-
-    .btn.danger {
-      background: #ef4444;
-    }
-
-    .status-msg {
-      font-size: 12px;
-      margin-top: 6px;
-    }
-
-    .apps {
-      margin-top: 16px;
-      max-height: 520px;
-      overflow-y: auto;
-      border-top: 1px solid var(--border);
-      padding-top: 10px;
-    }
-
-    .app-card {
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      padding: 10px 12px;
-      margin-bottom: 10px;
-    }
-
-    .app-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .app-meta {
-      font-size: 12px;
-      color: var(--muted);
-      margin: 4px 0;
-    }
-
-    .badge {
-      border-radius: 999px;
-      padding: 2px 8px;
-      font-size: 11px;
-      text-transform: uppercase;
-    }
-
-    .badge.pending {
-      background: #f59e0b33;
-      color: #fbbf24;
-    }
-    .badge.accepted {
-      background: #22c55e33;
-      color: #4ade80;
-    }
-    .badge.denied {
-      background: #ef444433;
-      color: #f87171;
-    }
-
-    .field-label {
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 4px;
-    }
-
-    .field-text {
-      font-size: 13px;
-      margin-top: 2px;
+    footer {
+      text-align: center; padding: 20px; opacity:.6; margin-top: 45px;
     }
   </style>
 </head>
+
 <body>
-  <div class="panel">
-    <div class="header">
-      <div class="header-left">
-        <div class="logo-circle">SR</div>
-        <div>
-          <div class="header-title">ShoreRP Staff Panel</div>
-          <div class="muted">Internal use only – application review</div>
-        </div>
-      </div>
-      <button id="modeToggle" class="toggle-btn">Light mode</button>
-    </div>
 
-    <div id="loginView">
-      <p class="muted">Enter the staff password to access applications.</p>
-      <div class="login-box">
-        <input type="password" id="staffPw" placeholder="Staff password" />
-        <button class="btn" id="loginBtn">Enter Panel</button>
-        <div class="status-msg" id="loginStatus"></div>
-      </div>
+  <!-- NAV -->
+  <nav>
+    <div>
+      <a href="/">Home</a>
+      <a href="/apply.html">Apply</a>
+      <span style="opacity:.5;">Staff Panel</span>
     </div>
+    <a href="/" class="btn" style="background:#4ea3ff;padding:10px 20px;border-radius:8px;">
+      ⬅ Back to Home
+    </a>
+  </nav>
 
-    <div id="panelView" style="display:none;">
-      <div class="status-msg" id="panelStatus"></div>
-      <div class="apps" id="appsList"></div>
-    </div>
+  <!-- HEADER -->
+  <header>
+    <h1>ShoreRP Staff Panel</h1>
+    <p>Review and manage player applications</p>
+  </header>
+
+  <!-- TABLE CONTAINER -->
+  <div class="container">
+    <table>
+      <thead>
+        <tr>
+          <th>Applicant</th>
+          <th>Email</th>
+          <th>Department</th>
+          <th>Status</th>
+          <th>Decision</th>
+        </tr>
+      </thead>
+      <tbody id="appTable"></tbody>
+    </table>
   </div>
 
+  <footer>
+    © 2025 Shore Roleplay — Staff Control Portal
+  </footer>
+
   <script>
-    const BACKEND_URL = "https://shoreroleplay.onrender.com"; // <-- change this
-    const STAFF_PASSWORD = "ShoreRPStaff2028!";      // MUST match STAFF_PANEL_PASSWORD env
+    const API = "https://shoreroleplay.onrender.com"; // backend URL
 
-    // Theme toggle
-    const body = document.body;
-    const toggleBtn = document.getElementById("modeToggle");
-    let isLight = false;
+    async function loadApps() {
+      const res = await fetch(API + "/applications");
+      const apps = await res.json();
 
-    toggleBtn.addEventListener("click", () => {
-      isLight = !isLight;
-      if (isLight) {
-        body.classList.add("light");
-        toggleBtn.textContent = "Dark mode";
-      } else {
-        body.classList.remove("light");
-        toggleBtn.textContent = "Light mode";
-      }
-    });
+      const table = document.getElementById("appTable");
+      table.innerHTML = "";
 
-    const loginView = document.getElementById("loginView");
-    const panelView = document.getElementById("panelView");
-    const loginBtn = document.getElementById("loginBtn");
-    const staffPwInput = document.getElementById("staffPw");
-    const loginStatus = document.getElementById("loginStatus");
-    const appsList = document.getElementById("appsList");
-    const panelStatus = document.getElementById("panelStatus");
-
-    let authKey = null;
-
-    loginBtn.addEventListener("click", () => {
-      const val = staffPwInput.value.trim();
-      if (val === STAFF_PASSWORD) {
-        authKey = val;
-        loginView.style.display = "none";
-        panelView.style.display = "block";
-        loadApplications();
-      } else {
-        loginStatus.style.color = "#ef4444";
-        loginStatus.textContent = "Incorrect password.";
-      }
-    });
-
-    async function loadApplications() {
-      panelStatus.style.color = "var(--muted)";
-      panelStatus.textContent = "Loading applications...";
-      appsList.innerHTML = "";
-
-      try {
-        const res = await fetch(
-          `${BACKEND_URL}/api/applications?key=${encodeURIComponent(authKey)}`
-        );
-        const data = await res.json();
-
-        if (!Array.isArray(data)) {
-          panelStatus.style.color = "#ef4444";
-          panelStatus.textContent = "Error loading applications.";
-          return;
-        }
-
-        panelStatus.style.color = "var(--muted)";
-        panelStatus.textContent = `${data.length} application(s) loaded.`;
-
-        data
-          .sort(
-            (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-          )
-          .forEach((app) => {
-            const card = document.createElement("div");
-            card.className = "app-card";
-
-            const badgeClass =
-              app.status === "accepted"
-                ? "accepted"
-                : app.status === "denied"
-                ? "denied"
-                : "pending";
-
-            card.innerHTML = `
-              <div class="app-row">
-                <div>
-                  <strong>${app.fullName}</strong>
-                  <span class="muted">(${app.email})</span>
-                </div>
-                <div>
-                  <span class="badge ${badgeClass}">${app.status}</span>
-                </div>
-              </div>
-              <div class="app-meta">
-                Department: <strong>${app.department}</strong> •
-                Discord: ${app.discord || "N/A"} •
-                Age: ${app.age || "N/A"} •
-                Timezone: ${app.timezone || "N/A"} •
-                ID: ${app.id}
-              </div>
-
-              <div class="field-label">Experience</div>
-              <div class="field-text">${app.experience || "—"}</div>
-
-              <div class="field-label">Certifications</div>
-              <div class="field-text">${app.certifications || "—"}</div>
-
-              <div class="field-label">Background Consent</div>
-              <div class="field-text">${app.backgroundConsent || "—"}</div>
-
-              <div class="field-label">Why should we pick them?</div>
-              <div class="field-text">${app.motivation || "—"}</div>
-
-              <div class="field-label">Availability</div>
-              <div class="field-text">${app.availability || "—"}</div>
-
-              <div style="margin-top:8px;">
-                <button class="btn small" data-action="accept" data-id="${app.id}">Accept</button>
-                <button class="btn small danger" data-action="deny" data-id="${app.id}" style="margin-left:6px;">Deny</button>
-              </div>
-            `;
-
-            const acceptBtn = card.querySelector('[data-action="accept"]');
-            const denyBtn = card.querySelector('[data-action="deny"]');
-
-            acceptBtn.addEventListener("click", () =>
-              decide(app.id, "accepted")
-            );
-            denyBtn.addEventListener("click", () => decide(app.id, "denied"));
-
-            appsList.appendChild(card);
-          });
-      } catch (err) {
-        console.error(err);
-        panelStatus.style.color = "#ef4444";
-        panelStatus.textContent =
-          "Network error while loading applications.";
-      }
+      apps.forEach(app => {
+        table.innerHTML += `
+          <tr>
+            <td>${app.username}</td>
+            <td>${app.email}</td>
+            <td>${app.department || "N/A"}</td>
+            <td style="color:${app.status === "pending" ? "#f1c40f" :
+                             app.status === "accepted" ? "#2ecc71" : "#e74c3c"}">
+              ${app.status.toUpperCase()}
+            </td>
+            <td>
+              <button class="btn accept" onclick="decide('${app.id}','accepted')">Accept</button>
+              <button class="btn deny" onclick="decide('${app.id}','denied')">Deny</button>
+            </td>
+          </tr>
+        `;
+      });
     }
 
-    async function decide(id, decision) {
-      if (
-        !confirm(
-          `Mark application ${id} as ${decision.toUpperCase()} and send email?`
-        )
-      )
-        return;
+    async function decide(id, status) {
+      if (!confirm(`Are you sure you want to mark as ${status}?`)) return;
 
-      try {
-        const res = await fetch(
-          `${BACKEND_URL}/api/applications/${encodeURIComponent(
-            id
-          )}/decision?key=${encodeURIComponent(authKey)}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ decision })
-          }
-        );
-        const json = await res.json();
-        if (json.ok) {
-          panelStatus.style.color = "#22c55e";
-          panelStatus.textContent = `Application ${id} marked as ${decision}. Email sent.`;
-          loadApplications();
-        } else {
-          panelStatus.style.color = "#ef4444";
-          panelStatus.textContent =
-            json.error || "Error updating application.";
-        }
-      } catch (err) {
-        console.error(err);
-        panelStatus.style.color = "#ef4444";
-        panelStatus.textContent = "Network error while updating.";
-      }
+      await fetch(`${API}/applications/${id}/decision`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      });
+
+      loadApps();
+      alert("Decision updated & email sent.");
     }
+
+    loadApps();
   </script>
+
 </body>
 </html>
