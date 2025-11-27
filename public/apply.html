@@ -104,8 +104,40 @@
 
     textarea{resize:none;height:140px}
 
-    /* ===== BUTTON ===== */
-    button{
+    /* ===== AGREEMENT BUTTONS ===== */
+    .agreements {
+      margin-top:30px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .agree-btn {
+      padding:14px;
+      border-radius:10px;
+      background:#111820;
+      border:1px solid rgba(255,255,255,.15);
+      color:#fff;
+      font-size:14px;
+      text-align:left;
+      line-height:1.35;
+      cursor:pointer;
+      transition:.25s;
+    }
+
+    .agree-btn:hover {
+      border-color:#4ea3ff;
+      box-shadow:0 0 12px #4ea3ff66;
+    }
+
+    .agree-btn.active {
+      background:#2ecc71;
+      border-color:#1fa85d;
+      box-shadow:0 0 18px #2ecc71aa;
+    }
+
+    /* ===== SUBMIT BUTTON ===== */
+    button[type="submit"]{
       margin-top:32px;
       padding:16px 36px;
       border-radius:10px;
@@ -120,7 +152,13 @@
       letter-spacing:.3px;
     }
 
-    button:hover{
+    button[type="submit"]:disabled{
+      background:#294d6b;
+      cursor:not-allowed;
+      opacity:.55;
+    }
+
+    button[type="submit"]:hover:not(:disabled){
       transform:translateY(-3px) scale(1.03);
       box-shadow:0 0 22px #4ea3ff;
     }
@@ -130,6 +168,7 @@
       font-size:1.15rem;
       min-height:30px;
       font-weight:500;
+      text-align:center;
     }
 
     footer{
@@ -157,7 +196,7 @@
 
 <main>
   <h1>Shore Roleplay Whitelist</h1>
-  <p class="lead">Submit your application to become an official member of our community.</p>
+  <p class="lead">Submit your application to be considered for participation in an official roleplay environment.</p>
 
   <form id="applyForm">
     <label>Discord Username</label>
@@ -178,9 +217,20 @@
     </select>
 
     <label>Tell us why you want to join</label>
-    <textarea id="reason" placeholder="Explain your interest... Must be longer then 100 charactors or it will not go through!" required></textarea>
+    <textarea id="reason" placeholder="Provide a detailed explanation of your intent and interests. Submissions lacking clarity or detail may be denied." required></textarea>
 
-    <button type="submit">Submit Application</button>
+    <!-- POLICY AGREEMENTS -->
+    <div class="agreements">
+      <button type="button" id="agree1" class="agree-btn">
+        I hereby acknowledge and understand that this application, including all submitted information, will be logged, recorded, and retained for administrative and audit purposes.
+      </button>
+
+      <button type="button" id="agree2" class="agree-btn">
+        I confirm that I am currently a member of the Shore Roleplay Discord server. I understand that providing false information or failure to be present in the server will result in immediate application denial.
+      </button>
+    </div>
+
+    <button id="submitBtn" type="submit" disabled>Submit Application</button>
   </form>
 
   <p id="msg"></p>
@@ -191,9 +241,30 @@
 <script>
 const API = "https://shoreroleplay.onrender.com";
 
+let agree1 = false;
+let agree2 = false;
+
+function updateSubmitState() {
+  document.getElementById("submitBtn").disabled = !(agree1 && agree2);
+}
+
+// Agreement Logic
+document.getElementById("agree1").onclick = function(){
+  agree1 = !agree1;
+  this.classList.toggle("active");
+  updateSubmitState();
+};
+
+document.getElementById("agree2").onclick = function(){
+  agree2 = !agree2;
+  this.classList.toggle("active");
+  updateSubmitState();
+};
+
+// Form Submission
 document.getElementById("applyForm").addEventListener("submit", async (e) =>{
   e.preventDefault();
-  const btn = e.target.querySelector("button");
+  const btn = document.getElementById("submitBtn");
   btn.disabled = true;
   btn.textContent = "Submitting...";
 
@@ -202,7 +273,9 @@ document.getElementById("applyForm").addEventListener("submit", async (e) =>{
     username: document.getElementById("username").value.trim(),
     email: document.getElementById("email").value.trim(),
     department: document.getElementById("department").value,
-    reason: document.getElementById("reason").value.trim()
+    reason: document.getElementById("reason").value.trim(),
+    agreedToLogging: agree1,
+    agreedToDiscordRequirement: agree2
   };
 
   const res = await fetch(API + "/apply", {
@@ -212,13 +285,19 @@ document.getElementById("applyForm").addEventListener("submit", async (e) =>{
   });
 
   const msg = document.getElementById("msg");
+  const data = await res.json();
+
   if(res.ok){
     msg.style.color="#2ecc71";
-    msg.textContent = "✔ Application submitted successfully!";
+    msg.textContent = "Your application has been successfully submitted and will be reviewed by a member of our staff team.";
     e.target.reset();
+    agree1 = agree2 = false;
+    document.getElementById("agree1").classList.remove("active");
+    document.getElementById("agree2").classList.remove("active");
+    updateSubmitState();
   }else{
     msg.style.color="#e74c3c";
-    msg.textContent = "❌ Something went wrong — please try again.";
+    msg.textContent = data.error || "Your submission could not be processed at this time.";
   }
 
   btn.disabled = false;
@@ -228,5 +307,3 @@ document.getElementById("applyForm").addEventListener("submit", async (e) =>{
 
 </body>
 </html>
-
-
