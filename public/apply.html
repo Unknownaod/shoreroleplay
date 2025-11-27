@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Apply – Shore Roleplay</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #05070a;
+      --card: #0b0f17;
+      --text: #ffffff;
+      --muted: #9ca3af;
+      --accent: #1f75ff;
+      --border: #1f2933;
+    }
+    .light {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --accent: #1f75ff;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 640px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 26px;
+      box-shadow: 0 12px 30px rgba(15,23,42,0.35);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .logo-circle {
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      background: #1f75ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+      font-size: 22px;
+    }
+
+    h1 {
+      font-size: 22px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .toggle-btn {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      background: none;
+      color: var(--muted);
+    }
+
+    form {
+      margin-top: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 3px;
+      display: block;
+    }
+
+    input, textarea {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      padding: 9px 10px;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .btn-submit {
+      margin-top: 10px;
+      display: inline-block;
+      background: var(--accent);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 999px;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn-submit:hover {
+      filter: brightness(1.1);
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body class="dark">
+  <div class="card">
+    <div class="header">
+      <div>
+        <div class="logo-circle">SR</div>
+      </div>
+      <button class="toggle-btn" id="modeToggle">Light mode</button>
+    </div>
+
+    <h1>Shore Roleplay Application</h1>
+    <p class="muted">Fill out the form below to apply. You will receive an email once staff have reviewed your application.</p>
+
+    <form id="appForm">
+      <div>
+        <label for="name">Full Name *</label>
+        <input id="name" name="name" required />
+      </div>
+      <div>
+        <label for="email">Email *</label>
+        <input id="email" name="email" type="email" required />
+      </div>
+      <div>
+        <label for="age">Age</label>
+        <input id="age" name="age" type="number" min="10" />
+      </div>
+      <div>
+        <label for="discord">Discord (username or ID)</label>
+        <input id="discord" name="discord" />
+      </div>
+      <div>
+        <label for="about">Why do you want to join ShoreRP? *</label>
+        <textarea id="about" name="about" required></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit">Submit Application</button>
+      <div class="status" id="status"></div>
+    </form>
+  </div>
+
+  <script>
+    const BACKEND_URL = "https://YOUR-BACKEND-URL"; // <-- replace
+
+    // Light/dark mode toggle
+    const body = document.body;
+    const toggleBtn = document.getElementById("modeToggle");
+    let light = false;
+    toggleBtn.addEventListener("click", () => {
+      light = !light;
+      if (light) {
+        body.classList.add("light");
+        toggleBtn.textContent = "Dark mode";
+      } else {
+        body.classList.remove("light");
+        toggleBtn.textContent = "Light mode";
+      }
+    });
+
+    const form = document.getElementById("appForm");
+    const statusEl = document.getElementById("status");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusEl.textContent = "Submitting...";
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/apply`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const json = await res.json();
+        if (json.ok) {
+          statusEl.style.color = "#22c55e";
+          statusEl.textContent = "Application submitted! You will receive an email after review.";
+          form.reset();
+        } else {
+          statusEl.style.color = "#ef4444";
+          statusEl.textContent = json.error || "Error submitting application.";
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.style.color = "#ef4444";
+        statusEl.textContent = "Network error. Please try again.";
+      }
+    });
+  </script>
+</body>
+</html>
