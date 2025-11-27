@@ -7,13 +7,14 @@ const path = require("path");
 
 const app = express();
 
-app.use(express.static("public"));
-app.use(express.json());
+// Serve your front-end (public folder)
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || "SHORERP-SECRET",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: { maxAge: 86400000 } // 1 day
 }));
 
 app.use(passport.initialize());
@@ -25,25 +26,40 @@ passport.deserializeUser((obj, done) => done(null, obj));
 passport.use(new DiscordStrategy({
   clientID: process.env.DISCORD_CLIENT_ID,
   clientSecret: process.env.DISCORD_CLIENT_SECRET,
-  callbackURL: `${process.env.DOMAIN}/auth/callback`,
+  callbackURL: `${process.env.CALLBACK_URL}`, // IMPORTANT CHANGE
   scope: ["identify"]
 }, (accessToken, refreshToken, profile, done) => done(null, profile)));
 
+
+// =====================
+// AUTH ROUTES
+// =====================
+
+// Start OAuth
 app.get("/auth", passport.authenticate("discord"));
 
+// Discord redirects here
 app.get("/auth/callback",
   passport.authenticate("discord", { failureRedirect: "/" }),
-  (req, res) => res.redirect("/")
+  (req, res) => res.redirect("/") // send back to frontend
 );
 
+// Logout user
 app.get("/logout", (req, res) => {
-  req.logout(() => res.redirect("/"));
+  req.session.destroy(() => res.redirect("/"));
 });
 
+// Returns the logged-in Discord user
 app.get("/user", (req, res) => {
-  res.json(req.user ?? {});
+  res.json(req.user || {});
 });
 
-app.listen(3000, () =>
-  console.log("Shore Roleplay Auth Server running on port 3000")
+
+// =====================
+// SERVER LISTENER
+// =====================
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () =>
+  console.log(`Shore Roleplay Auth Server running on port ${PORT}`)
 );
