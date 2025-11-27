@@ -4,7 +4,6 @@
   <title>Shore Roleplay | Staff Control Console</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
@@ -14,7 +13,7 @@ body{
   overflow-x:hidden;
 }
 
-/* NAVIGATION BAR */
+/* NAV */
 nav{
   padding:18px 55px;
   display:flex;justify-content:space-between;align-items:center;
@@ -31,8 +30,7 @@ nav a:hover{color:#4ea3ff;text-shadow:0 0 12px #4ea3ff}
 /* HEADER */
 header{padding-top:135px;text-align:center;}
 header h1{
-  font-size:3.4rem;font-weight:700;
-  margin-bottom:10px;
+  font-size:3.4rem;font-weight:700;margin-bottom:10px;
   text-shadow:0 0 26px rgba(78,163,255,.45);
 }
 header p{opacity:.75;font-size:1.1rem}
@@ -42,18 +40,13 @@ header p{opacity:.75;font-size:1.1rem}
   max-width:450px;margin:80px auto;background:rgba(10,14,22,.78);
   padding:38px;border-radius:14px;
   border:1px solid rgba(255,255,255,.1);
-  backdrop-filter:blur(28px);
-  text-align:center;
+  backdrop-filter:blur(28px);text-align:center;
   box-shadow:0 0 35px rgba(0,0,0,.55);
 }
 .login-box input{
   width:100%;padding:15px;font-size:16px;
   border-radius:10px;border:1px solid rgba(255,255,255,.22);
-  background:#0e121c;color:#fff;margin-top:16px;
-  transition:.25s;
-}
-.login-box input:focus{
-  border-color:#4ea3ff;box-shadow:0 0 12px #4ea3ff;outline:none;
+  background:#0e121c;color:#fff;margin-top:16px;transition:.25s;
 }
 .login-box button{
   margin-top:22px;width:100%;padding:15px;
@@ -61,15 +54,11 @@ header p{opacity:.75;font-size:1.1rem}
   color:#fff;font-size:17px;font-weight:600;
   transition:.25s;cursor:pointer;letter-spacing:.4px;
 }
-.login-box button:hover{
-  transform:translateY(-3px) scale(1.03);
-  box-shadow:0 0 22px #4ea3ff;
-}
+.login-box button:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 0 22px #4ea3ff}
 
 /* PANEL */
 .panel{
-  display:none;
-  max-width:1250px;margin:60px auto;
+  display:none;max-width:1350px;margin:60px auto;
   background:rgba(5,8,14,.75);
   padding:40px;border-radius:14px;
   border:1px solid rgba(255,255,255,.07);
@@ -79,40 +68,57 @@ header p{opacity:.75;font-size:1.1rem}
 }
 @keyframes fadeIn{from{opacity:0;transform:translateY(30px)}to{opacity:1}}
 
-/* TABLE */
-table{width:100%;border-collapse:collapse;margin-top:25px;}
-th,td{
-  padding:16px;text-align:left;
-  border-bottom:1px solid rgba(255,255,255,.09);
-  font-size:15px;
+/* CONTROLS */
+.tabs{
+  display:flex;gap:12px;margin-bottom:18px;
 }
-th{
-  text-transform:uppercase;font-size:13px;letter-spacing:.8px;
-  color:#4ea3ff;opacity:.9;
+.tab{
+  padding:10px 18px;border-radius:8px;
+  background:#111820;border:1px solid rgba(255,255,255,.12);
+  cursor:pointer;transition:.25s;
 }
+.tab.active,.tab:hover{background:#4ea3ff;border-color:#4ea3ff}
 
-/* STATUS TAGS */
+/* TABLE */
+table{width:100%;border-collapse:collapse;margin-top:25px}
+th,td{padding:16px;text-align:left;border-bottom:1px solid rgba(255,255,255,.09);font-size:15px}
+th{text-transform:uppercase;font-size:13px;letter-spacing:.8px;color:#4ea3ff;opacity:.9}
+
+/* STATUS */
 .status{
-  padding:6px 12px;border-radius:6px;
-  font-size:12px;font-weight:600;text-transform:uppercase;
+  padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;text-transform:uppercase;
 }
 .pending{background:#f1c40f33;color:#f1c40f}
 .accepted{background:#2ecc7133;color:#2ecc71}
 .denied{background:#e74c3c33;color:#e74c3c}
 
-/* ACTION BUTTONS */
+/* BUTTONS */
 .btn{
-  padding:8px 14px;border-radius:6px;font-size:14px;
-  cursor:pointer;border:none;transition:.2s;font-weight:600;
+  padding:8px 14px;border-radius:6px;font-size:14px;cursor:pointer;border:none;transition:.2s;font-weight:600;
 }
 .accept{background:#2ecc71;border:1px solid #1e9d55}
 .accept:hover{background:#45ed8a}
 .deny{background:#e74c3c;border:1px solid #b23127}
 .deny:hover{background:#ff6a5e}
+.view{
+  background:#2980b9;border:1px solid #1f5f86;color:#fff;
+}
+.view:hover{background:#3498db}
 
-footer{
-  text-align:center;padding:35px;margin-top:75px;
-  opacity:.55;font-size:.9rem;letter-spacing:.3px;
+/* MODAL */
+#modal{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,.65);
+  display:none;justify-content:center;align-items:center;z-index:2000;
+}
+.modal-box{
+  background:#0b0f16;padding:35px;width:550px;max-height:85vh;
+  overflow-y:auto;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+}
+.modal-box h3{margin-bottom:14px}
+.modal-close{
+  margin-top:18px;padding:10px 18px;border-radius:8px;
+  background:#4ea3ff;border:none;color:#fff;cursor:pointer;
 }
 </style>
 </head>
@@ -123,9 +129,7 @@ footer{
     <a href="/">Home</a>
     <span style="opacity:.55;">Staff Panel</span>
   </div>
-  <a href="/" style="background:#4ea3ff;padding:10px 22px;border-radius:8px;color:#fff;text-decoration:none;">
-    ⬅ Back to Home
-  </a>
+  <a href="/" style="background:#4ea3ff;padding:10px 22px;border-radius:8px;color:#fff;text-decoration:none;">⬅ Back to Home</a>
 </nav>
 
 <header>
@@ -133,18 +137,25 @@ footer{
   <p>Staff Credentials Required</p>
 </header>
 
-<!-- LOGIN FORM -->
-<div class="login-box" id="loginBox">
-  <h2 style="margin-bottom:8px;">Authorization Required</h2>
-  <p style="opacity:.6;font-size:.9rem;">Enter your staff access credential</p>
+<!-- LOGIN -->
+<div id="loginBox" class="login-box">
+  <h2>Authorization Required</h2>
   <input id="staffPass" type="password" placeholder="Staff Access Password">
   <button onclick="login()">Access Console</button>
   <p id="error" style="color:#e74c3c;margin-top:12px;"></p>
 </div>
 
 <!-- PANEL -->
-<div class="panel" id="panel">
+<div id="panel" class="panel">
   <h2 style="margin-bottom:18px;font-weight:600;color:#4ea3ff">Application Review Dashboard</h2>
+
+  <!-- TAB CONTROLS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('pending')">Pending Applications</div>
+    <div class="tab" onclick="switchTab('all')">Previous Applications</div>
+  </div>
+
+  <!-- TABLE -->
   <table>
     <thead>
       <tr>
@@ -155,42 +166,55 @@ footer{
   </table>
 </div>
 
+<!-- MODAL -->
+<div id="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle"></h3>
+    <pre id="modalContent" style="white-space:pre-wrap;font-size:14px;opacity:.9"></pre>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
 <footer>© Shore Roleplay — Staff Operations Command</footer>
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
+let currentTab = 'pending';
 
 /* LOGIN */
-async function login() {
-  const password = document.getElementById("staffPass").value;
-  const error = document.getElementById("error");
-
-  const res = await fetch(API + "/staff-auth", {
-    method:"POST",headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ password })
-  });
-
+async function login(){
+  const password=document.getElementById("staffPass").value;
+  const res=await fetch(API+"/staff-auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});
   if(res.ok){
     document.getElementById("loginBox").style.display="none";
     document.getElementById("panel").style.display="block";
     loadApps();
-  }else error.textContent="❌ Invalid Staff Credential";
+  }else document.getElementById("error").textContent="❌ Invalid Credential";
+}
+
+/* TAB SWITCH */
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`.tab:nth-child(${tab==='pending'?1:2})`).classList.add('active');
+  loadApps();
 }
 
 /* LOAD APPLICATIONS */
-async function loadApps() {
-  const res = await fetch(API + "/applications");
-  const data = await res.json();
-  const tbody = document.getElementById("apps");
+async function loadApps(){
+  const data = await (await fetch(API+"/applications")).json();
+  const pending = data.filter(a => a.status==="pending");
+  const tableData = currentTab==='pending' ? pending : data;
 
-  tbody.innerHTML = data.map(app => `
+  document.getElementById("apps").innerHTML = tableData.map(app => `
     <tr>
       <td>${app.username}</td>
       <td>${app.email}</td>
-      <td>${app.department || "N/A"}</td>
-      <td>${app.submittedAt?.split("T")[0] || "N/A"}</td>
+      <td>${app.department}</td>
+      <td>${app.submittedAt?.split("T")[0]}</td>
       <td><span class="status ${app.status}">${app.status}</span></td>
       <td>
+        <button class="btn view" onclick="viewApp('${app.id}')">View</button>
         <button class="btn accept" onclick="decide('${app.id}','accepted')">Accept</button>
         <button class="btn deny" onclick="decide('${app.id}','denied')">Deny</button>
       </td>
@@ -198,18 +222,36 @@ async function loadApps() {
   `).join("");
 }
 
-/* ACTIONS */
+/* VIEW FULL APPLICATION */
+async function viewApp(id){
+  const app = (await (await fetch(API+"/applications")).json()).find(a=>a.id===id);
+  document.getElementById("modalTitle").textContent = `Application — ${app.username}`;
+  document.getElementById("modalContent").textContent =
+`
+ID: ${app.id}
+Username: ${app.username}
+Email: ${app.email}
+Department: ${app.department}
+Status: ${app.status}
+Submitted: ${app.submittedAt}
+
+Reason:
+${app.reason || "No reason provided"}
+
+Agreed to Logging: ${app.agreedToLogging ? "YES" : "NO"}
+Agreed Discord Requirement: ${app.agreedToDiscordRequirement ? "YES" : "NO"}
+`;
+  document.getElementById("modal").style.display="flex";
+}
+function closeModal(){document.getElementById("modal").style.display="none"}
+
+/* DECISION */
 async function decide(id,status){
-  if(!confirm(`Confirm marking this application as ${status.toUpperCase()}?`)) return;
-  await fetch(`${API}/applications/${id}/decision`,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({status})
-  });
-  alert("Decision recorded. Applicant notified.");
+  if(!confirm(`Confirm marking this application as ${status.toUpperCase()}?`))return;
+  await fetch(API+"/applications/"+id+"/decision",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})});
+  alert("Decision saved and applicant notified.");
   loadApps();
 }
 </script>
-
 </body>
 </html>
