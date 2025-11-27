@@ -1,58 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Shore Roleplay | Application</title>
+  <title>Shore Roleplay | Whitelist Application</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
+    /* ===== RESET ===== */
     *{margin:0;padding:0;box-sizing:border-box}
+
     body{
-      background:#05070a;color:#fff;
-      font-family:"Segoe UI",sans-serif;
+      background:#05070a url('https://i.imgur.com/ma4t8eF.png') center/cover no-repeat fixed;
+      color:#fff;
+      font-family:"Segoe UI",Roboto,Helvetica,sans-serif;
+      overflow-x:hidden;
     }
 
+    /* ===== NAVIGATION ===== */
     nav{
-      padding:18px 55px;display:flex;
-      justify-content:space-between;align-items:center;
-      background:rgba(0,0,0,.35);backdrop-filter:blur(14px);
-      border-bottom:1px solid rgba(255,255,255,.1);
-      position:fixed;top:0;width:100%;z-index:1000;
+      padding:18px 55px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:rgba(0,0,0,.45);
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid rgba(255,255,255,.13);
+      position:fixed;top:0;left:0;width:100%;z-index:1000;
     }
+
     nav a{
-      color:#fff;text-decoration:none;font-size:15px;margin-right:30px;
+      color:#e4e8ef;
+      text-decoration:none;
+      font-size:15px;
+      margin-right:32px;
+      transition:.25s;
+      letter-spacing:.3px;
     }
-    nav a:hover{color:#4EA3FF;text-shadow:0 0 10px #4EA3FF;}
 
+    nav a:hover{
+      color:#4ea3ff;
+      text-shadow:0 0 14px #4ea3ff;
+    }
+
+    /* ===== PAGE ===== */
     main{
-      padding-top:120px;max-width:700px;margin:auto;text-align:center;
+      max-width:750px;
+      margin:0 auto;
+      padding-top:155px;
+      text-align:center;
     }
-    h1{font-size:3rem;margin-bottom:12px}
-    p{opacity:.75;margin-bottom:35px;font-size:1.1rem}
 
+    h1{
+      font-size:3.4rem;
+      font-weight:700;
+      letter-spacing:-1px;
+      margin-bottom:12px;
+      text-shadow:0 0 30px rgba(78,163,255,.45);
+    }
+
+    p.lead{
+      opacity:.75;
+      margin-bottom:45px;
+      font-size:1.2rem;
+    }
+
+    /* ===== FORM CARD ===== */
     form{
-      background:#090c12;padding:35px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.06);
+      background:rgba(9,12,18,.75);
+      backdrop-filter:blur(26px);
+      padding:45px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 0 35px rgba(0,0,0,.55);
       text-align:left;
     }
 
-    label{display:block;margin-top:18px;font-size:15px;font-weight:600;opacity:.85}
+    label{
+      display:block;
+      margin-top:22px;
+      font-size:15px;
+      font-weight:600;
+      opacity:.92;
+      letter-spacing:.3px;
+    }
+
     input,select,textarea{
-      width:100%;padding:14px;margin-top:8px;
-      border-radius:8px;border:1px solid rgba(255,255,255,.15);
-      background:#0c1018;color:#fff;font-size:15px;
+      width:100%;
+      padding:15px 16px;
+      margin-top:8px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.15);
+      background:#0c111a;
+      color:#fff;
+      font-size:15px;
+      transition:.2s;
     }
-    textarea{resize:none;height:120px}
 
+    input:focus,select:focus,textarea:focus{
+      outline:none;
+      border-color:#4ea3ff;
+      box-shadow:0 0 12px #4ea3ff;
+    }
+
+    textarea{resize:none;height:140px}
+
+    /* ===== BUTTON ===== */
     button{
-      margin-top:25px;padding:15px 32px;border-radius:8px;
-      border:none;background:#2ecc71;color:#fff;
-      font-size:17px;font-weight:600;cursor:pointer;
-      transition:.25s;width:100%;
+      margin-top:32px;
+      padding:16px 36px;
+      border-radius:10px;
+      border:none;
+      background:#4ea3ff;
+      color:#fff;
+      font-size:17px;
+      font-weight:600;
+      cursor:pointer;
+      transition:.28s;
+      width:100%;
+      letter-spacing:.3px;
     }
-    button:hover{transform:scale(1.03);box-shadow:0 0 18px #2ecc71}
 
-    footer{text-align:center;padding:28px;opacity:.6;margin-top:65px;}
+    button:hover{
+      transform:translateY(-3px) scale(1.03);
+      box-shadow:0 0 22px #4ea3ff;
+    }
+
+    #msg{
+      margin-top:22px;
+      font-size:1.15rem;
+      min-height:30px;
+      font-weight:500;
+    }
+
+    footer{
+      text-align:center;
+      padding:38px;
+      opacity:.45;
+      margin-top:75px;
+      letter-spacing:.4px;
+      font-size:.9rem;
+    }
   </style>
 </head>
 <body>
@@ -61,14 +148,16 @@
   <div>
     <a href="/">Home</a>
     <a href="/rules.html">Rules</a>
-    <span style="opacity:.55;">Application</span>
+    <span style="opacity:.5;">Application</span>
   </div>
-  <a href="/" style="background:#4ea3ff;padding:10px 22px;border-radius:8px;">⬅ Back to Home</a>
+  <a href="/" style="background:#4ea3ff;padding:10px 22px;border-radius:8px;color:#fff;text-decoration:none;">
+    ⬅ Back to Home
+  </a>
 </nav>
 
 <main>
-  <h1>Apply to Join Shore Roleplay</h1>
-  <p>Fill out this form to be considered for whitelist approval.</p>
+  <h1>Shore Roleplay Whitelist</h1>
+  <p class="lead">Submit your application to become an official member of our community.</p>
 
   <form id="applyForm">
     <label>Discord Username</label>
@@ -79,7 +168,7 @@
 
     <label>Preferred Department</label>
     <select id="department" required>
-      <option value="">-- Select Department --</option>
+      <option value="">— Select Department —</option>
       <option>Police Department</option>
       <option>State Police</option>
       <option>Sheriff's Office</option>
@@ -94,21 +183,20 @@
     <button type="submit">Submit Application</button>
   </form>
 
-  <p id="msg" style="margin-top:20px;font-size:1.1rem;"></p>
+  <p id="msg"></p>
 </main>
 
-<footer>© Shore Roleplay — Whitelist Applications</footer>
+<footer>© Shore Roleplay — Official Recruitment Portal</footer>
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
 
-document.getElementById("applyForm").addEventListener("submit", async(e)=>{
+document.getElementById("applyForm").addEventListener("submit", async (e) =>{
   e.preventDefault();
   const btn = e.target.querySelector("button");
   btn.disabled = true;
   btn.textContent = "Submitting...";
 
-  // ⭐ ADDED ID FIELD
   const body = {
     id: crypto.randomUUID(),
     username: document.getElementById("username").value.trim(),
@@ -126,11 +214,11 @@ document.getElementById("applyForm").addEventListener("submit", async(e)=>{
   const msg = document.getElementById("msg");
   if(res.ok){
     msg.style.color="#2ecc71";
-    msg.textContent = "Your application has been submitted successfully.";
+    msg.textContent = "✔ Application submitted successfully!";
     e.target.reset();
   }else{
     msg.style.color="#e74c3c";
-    msg.textContent = "Something went wrong — try again.";
+    msg.textContent = "❌ Something went wrong — please try again.";
   }
 
   btn.disabled = false;
