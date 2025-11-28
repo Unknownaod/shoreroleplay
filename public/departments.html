@@ -195,34 +195,67 @@ footer{
 <footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
 
 <script>
-/* ===== LOGIN STATE DISPLAY ===== */
+const API = "https://shoreroleplay.onrender.com";
 const user = JSON.parse(localStorage.getItem("shoreUser"));
 const bar = document.getElementById("userBar");
 
-if(user){
-  bar.innerHTML = `
-    Logged in as <strong>${user.username}</strong>
-    <div>
-      <button class="btn-chip" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
-      <button class="btn-chip" onclick="location.href='settings.html'">Settings</button>
-      <button class="btn-chip btn-chip-primary" onclick="logout()">Logout</button>
-    </div>
-  `;
-} else {
-  bar.innerHTML = `
-    <span>Explore our departments and join Shore Roleplay.</span>
-    <div>
-      <button class="btn-chip" onclick="location.href='login.html'">Sign In</button>
-      <button class="btn-chip btn-chip-primary" onclick="location.href='register.html'">Sign Up</button>
-    </div>
-  `;
+/* Check DB if user is banned */
+async function checkBan() {
+  if (!user) return false;
+
+  try {
+    const res = await fetch(`${API}/users/${user.id}/status`);
+    const data = await res.json();
+
+    if (data.banned) {
+      // Store reason for banned.html
+      localStorage.setItem("shoreBanReason", data.reason || "No reason provided");
+
+      // Remove session
+      localStorage.removeItem("shoreUser");
+
+      // Force redirect
+      window.location.href = "banned.html";
+      return true;
+    }
+    return false;
+
+  } catch (err) { return false; }
 }
 
-function logout(){
+/* Render UI depending on login */
+async function renderUserBar() {
+  const isBanned = await checkBan();
+  if (isBanned) return; // stop here
+
+  if (user) {
+    bar.innerHTML = `
+      Logged in as <strong>${user.username}</strong>
+      <div>
+        <button class="btn-chip" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
+        <button class="btn-chip" onclick="location.href='settings.html'">Settings</button>
+        <button class="btn-chip btn-chip-primary" onclick="logout()">Logout</button>
+      </div>
+    `;
+  } else {
+    bar.innerHTML = `
+      <span>Explore our departments and join Shore Roleplay.</span>
+      <div>
+        <button class="btn-chip" onclick="location.href='login.html'">Sign In</button>
+        <button class="btn-chip btn-chip-primary" onclick="location.href='register.html'">Sign Up</button>
+      </div>
+    `;
+  }
+}
+
+function logout() {
   localStorage.removeItem("shoreUser");
   location.reload();
 }
+
+renderUserBar();
 </script>
+
 
 </body>
 </html>
