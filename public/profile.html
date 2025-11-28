@@ -5,7 +5,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -27,7 +26,9 @@ nav{
   display:flex;justify-content:space-between;align-items:center;
   position:fixed;top:0;width:100%;z-index:20;
 }
-nav span,nav a{margin-right:28px;font-size:15px;opacity:.85;cursor:pointer}
+nav a{
+  margin-right:28px;font-size:15px;opacity:.85;cursor:pointer;
+}
 nav a:hover{color:#4ea3ff;text-shadow:0 0 12px #4ea3ff}
 
 /* MAIN */
@@ -42,11 +43,22 @@ main{
 }
 
 /* HEADER */
-.profile-header{
-  text-align:center;margin-bottom:32px;
-}
+.profile-header{text-align:center;margin-bottom:32px}
 .profile-header h1{font-size:2.7rem;margin-bottom:6px}
-.profile-header p{opacity:.78}
+.profile-header p{opacity:.78;font-size:1rem}
+
+/* STAFF BADGE */
+.staff-badge{
+  padding:4px 10px;border-radius:6px;
+  font-size:.78rem;font-weight:700;display:inline-block;margin-left:6px;
+}
+.ha{background:#f1c40f;color:#000}
+.ia{background:#ff5050}
+.adm{background:#3498db}
+.jadm{background:#6741ff}
+.sstaff{background:#ffaa00;color:#000}
+.staff{background:#27ae60;color:#000}
+.sit{background:#16a085}
 
 /* SECTIONS */
 .section{margin-top:45px}
@@ -84,13 +96,13 @@ footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div>
     <a href="index.html">Home</a>
     <a href="departments.html">Departments</a>
     <a href="rules.html">Rules</a>
     <a href="apply.html">Apply</a>
+    <a href="forums.html">Forums</a>
   </div>
 </nav>
 
@@ -118,14 +130,22 @@ footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem
 <script>
 const API = "https://shoreroleplay.onrender.com";
 const urlParams = new URLSearchParams(window.location.search);
-const username = urlParams.get("user");
+const profileUsername = urlParams.get("user");
+if(!profileUsername) location.href = "index.html";
 
-if(!username){
-  location.href = "index.html";
-}
+/* STAFF ROLE COLOR MAP */
+const roleColor = {
+  "Head Administrator":"ha",
+  "Internal Affairs":"ia",
+  "Administration":"adm",
+  "Junior Administration":"jadm",
+  "Senior Staff":"sstaff",
+  "Staff":"staff",
+  "Staff In Training":"sit"
+};
 
-/* BADGES MAP */
-const badges = {
+/* DEPARTMENT BADGES */
+const deptIcons = {
   "Police Department":"https://i.imgur.com/3Uhtndq.png",
   "State Police":"https://i.imgur.com/24jUZlT.png",
   "Sheriff's Office":"https://i.imgur.com/3Uhtndq.png",
@@ -135,26 +155,28 @@ const badges = {
   "DevOps":"https://i.imgur.com/DAlxtWE.png"
 };
 
-/* LOAD PROFILE DATA */
+/* LOAD PROFILE */
 async function loadProfile(){
-  const res = await fetch(API + "/applications");
-  const apps = await res.json();
+  const users = await fetch(API+"/users").then(r=>r.json());
+  const user = users.find(u => u.username.toLowerCase() === profileUsername.toLowerCase());
 
-  const userApps = apps.filter(
-    a => a.username.toLowerCase() === username.toLowerCase()
-  );
+  document.getElementById("username").textContent = profileUsername;
+  const subtitleEl = document.getElementById("subtitle");
 
-  document.getElementById("username").textContent = username;
-
-  if(userApps.length === 0){
-    document.getElementById("subtitle").textContent = "No public data found.";
-    return;
+  /* Staff Badge */
+  if(user?.staffRole){
+    subtitleEl.innerHTML = `
+      Shore Roleplay Staff —
+      <span class="staff-badge ${roleColor[user.staffRole]}">${user.staffRole}</span>
+    `;
+  } else {
+    subtitleEl.textContent = "Shore Roleplay Member";
   }
 
+  /* Fetch applications */
+  const apps = await fetch(API+"/applications").then(r=>r.json());
+  const userApps = apps.filter(a => a.username.toLowerCase() === profileUsername.toLowerCase());
   const accepted = userApps.filter(a => a.status === "accepted");
-
-  document.getElementById("subtitle").textContent =
-    accepted.length > 0 ? "Active Shore Roleplay Member" : "Applicant";
 
   const deptList = document.getElementById("deptList");
   const appsList = document.getElementById("appsList");
@@ -166,17 +188,18 @@ async function loadProfile(){
   accepted.forEach(app => {
     deptList.innerHTML += `
       <div class="dept">
-        <img src="${badges[app.department] || badges['Civilian Operations']}">
+        <img src="${deptIcons[app.department] || deptIcons['Civilian Operations']}">
         <div>
-          <strong>${app.department}</strong><br>
-          Verified Member
+          <strong>${app.department}</strong><br>Active Department Member
         </div>
-      </div>`;
+      </div>
+    `;
     appsList.innerHTML += `
       <div class="app-card">
         <strong>${app.department}</strong> — ${new Date(app.submittedAt).toLocaleDateString()}
         <div class="badge accepted">ACCEPTED</div>
-      </div>`;
+      </div>
+    `;
   });
 }
 
