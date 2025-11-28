@@ -4,7 +4,6 @@
 <title>Shore Roleplay | Account Settings</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -58,7 +57,7 @@ main{
 h1{font-size:2.6rem;margin-bottom:4px}
 .sub{opacity:.75;margin-bottom:18px;font-size:1.05rem}
 
-/* PROFILE IMAGE BOX */
+/* PROFILE IMAGE */
 .pfp-box{text-align:center;margin-bottom:30px}
 #pfpPreview{
   width:140px;height:140px;border-radius:50%;
@@ -142,7 +141,7 @@ footer{text-align:center;opacity:.55;margin-top:40px}
   <p class="sub" id="email"></p>
   <p id="roleBadge"></p>
 
-  <!-- PFP UPLOAD -->
+  <!-- PFP -->
   <div class="pfp-box">
     <img id="pfpPreview" src="https://i.imgur.com/8eO8KZB.png">
     <input type="file" id="pfpFile" accept="image/*">
@@ -170,7 +169,7 @@ footer{text-align:center;opacity:.55;margin-top:40px}
     </div>
   </div>
 
-  <!-- APPLICATION LOG -->
+  <!-- APPLICATIONS -->
   <div class="section">
     <h2>Your Applications</h2>
     <h3>Pending</h3><div id="pendingList"></div>
@@ -214,7 +213,6 @@ footer{text-align:center;opacity:.55;margin-top:40px}
       <p id="deleteMsg"></p>
     </div>
   </div>
-
 </main>
 
 <footer>© 2025 Shore Roleplay</footer>
@@ -226,42 +224,37 @@ if(!user) location.href="login.html";
 
 document.getElementById("username").textContent=user.username;
 document.getElementById("email").textContent=user.email;
+
 loadUser();
 loadIdentifiers();
 loadApps();
 
-/* LOAD USER INFO + PFP + BIO */
+/* LOAD USER */
 async function loadUser(){
   const res=await fetch(API+"/users/"+user.id);
   const u=await res.json();
-
   document.getElementById("pfpPreview").src=u.pfp||"https://i.imgur.com/8eO8KZB.png";
-  document.getElementById("bio").value = u.bio || "";
-
+  document.getElementById("bio").value=u.bio||"";
   renderRole(u.role);
 }
 
-/* UPLOAD IMAGE FROM PC */
+/* UPDATE PROFILE PICTURE */
 async function uploadPFP(){
   const file=document.getElementById("pfpFile").files[0];
   const msg=document.getElementById("pfpMsg");
-
   if(!file) return msg.textContent="Select an image first.";
 
   const reader=new FileReader();
   reader.onload=async()=>{
     const base64=reader.result;
-
     const r=await fetch(API+"/users/update",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({id:user.id,pfp:base64})
     });
-
-    msg.textContent=r.ok?"Updated!":"Upload Failed";
-    if(r.ok) setTimeout(()=>location.reload(),800);
+    msg.textContent=r.ok?"Updated!":"Error";
+    if(r.ok) setTimeout(()=>location.reload(),600);
   };
-
   reader.readAsDataURL(file);
 }
 
@@ -275,11 +268,10 @@ async function saveBio(){
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({id:user.id,bio:text})
   });
-
   msg.textContent=r.ok?"Saved!":"Error";
 }
 
-/* ROLE */
+/* ROLE BADGE */
 function renderRole(role){
   const map={
     "Head Administrator":"ha","Internal Affairs":"ia","Administration":"admin",
@@ -305,9 +297,9 @@ async function loadApps(){
   const mine=(await res.json()).filter(a=>a.email===user.email);
   const out={pending:"pendingList",accepted:"acceptedList",denied:"deniedList"};
   mine.forEach(a=>{
-    document.getElementById(out[a.status]).innerHTML+=`
-      <div class="card"><strong>${a.department}</strong> — ${new Date(a.submittedAt).toLocaleString()}
-      <span class="status-badge ${a.status}">${a.status.toUpperCase()}</span></div>`;
+    document.getElementById(out[a.status]).innerHTML+=
+    `<div class="card"><strong>${a.department}</strong> — ${new Date(a.submittedAt).toLocaleString()}
+    <span class="status-badge ${a.status}">${a.status.toUpperCase()}</span></div>`;
   });
 }
 
@@ -322,6 +314,7 @@ async function changePassword(){
   const c=document.getElementById("confirmPass").value.trim();
   const m=document.getElementById("msg");
   if(p!==c) return m.textContent="Does not match";
+
   const r=await fetch(API+"/users/update-password",{
     method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({email:user.email,password:p})
@@ -332,17 +325,17 @@ async function changePassword(){
 /* CHANGE USERNAME */
 async function changeUsername(){
   const v=document.getElementById("newUser").value.trim();
-  const p=document.getElementById("userMsg");
-  if(v.length<3) return p.textContent="Too short.";
+  const m=document.getElementById("userMsg");
+  if(v.length<3) return m.textContent="Too short.";
   const r=await fetch(API+"/users/change-username",{
     method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({id:user.id,username:v})
   });
-  p.textContent=r.ok?"Updated!":"Failed";
-  if(r.ok){user.username=v;localStorage.setItem("shoreUser",JSON.stringify(user));setTimeout(()=>location.reload(),800);}
+  m.textContent=r.ok?"Updated!":"Failed";
+  if(r.ok){user.username=v;localStorage.setItem("shoreUser",JSON.stringify(user));setTimeout(()=>location.reload(),600);}
 }
 
-/* DELETE */
+/* DELETE ACCOUNT */
 async function deleteAccount(){
   if(!confirm("Are you sure?"))return;
   const r=await fetch(API+"/users/"+user.id,{method:"DELETE"});
