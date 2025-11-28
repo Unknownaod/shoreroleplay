@@ -13,43 +13,55 @@
 body{
   font-family:"Inter",sans-serif;
   background:#05070a url('https://i.imgur.com/vbt5BPF.jpeg') center/cover fixed;
-  color:#fff;
-  overflow-x:hidden;
+  color:#fff;overflow-x:hidden;
 }
+
+/* NAV */
+nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 60px;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.12);
+  position:fixed;top:0;width:100%;z-index:1000;
+}
+nav a,nav span{
+  color:#fff;text-decoration:none;margin-right:32px;font-weight:500;
+  transition:.25s;cursor:pointer;
+}
+nav a:hover{color:#4ea3ff;text-shadow:0 0 12px #4ea3ff}
+.active-page{color:#4ea3ff;text-shadow:0 0 10px #4ea3ff}
+.nav-links{display:flex;gap:32px}
+.user-controls{display:flex;gap:14px;align-items:center}
+.user-btn{
+  padding:6px 14px;border-radius:4px;
+  border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.05);color:#fff;font-weight:500;cursor:pointer;
+}
+.user-btn:hover{background:rgba(255,255,255,.18)}
+.logout-btn{background:#4ea3ff;border-color:#4ea3ff}
+.logout-btn:hover{filter:brightness(1.07)}
 
 /* HERO */
 .hero{
-  padding:130px 25px 70px;
-  text-align:center;
-  background:rgba(0,0,0,.50);
-  backdrop-filter:blur(18px);
+  padding-top:145px;padding-bottom:60px;text-align:center;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(18px);
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 .hero h1{
-  font-size:3.6rem;font-weight:800;
-  text-shadow:0 0 26px rgba(78,163,255,.45);
+  font-size:3.4rem;font-weight:800;
+  text-shadow:0 0 28px rgba(78,163,255,.45);
 }
-.hero p{
-  opacity:.75;
-  font-size:1.1rem;
-  max-width:620px;
-  margin:12px auto;
-}
+.hero p{font-size:1.1rem;opacity:.75;margin-top:8px}
 .status-pill{
-  margin-top:22px;
-  display:inline-block;
-  padding:12px 28px;
-  background:#4ea3ff;
-  color:#000;font-weight:700;font-size:1.1rem;
-  border-radius:8px;
-  box-shadow:0 0 26px #4ea3ff;
+  margin-top:20px;display:inline-block;
+  padding:10px 24px;border-radius:8px;
+  background:#4ea3ff;color:#000;font-weight:700;
+  box-shadow:0 0 22px #4ea3ff;font-size:1.05rem;
 }
 
-/* CONTAINER */
+/* MAIN CONTAINER */
 .container{
-  max-width:1150px;
-  margin:60px auto;
-  padding:0 25px;
+  max-width:1150px;margin:55px auto;padding:0 25px;
 }
 
 /* SERVICE BOX */
@@ -57,120 +69,258 @@ body{
   background:rgba(0,0,0,.45);
   border:1px solid rgba(255,255,255,.08);
   border-radius:14px;
+  padding:32px;margin-bottom:40px;
   backdrop-filter:blur(22px);
-  padding:32px;margin-bottom:35px;
-  box-shadow:0 0 38px rgba(0,0,0,.55);
+  box-shadow:0 0 36px rgba(0,0,0,.55);
 }
 .service-title{
-  font-size:1.5rem;font-weight:700;
-  color:#4ea3ff;margin-bottom:18px;
-  text-transform:uppercase;
-  border-left:4px solid #4ea3ff;
-  padding-left:12px;
+  font-size:1.45rem;font-weight:700;
+  color:#4ea3ff;text-transform:uppercase;
+  border-left:4px solid #4ea3ff;padding-left:12px;
+  margin-bottom:18px;
 }
 
-/* ROWS */
+/* ROW */
 .row{
   display:flex;justify-content:space-between;align-items:center;
-  padding:14px 0;
-  border-bottom:1px solid rgba(255,255,255,.08);
-  font-size:1rem;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  padding:16px 0;font-size:15px;
+}
+.status-dot{
+  width:12px;height:12px;border-radius:50%;
+  display:inline-block;margin-right:8px;
+  box-shadow:0 0 12px currentColor;
+}
+.online{color:#4ea3ff;font-weight:600}
+.online .status-dot{background:#4ea3ff}
+.offline{color:#ff4e4e;font-weight:600}
+.offline .status-dot{background:#ff4e4e}
+
+/* UPTIME GRAPH */
+.uptime-block{margin-top:20px}
+.uptime-labels{
+  display:flex;justify-content:space-between;
+  font-size:.75rem;opacity:.45;margin-top:10px;
+}
+.uptime-graph{
+  display:flex;gap:2px;margin-top:10px;
+  height:34px;align-items:flex-end;
+}
+.uptime-bar{
+  width:8px;height:34px;border-radius:3px;
+  background:#2e2e2e;
+}
+.uptime-bar.up{
+  background:#4ea3ff;
+  box-shadow:0 0 8px #4ea3ff;
 }
 
-/* STATUS COLORS */
-.online{
-  color:#4ea3ff;
-  font-weight:700;
-  text-shadow:0 0 10px #4ea3ff;
-}
-.offline{
-  color:#ff4e4e;
-  font-weight:700;
-  text-shadow:0 0 10px #ff4e4e;
-}
-
-footer{
-  text-align:center;
-  padding:35px;
-  opacity:.45;
-  margin-top:50px;
-  font-size:.9rem;
-}
+/* FOOTER */
+#lastUpdate{text-align:center;margin-top:10px;font-size:.8rem;opacity:.55}
+footer{text-align:center;opacity:.35;margin:55px 0 25px;font-size:.9rem}
 </style>
 </head>
 <body>
 
+<!-- NAV -->
+<nav>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="departments.html">Departments</a>
+    <a href="apply.html">Apply</a>
+    <a href="forums.html">Forums</a>
+    <span class="active-page">Status</span>
+  </div>
+  <div id="userControls" class="user-controls"></div>
+</nav>
+
+<!-- HERO -->
 <section class="hero">
-  <h1>Shore Roleplay Status</h1>
-  <p>Real-time system health checks for our core services.</p>
-  <span id="overall" class="status-pill">Checking systems...</span>
+  <h1>System Status</h1>
+  <p>Live health overview of Shore Roleplay services.</p>
+  <span id="overall" class="status-pill">Checking Systems...</span>
 </section>
 
 <div class="container">
 
+  <!-- API CORE -->
   <div class="service-box">
     <div class="service-title">API Core</div>
     <div class="row"><span>Web API</span><span id="web">Checking...</span></div>
+    <div class="uptime-block">
+      <div class="uptime-labels">
+        <span>90 days ago</span>
+        <span id="uptime-web-percent">100% uptime</span>
+        <span>Today</span>
+      </div>
+      <div id="uptime-web" class="uptime-graph"></div>
+    </div>
   </div>
 
+  <!-- AUTH -->
   <div class="service-box">
-    <div class="service-title">Authentication Services</div>
+    <div class="service-title">Authentication</div>
     <div class="row"><span>Account System</span><span id="login">Checking...</span></div>
+    <div class="uptime-block">
+      <div class="uptime-labels">
+        <span>90 days ago</span>
+        <span id="uptime-login-percent">100% uptime</span>
+        <span>Today</span>
+      </div>
+      <div id="uptime-login" class="uptime-graph"></div>
+    </div>
   </div>
 
+  <!-- USERS -->
   <div class="service-box">
     <div class="service-title">User Services</div>
     <div class="row"><span>User Directory</span><span id="users">Checking...</span></div>
+    <div class="uptime-block">
+      <div class="uptime-labels">
+        <span>90 days ago</span>
+        <span id="uptime-users-percent">100% uptime</span>
+        <span>Today</span>
+      </div>
+      <div id="uptime-users" class="uptime-graph"></div>
+    </div>
   </div>
 
+  <!-- APPLICATIONS -->
   <div class="service-box">
     <div class="service-title">Application System</div>
-    <div class="row"><span>Applications</span><span id="apps">Checking...</span></div>
+    <div class="row"><span>Application Portal</span><span id="apps">Checking...</span></div>
+    <div class="uptime-block">
+      <div class="uptime-labels">
+        <span>90 days ago</span>
+        <span id="uptime-apps-percent">100% uptime</span>
+        <span>Today</span>
+      </div>
+      <div id="uptime-apps" class="uptime-graph"></div>
+    </div>
   </div>
 
+  <!-- FORUM TOOLS -->
   <div class="service-box">
     <div class="service-title">Forum Tools</div>
     <div class="row"><span>Threads</span><span id="threads">Checking...</span></div>
     <div class="row"><span>Posting System</span><span id="posting">Checking...</span></div>
+    <div class="uptime-block">
+      <div class="uptime-labels">
+        <span>90 days ago</span>
+        <span id="uptime-threads-percent">100% uptime</span>
+        <span>Today</span>
+      </div>
+      <div id="uptime-threads" class="uptime-graph"></div>
+    </div>
   </div>
 
 </div>
 
-<footer>Auto-updates every 60s · © Shore Roleplay</footer>
+<div id="lastUpdate"></div>
+<footer>© Shore Roleplay — Live System Monitor</footer>
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
+const user = JSON.parse(localStorage.getItem("shoreUser"));
+const box = document.getElementById("userControls");
 
-/*
-  PUBLIC-SAFE CHECKING:
-  As long as the endpoint responds (any code), it's considered ONLINE.
-  If the network dies → OFFLINE.
-*/
-async function check(url, id){
+/* NAV LOGIN STATE */
+if(!user){
+  box.innerHTML = `
+    <button class="user-btn" onclick="location.href='login.html'">Login</button>
+    <button class="user-btn logout-btn" onclick="location.href='register.html'">Register</button>
+  `;
+}else{
+  box.innerHTML = `
+    Logged in as <strong>${user.username}</strong>
+    <button class="user-btn" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
+    <button class="user-btn logout-btn" onclick="logout()">Logout</button>
+  `;
+}
+function logout(){localStorage.removeItem("shoreUser");location.reload()}
+
+
+/* STATUS CHECK */
+async function check(url,id){
   try{
-    await fetch(url, { method: "GET" });
-    document.getElementById(id).innerHTML = `<span class="online">Online</span>`;
+    await fetch(url,{method:"GET"});
+    document.getElementById(id).innerHTML =
+    `<span class="online"><span class="status-dot"></span>Online</span>`;
     return true;
   }catch(e){
-    document.getElementById(id).innerHTML = `<span class="offline">Offline</span>`;
+    document.getElementById(id).innerHTML =
+    `<span class="offline"><span class="status-dot"></span>Offline</span>`;
     return false;
   }
 }
 
-async function runStatus(){
-  let results = [];
+/* UPTIME TRACKING */
+const UPTIME_KEY = "shore_uptime";
+const SERVICES = ["web","login","users","apps","threads","posting"];
 
-  results.push(await check(API + "/", "web"));
-  results.push(await check(API + "/users", "users"));
-  results.push(await check(API + "/users/login", "login"));
-  results.push(await check(API + "/applications", "apps"));
-  results.push(await check(API + "/threads", "threads"));
-  results.push(await check(API + "/users/1/restrict", "posting"));
-
-  document.getElementById("overall").innerHTML =
-    results.every(v => v) ? "All Systems Operational" : "Some Services Offline";
+/* init uptime store */
+function initUptime(){
+  let data = JSON.parse(localStorage.getItem(UPTIME_KEY)) || {};
+  SERVICES.forEach(s=>{ if(!data[s]) data[s]=[] });
+  localStorage.setItem(UPTIME_KEY, JSON.stringify(data));
 }
 
+/* log today's uptime */
+function logUptime(results){
+  let data = JSON.parse(localStorage.getItem(UPTIME_KEY));
+  SERVICES.forEach((s,i)=>{
+    const status = results[i] ? 1 : 0;
+    data[s].push(status);
+    if(data[s].length > 90) data[s].shift();
+  });
+  localStorage.setItem(UPTIME_KEY, JSON.stringify(data));
+}
+
+/* render uptime bars */
+function renderUptime(){
+  const data = JSON.parse(localStorage.getItem(UPTIME_KEY));
+  SERVICES.forEach(s=>{
+    const container = document.getElementById(`uptime-${s}`);
+    const percentTag = document.getElementById(`uptime-${s}-percent`);
+    if(!container) return;
+
+    container.innerHTML="";
+    let arr = data[s];
+    let total = arr.length;
+    let up = arr.filter(x=>x===1).length;
+    let pct = total ? ((up/total)*100).toFixed(1) : "100.0";
+
+    percentTag.textContent = `${pct}% uptime`;
+    arr.forEach(v=>{
+      const bar = document.createElement("div");
+      bar.className = "uptime-bar" + (v===1?" up":"");
+      container.appendChild(bar);
+    });
+  });
+}
+
+/* ORIGINAL RUNSTATUS WRAPPER */
+async function runStatus(){
+  const r = [];
+  r.push(await check(API + "/", "web"));
+  r.push(await check(API + "/users/login", "login"));
+  r.push(await check(API + "/users", "users"));
+  r.push(await check(API + "/applications", "apps"));
+  r.push(await check(API + "/threads", "threads"));
+  r.push(await check(API + "/users/1/restrict", "posting"));
+
+  document.getElementById("overall").innerText =
+    r.every(v=>v) ? "All Systems Operational" : "Service Disruptions";
+
+  document.getElementById("lastUpdate").innerText =
+    "Last Updated: " + new Date().toLocaleTimeString();
+
+  logUptime(r);
+  renderUptime();
+}
+
+/* INIT + FIRST RUN */
+initUptime();
 runStatus();
 setInterval(runStatus, 60000);
 </script>
