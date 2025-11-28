@@ -58,29 +58,25 @@ main{
 h1{font-size:2.6rem;margin-bottom:4px}
 .sub{opacity:.75;margin-bottom:18px;font-size:1.05rem}
 
-/* PROFILE PICTURE */
-.pfp-box{
-  text-align:center;margin-bottom:30px;
+/* PROFILE IMAGE BOX */
+.pfp-box{text-align:center;margin-bottom:30px}
+#pfpPreview{
+  width:140px;height:140px;border-radius:50%;
+  border:3px solid var(--accent);
+  object-fit:cover;box-shadow:0 0 18px rgba(78,163,255,.45);
+  display:block;margin:auto;
 }
-#pfp{
-  width:120px;height:120px;border-radius:14px;
-  border:2px solid var(--accent);
-  object-fit:cover;box-shadow:0 0 16px rgba(0,0,0,.6);
-}
-.upload-box{
-  margin-top:12px;
-  display:flex;gap:10px;justify-content:center;
-}
-.upload-input{
-  width:65%;padding:12px;border-radius:8px;
-  border:1px solid rgba(255,255,255,.25);
+input[type=file]{
+  margin-top:14px;padding:10px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.22);
   background:var(--card);color:var(--text);
 }
 button.upload-btn{
-  padding:12px 20px;border:none;border-radius:8px;
+  margin-top:10px;padding:10px 16px;border:none;
   background:var(--accent);color:white;font-weight:600;
-  cursor:pointer;
+  border-radius:8px;cursor:pointer;
 }
+#pfpMsg{margin-top:6px;font-size:.9rem}
 
 /* SECTIONS */
 .section{margin-top:45px}
@@ -95,13 +91,14 @@ button.upload-btn{
 }
 
 /* INPUTS */
-input{
+input,textarea{
   width:100%;padding:14px;border-radius:8px;
   border:1px solid rgba(255,255,255,.2);
   background:var(--card);color:var(--text);margin-top:6px;
+  resize:none;
 }
 
-/* BUTTONS */
+/* ACTION BUTTON */
 button.action{
   margin-top:10px;padding:12px 16px;width:100%;
   background:var(--accent);border:none;color:#fff;
@@ -110,19 +107,10 @@ button.action{
 button.action:hover{filter:brightness(1.1)}
 .delete{background:#e74c3c}
 
-/* BADGES */
-.badge{
-  padding:5px 10px;border-radius:6px;font-size:.8rem;font-weight:600;
-  display:inline-block;margin-top:3px;
-}
-.ha{background:#ff3b3b33;border:1px solid #ff3b3b;color:#ff9a9a}
-.ia{background:#b83bff33;border:1px solid #b83bff;color:#e6cbff}
-.admin{background:#00c8ff33;border:1px solid #00c8ff;color:#c9f3ff}
-.jadmin{background:#00ffe533;border:1px solid #00ffe5;color:#c9fff9}
-.sstaff{background:#ffc40033;border:1px solid #ffc400;color:#fff0b6}
-.staff{background:#00ff6033;border:1px solid #00ff60;color:#c6ffc6}
-.sit{background:#4ea3ff33;border:1px solid #4ea3ff;color:#d7e8ff}
-.civ{background:#ffffff22;border:1px solid #fff;color:#fff}
+.status-badge{padding:4px 8px;border-radius:6px;font-size:.78rem;font-weight:600}
+.pending{background:#ffb703;color:#000}
+.accepted{background:#2ecc71;color:#000}
+.denied{background:#e74c3c;color:#fff}
 
 footer{text-align:center;opacity:.55;margin-top:40px}
 .toggle{
@@ -154,14 +142,22 @@ footer{text-align:center;opacity:.55;margin-top:40px}
   <p class="sub" id="email"></p>
   <p id="roleBadge"></p>
 
-  <!-- PROFILE PICTURE -->
+  <!-- PFP UPLOAD -->
   <div class="pfp-box">
-    <img id="pfp" src="https://i.imgur.com/8eO8KZB.png" alt="Profile Picture">
-    <div class="upload-box">
-      <input class="upload-input" id="newPFP" placeholder="Image URL (PNG/JPG only)">
-      <button class="upload-btn" onclick="updatePFP()">Save</button>
-    </div>
+    <img id="pfpPreview" src="https://i.imgur.com/8eO8KZB.png">
+    <input type="file" id="pfpFile" accept="image/*">
+    <button class="upload-btn" onclick="uploadPFP()">Upload New Picture</button>
     <p id="pfpMsg"></p>
+  </div>
+
+  <!-- BIO -->
+  <div class="section">
+    <h2>Profile Description</h2>
+    <div class="card">
+      <textarea id="bio" placeholder="Write something about yourself..."></textarea>
+      <button class="action" onclick="saveBio()">Save Description</button>
+      <p id="bioMsg"></p>
+    </div>
   </div>
 
   <!-- IDENTIFIERS -->
@@ -174,15 +170,15 @@ footer{text-align:center;opacity:.55;margin-top:40px}
     </div>
   </div>
 
-  <!-- APPLICATIONS -->
+  <!-- APPLICATION LOG -->
   <div class="section">
     <h2>Your Applications</h2>
-    <h3 style="margin-top:10px">Pending</h3><div id="pendingList"></div>
+    <h3>Pending</h3><div id="pendingList"></div>
     <h3>Accepted</h3><div id="acceptedList"></div>
     <h3>Denied</h3><div id="deniedList"></div>
   </div>
 
-  <!-- PROFILE SETTINGS -->
+  <!-- USERNAME -->
   <div class="section">
     <h2>Profile Settings</h2>
     <div class="card">
@@ -214,7 +210,6 @@ footer{text-align:center;opacity:.55;margin-top:40px}
 
     <div class="card" style="border-color:#e74c3c">
       <h3 style="color:#e74c3c">Delete Account</h3>
-      <p>This action is irreversible.</p>
       <button class="action delete" onclick="deleteAccount()">Delete My Account</button>
       <p id="deleteMsg"></p>
     </div>
@@ -229,61 +224,70 @@ const API="https://shoreroleplay.onrender.com";
 const user=JSON.parse(localStorage.getItem("shoreUser"));
 if(!user) location.href="login.html";
 
-/* INIT */
 document.getElementById("username").textContent=user.username;
 document.getElementById("email").textContent=user.email;
-renderRole();
+loadUser();
 loadIdentifiers();
 loadApps();
-loadPFP();
 
-/* LOAD PROFILE PICTURE */
-async function loadPFP(){
+/* LOAD USER INFO + PFP + BIO */
+async function loadUser(){
   const res=await fetch(API+"/users/"+user.id);
   const u=await res.json();
-  document.getElementById("pfp").src=u.pfp||"https://i.imgur.com/8eO8KZB.png";
+
+  document.getElementById("pfpPreview").src=u.pfp||"https://i.imgur.com/8eO8KZB.png";
+  document.getElementById("bio").value = u.bio || "";
+
+  renderRole(u.role);
 }
 
-/* UPDATE PROFILE PICTURE */
-async function updatePFP(){
-  const url=document.getElementById("newPFP").value.trim();
+/* UPLOAD IMAGE FROM PC */
+async function uploadPFP(){
+  const file=document.getElementById("pfpFile").files[0];
   const msg=document.getElementById("pfpMsg");
-  if(!url || !url.match(/^https?:\/\/.*\.(png|jpg|jpeg)$/i))
-    return msg.textContent="Invalid image URL.";
 
-  const r=await fetch(API+"/users/update-pfp",{
+  if(!file) return msg.textContent="Select an image first.";
+
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    const base64=reader.result;
+
+    const r=await fetch(API+"/users/update",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({id:user.id,pfp:base64})
+    });
+
+    msg.textContent=r.ok?"Updated!":"Upload Failed";
+    if(r.ok) setTimeout(()=>location.reload(),800);
+  };
+
+  reader.readAsDataURL(file);
+}
+
+/* SAVE BIO */
+async function saveBio(){
+  const text=document.getElementById("bio").value.trim();
+  const msg=document.getElementById("bioMsg");
+
+  const r=await fetch(API+"/users/update",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({id:user.id,pfp:url})
+    body:JSON.stringify({id:user.id,bio:text})
   });
 
-  if(r.ok){
-    user.pfp=url;
-    localStorage.setItem("shoreUser",JSON.stringify(user));
-    document.getElementById("pfp").src=url;
-    msg.style.color="#2ecc71";
-    msg.textContent="Profile picture updated!";
-  } else {
-    msg.style.color="#e74c3c";
-    msg.textContent="Update failed.";
-  }
+  msg.textContent=r.ok?"Saved!":"Error";
 }
 
-/* ROLE RENDER */
-function renderRole(){
-  const role=user.role||"Civilian";
-  const roleMap={
-    "Head Administrator":"ha",
-    "Internal Affairs":"ia",
-    "Administration":"admin",
-    "Junior Administration":"jadmin",
-    "Senior Staff":"sstaff",
-    "Staff":"staff",
-    "Staff In Training":"sit",
-    "Civilian":"civ"
+/* ROLE */
+function renderRole(role){
+  const map={
+    "Head Administrator":"ha","Internal Affairs":"ia","Administration":"admin",
+    "Junior Administration":"jadmin","Senior Staff":"sstaff",
+    "Staff":"staff","Staff In Training":"sit","Civilian":"civ"
   };
   document.getElementById("roleBadge").innerHTML=
-    `<span class="badge ${roleMap[role]||'civ'}">${role}</span>`;
+  `<span class="badge ${map[role]||'civ'}">${role}</span>`;
 }
 
 /* IDENTIFIERS */
@@ -301,30 +305,13 @@ async function loadApps(){
   const mine=(await res.json()).filter(a=>a.email===user.email);
   const out={pending:"pendingList",accepted:"acceptedList",denied:"deniedList"};
   mine.forEach(a=>{
-    document.getElementById(out[a.status]).innerHTML+=
-    `<div class="card"><strong>${a.department}</strong> — ${new Date(a.submittedAt).toLocaleString()}
-     <span class="status-badge ${a.status}">${a.status.toUpperCase()}</span></div>`;
+    document.getElementById(out[a.status]).innerHTML+=`
+      <div class="card"><strong>${a.department}</strong> — ${new Date(a.submittedAt).toLocaleString()}
+      <span class="status-badge ${a.status}">${a.status.toUpperCase()}</span></div>`;
   });
 }
 
-/* THEME */
-document.getElementById("themeToggle").onclick=()=>{
-  document.body.dataset.theme=document.body.dataset.theme==="light"?"dark":"light";
-};
-
-/* USERNAME CHANGE */
-async function changeUsername(){
-  const v=document.getElementById("newUser").value.trim();
-  const p=document.getElementById("userMsg");
-  if(v.length<3) return p.textContent="Too short.";
-  const r=await fetch(API+"/users/change-username",{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({id:user.id,username:v})
-  });
-  if(r.ok){user.username=v;localStorage.setItem("shoreUser",JSON.stringify(user));p.textContent="Updated!";setTimeout(()=>location.reload(),900)}
-}
-
-/* PASSWORD CHANGE */
+/* PASSWORD */
 document.getElementById("newPass").oninput=e=>{
   const m=document.getElementById("strength"),l=e.target.value.length;
   m.textContent=l<6?"Weak":l<10?"Medium":"Strong";
@@ -342,23 +329,36 @@ async function changePassword(){
   m.textContent=r.ok?"Updated":"Failed";
 }
 
-/* LOGOUT ALL */
-function logoutAll(){
-  localStorage.removeItem("shoreUser");
-  document.getElementById("sessMsg").textContent="All sessions cleared.";
-  setTimeout(()=>location.href="index.html",1200);
+/* CHANGE USERNAME */
+async function changeUsername(){
+  const v=document.getElementById("newUser").value.trim();
+  const p=document.getElementById("userMsg");
+  if(v.length<3) return p.textContent="Too short.";
+  const r=await fetch(API+"/users/change-username",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({id:user.id,username:v})
+  });
+  p.textContent=r.ok?"Updated!":"Failed";
+  if(r.ok){user.username=v;localStorage.setItem("shoreUser",JSON.stringify(user));setTimeout(()=>location.reload(),800);}
 }
 
-/* DELETE ACCOUNT */
+/* DELETE */
 async function deleteAccount(){
   if(!confirm("Are you sure?"))return;
   const r=await fetch(API+"/users/"+user.id,{method:"DELETE"});
-  const m=document.getElementById("deleteMsg");
-  if(r.ok){localStorage.removeItem("shoreUser");m.textContent="Deleted";setTimeout(()=>location.href="index.html",900)}
+  if(r.ok){localStorage.removeItem("shoreUser");location.href="index.html";}
 }
 
-/* LOGOUT BUTTON */
-document.getElementById("logoutBtn").onclick=logoutAll;
+/* LOGOUT */
+document.getElementById("logoutBtn").onclick=()=>{
+  localStorage.removeItem("shoreUser");
+  location.href="index.html";
+};
+
+/* THEME */
+document.getElementById("themeToggle").onclick=()=>{
+  document.body.dataset.theme=document.body.dataset.theme==="light"?"dark":"light";
+};
 </script>
 
 </body>
