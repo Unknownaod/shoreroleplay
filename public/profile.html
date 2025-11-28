@@ -26,14 +26,12 @@ nav{
   display:flex;justify-content:space-between;align-items:center;
   position:fixed;top:0;width:100%;z-index:20;
 }
-nav a{
-  margin-right:28px;font-size:15px;opacity:.85;cursor:pointer;
-}
+nav a{margin-right:28px;font-size:15px;opacity:.85;cursor:pointer}
 nav a:hover{color:#4ea3ff;text-shadow:0 0 12px #4ea3ff}
 
 /* MAIN */
 main{
-  max-width:1000px;
+  max-width:1100px;
   margin:150px auto 60px;
   background:rgba(0,0,0,.75);
   border-radius:14px;
@@ -44,8 +42,13 @@ main{
 
 /* HEADER */
 .profile-header{text-align:center;margin-bottom:32px}
-.profile-header h1{font-size:2.7rem;margin-bottom:6px}
-.profile-header p{opacity:.78;font-size:1rem}
+.profile-header h1{
+  font-size:2.8rem;margin-bottom:6px;
+  display:flex;justify-content:center;align-items:center;gap:10px
+}
+.profile-header img#staffIcon{
+  width:32px;height:32px;border-radius:6px;
+}
 
 /* STAFF BADGE */
 .staff-badge{
@@ -66,17 +69,28 @@ main{
   font-size:1.45rem;margin-bottom:16px;
   border-left:4px solid #4ea3ff;padding-left:10px;
 }
+
+/* PUBLIC INFO BOX */
+.info-box{
+  background:#0c111b;
+  border:1px solid rgba(255,255,255,.14);
+  padding:18px;margin:10px 0;border-radius:10px;
+  font-size:1rem;line-height:1.5;
+}
+
+/* DEPARTMENTS */
 .dept{
   display:flex;align-items:center;
   background:#111722;
   border:1px solid rgba(255,255,255,.14);
-  padding:14px 18px;margin:8px 0;
-  border-radius:10px;
+  padding:14px 18px;margin:8px 0;border-radius:10px;
 }
 .dept img{
   width:52px;height:52px;margin-right:18px;
-  filter:drop-shadow(0 0 10px rgba(0,0,0,.55));
+  filter:drop-shadow(0 0 10px rgba(0,0,0,.55))
 }
+
+/* APPLICATIONS */
 .app-card{
   background:#0b1019;
   border:1px solid rgba(255,255,255,.12);
@@ -84,12 +98,10 @@ main{
   padding:14px;margin:8px 0;
   font-size:.95rem;
 }
-.badge{
-  padding:4px 10px;border-radius:6px;
-  display:inline-block;margin-top:6px;
-  font-size:.78rem;font-weight:600
-}
+.badge{padding:4px 10px;border-radius:6px;font-size:.78rem;font-weight:600}
 .accepted{background:#2ecc71;color:#000}
+.denied{background:#ff4f4f;color:#000}
+.pending{background:#f1c40f;color:#000}
 
 footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem}
 </style>
@@ -113,6 +125,12 @@ footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem
     <p id="subtitle">Fetching profile...</p>
   </div>
 
+  <!-- PUBLIC ACCOUNT INFO -->
+  <div class="section">
+    <h2>Account Information</h2>
+    <div id="infoBox" class="info-box">Loading...</div>
+  </div>
+
   <div class="section">
     <h2>Departments</h2>
     <div id="deptList"></div>
@@ -129,12 +147,12 @@ footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
-const urlParams = new URLSearchParams(window.location.search);
-const profileUsername = urlParams.get("user");
-if(!profileUsername) location.href = "index.html";
+const params = new URLSearchParams(window.location.search);
+const profileName = params.get("user");
+if(!profileName) location.href = "index.html";
 
 /* STAFF ROLE COLOR MAP */
-const roleColor = {
+const roleCSS = {
   "Head Administrator":"ha",
   "Internal Affairs":"ia",
   "Administration":"adm",
@@ -155,29 +173,42 @@ const deptIcons = {
   "DevOps":"https://i.imgur.com/DAlxtWE.png"
 };
 
-/* LOAD PROFILE */
 async function loadProfile(){
   const users = await fetch(API+"/users").then(r=>r.json());
-  const user = users.find(u => u.username.toLowerCase() === profileUsername.toLowerCase());
+  const u = users.find(x => x.username.toLowerCase() === profileName.toLowerCase());
 
-  document.getElementById("username").textContent = profileUsername;
-  const subtitleEl = document.getElementById("subtitle");
+  document.getElementById("username").textContent = profileName;
 
-  /* Staff Badge */
-  if(user?.staffRole){
-    subtitleEl.innerHTML = `
-      Shore Roleplay Staff —
-      <span class="staff-badge ${roleColor[user.staffRole]}">${user.staffRole}</span>
+  const subtitle = document.getElementById("subtitle");
+
+  /* STAFF ROLE + TAG + ICON */
+  if(u.role && u.role !== "user"){
+    subtitle.innerHTML = `
+      Verified Staff —
+      <span class="staff-badge ${roleCSS[u.role]}">${u.role}</span>
+      ${u.staffTag ? `· ${u.staffTag}` : ""}
     `;
+    if(u.staffIcon){
+      const icon = document.createElement("img");
+      icon.id = "staffIcon";
+      icon.src = u.staffIcon;
+      document.querySelector("#username").appendChild(icon);
+    }
   } else {
-    subtitleEl.textContent = "Shore Roleplay Member";
+    subtitle.textContent = "Shore Roleplay Member";
   }
 
-  /* Fetch applications */
-  const apps = await fetch(API+"/applications").then(r=>r.json());
-  const userApps = apps.filter(a => a.username.toLowerCase() === profileUsername.toLowerCase());
-  const accepted = userApps.filter(a => a.status === "accepted");
+  /* PUBLIC ACCOUNT INFO */
+  document.getElementById("infoBox").innerHTML = `
+    <strong>Member Since:</strong> ${new Date(u.createdAt).toLocaleDateString()}<br>
+    <strong>Last Seen:</strong> ${u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : "Never Logged In"}
+  `;
 
+  /* APPLICATIONS */
+  const apps = await fetch(API+"/applications").then(r=>r.json());
+  const userApps = apps.filter(a => a.username.toLowerCase() === profileName.toLowerCase());
+
+  const accepted = userApps.filter(a => a.status === "accepted");
   const deptList = document.getElementById("deptList");
   const appsList = document.getElementById("appsList");
 
@@ -185,19 +216,20 @@ async function loadProfile(){
     deptList.innerHTML = "<p>No accepted departments yet.</p>";
   }
 
-  accepted.forEach(app => {
+  accepted.forEach(app=>{
     deptList.innerHTML += `
       <div class="dept">
         <img src="${deptIcons[app.department] || deptIcons['Civilian Operations']}">
-        <div>
-          <strong>${app.department}</strong><br>Active Department Member
-        </div>
+        <div><strong>${app.department}</strong><br>Active Department Member</div>
       </div>
     `;
+  });
+
+  userApps.forEach(app=>{
     appsList.innerHTML += `
       <div class="app-card">
         <strong>${app.department}</strong> — ${new Date(app.submittedAt).toLocaleDateString()}
-        <div class="badge accepted">ACCEPTED</div>
+        <div class="badge ${app.status}">${app.status.toUpperCase()}</div>
       </div>
     `;
   });
