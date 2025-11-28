@@ -16,67 +16,67 @@ body{
   color:#fff;overflow-x:hidden;
 }
 
-/* NAV (consistent across site) */
+/* NAV */
 nav{
-  display:flex;justify-content:flex-start;align-items:center;
-  padding:18px 60px;
-  background:rgba(0,0,0,.45);
-  backdrop-filter:blur(18px);
+  display:flex;align-items:center;
+  padding:18px 60px;background:rgba(0,0,0,.45);
   border-bottom:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(18px);
   position:fixed;top:0;width:100%;z-index:100;
 }
 nav a,nav span{
-  color:#dfe6ff;text-decoration:none;font-size:15px;
-  margin-right:32px;font-weight:500;transition:.25s;
+  margin-right:32px;text-decoration:none;color:#dfe6ff;
+  font-size:15px;font-weight:500;transition:.25s;
 }
 nav a:hover{color:#4ea3ff;text-shadow:0 0 10px #4ea3ff}
 nav span{opacity:.45;cursor:default}
 
-/* LOGIN CONTAINER */
+/* CONTAINER */
 main{
-  max-width:500px;margin:auto;
-  padding:180px 20px 60px;text-align:center;
+  max-width:500px;margin:auto;padding:180px 20px 60px;text-align:center;
 }
 form{
   background:rgba(10,12,18,.78);
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.1);
-  padding:45px;
+  border-radius:14px;padding:45px;
   backdrop-filter:blur(25px);
+  border:1px solid rgba(255,255,255,.1);
   box-shadow:0 0 35px rgba(0,0,0,.6);
-  text-align:left;
-  animation:fadeIn .7s ease forwards;
+  animation:fadeIn .7s ease forwards;text-align:left;
 }
-@keyframes fadeIn{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(25px)}to{opacity:1}}
 
-h1{font-size:2.7rem;margin-bottom:14px;text-align:center}
+h1{text-align:center;font-size:2.7rem;margin-bottom:12px}
 
-label{display:block;margin-top:22px;font-size:15px;font-weight:600;opacity:.9}
+label{display:block;margin-top:22px;font-weight:600;opacity:.9;font-size:15px}
 input{
-  width:100%;padding:15px;border-radius:10px;
-  border:1px solid rgba(255,255,255,.18);
-  background:#0c111a;color:#fff;margin-top:6px;
-  font-size:15px;transition:.3s;
+  width:100%;padding:15px;margin-top:6px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.18);background:#0c111a;
+  color:#fff;font-size:15px;transition:.3s;
 }
 input:focus{border-color:#4ea3ff;box-shadow:0 0 10px #4ea3ff;outline:none}
 
+/* PASSWORD TOGGLE */
+.pass-wrapper{position:relative}
+.pass-wrapper img{
+  position:absolute;top:50%;right:15px;transform:translateY(-50%);
+  width:22px;height:22px;cursor:pointer;opacity:.75;
+}
+.pass-wrapper img:hover{opacity:1}
+
+/* BUTTON */
 button{
-  margin-top:32px;width:100%;padding:16px;
-  border-radius:10px;border:none;
-  background:#4ea3ff;color:#fff;font-size:17px;
+  margin-top:32px;width:100%;padding:16px;border-radius:10px;
+  border:none;background:#4ea3ff;color:#fff;font-size:17px;
   font-weight:600;cursor:pointer;transition:.3s;
-  box-shadow:0 0 18px rgba(78,163,255,.45);
 }
 button:hover{transform:translateY(-3px);box-shadow:0 0 28px rgba(78,163,255,.85)}
 
-small{text-align:center;display:block;margin-top:18px;font-size:.9rem;opacity:.75}
+small{display:block;margin-top:18px;text-align:center;opacity:.75}
 small a{color:#4ea3ff;text-decoration:none}
 small a:hover{text-shadow:0 0 10px #4ea3ff}
 
-/* ALERT */
-#msg{margin-top:20px;font-size:1rem;min-height:25px;font-weight:600;text-align:center}
-
-footer{opacity:.55;text-align:center;margin-top:50px;padding:20px;font-size:.85rem}
+#msg{margin-top:20px;text-align:center;font-weight:600}
+footer{text-align:center;margin-top:50px;opacity:.55;font-size:.85rem}
 </style>
 </head>
 <body>
@@ -98,7 +98,10 @@ footer{opacity:.55;text-align:center;margin-top:50px;padding:20px;font-size:.85r
     <input type="email" id="email" placeholder="you@example.com" required>
 
     <label>Password</label>
-    <input type="password" id="password" placeholder="Enter your password" required>
+    <div class="pass-wrapper">
+      <input type="password" id="password" placeholder="Enter your password" required>
+      <img id="togglePass" src="https://cdn-icons-png.flaticon.com/512/709/709612.png">
+    </div>
 
     <button type="submit">Sign In</button>
     <small>Don't have an account? <a href="register.html">Register</a></small>
@@ -112,72 +115,79 @@ footer{opacity:.55;text-align:center;margin-top:50px;padding:20px;font-size:.85r
 <script>
 const API = "https://shoreroleplay.onrender.com";
 
-// Generate a hardware fingerprint (simple persistent client ID)
+/* ==========================
+   PERSISTENT HWID GENERATION
+========================== */
+function generateHWID() {
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return [...arr].map(x => x.toString(16).padStart(2,"0")).join("");
+}
+
 function getHWID() {
   let hwid = localStorage.getItem("shoreHWID");
   if (!hwid) {
-    hwid = crypto.randomUUID();
+    hwid = generateHWID();
     localStorage.setItem("shoreHWID", hwid);
   }
   return hwid;
 }
 
-// Capture public IP
-async function getIP() {
-  try {
-    const res = await fetch("https://api.ipify.org?format=json");
-    const data = await res.json();
-    return data.ip || "unknown";
-  } catch {
-    return "unknown";
-  }
-}
+/* ==========================
+   PASSWORD TOGGLE
+========================== */
+document.getElementById("togglePass").onclick = () => {
+  const field = document.getElementById("password");
+  field.type = field.type === "password" ? "text" : "password";
+};
 
+/* ==========================
+   LOGIN HANDLER
+========================== */
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const email = emailField.value.trim();
+  const password = passwordField.value.trim();
   const msg = document.getElementById("msg");
-  const hwid = getHWID();
-  const ip = await getIP();
 
   if (!email || !password) {
-    msg.style.color = "#e74c3c";
-    msg.textContent = "Please enter your email and password.";
+    msg.style.color="#e74c3c";
+    msg.textContent="Please enter your login details.";
     return;
   }
 
+  const hwid = getHWID();
+
   const res = await fetch(API + "/users/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, hwid, ip })
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ email, password, hwid })
   });
 
   const data = await res.json();
 
   if (!data.success) {
-    msg.style.color = "#e74c3c";
-    msg.textContent = data.error || "❌ Invalid credentials";
+    msg.style.color="#e74c3c";
+    msg.textContent=data.error || "❌ Invalid credentials";
     return;
   }
 
-  // 🔥 USER IS BANNED → REDIRECT
   if (data.user.banned) {
-    window.location.href = `banned.html?reason=${encodeURIComponent(data.user.banReason || "No reason provided")}`;
+    location.href = `banned.html?reason=${encodeURIComponent(data.user.banReason || "No reason provided")}`;
     return;
   }
 
-  // Save logged-in user to local session
   localStorage.setItem("shoreUser", JSON.stringify(data.user));
+  msg.style.color="#2ecc71";
+  msg.textContent="✔ Login successful! Redirecting...";
 
-  msg.style.color = "#2ecc71";
-  msg.textContent = "✔ Login successful! Redirecting...";
-
-  setTimeout(() => {
-    window.location.href = "apply.html"; 
-  }, 1200);
+  setTimeout(() => location.href="index.html", 900);
 });
+
+// quick refs
+const emailField = document.getElementById("email");
+const passwordField = document.getElementById("password");
 </script>
 
 </body>
