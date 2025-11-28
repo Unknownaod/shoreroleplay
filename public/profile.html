@@ -44,7 +44,13 @@ main{
 .profile-header{text-align:center;margin-bottom:32px}
 .profile-header h1{
   font-size:2.8rem;margin-bottom:6px;
-  display:flex;justify-content:center;align-items:center;gap:10px
+  display:flex;justify-content:center;align-items:center;gap:12px
+}
+#pfp{
+  width:64px;height:64px;border-radius:10px;
+  object-fit:cover;
+  border:2px solid #4ea3ff;
+  box-shadow:0 0 14px rgba(78,163,255,.45);
 }
 
 /* STAFF BADGE */
@@ -117,7 +123,8 @@ footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem
 <main>
 
   <div class="profile-header">
-    <h1 id="username">Loading...</h1>
+    <!-- PROFILE PICTURE NOW INCLUDED -->
+    <h1><img id="pfp" src=""> <span id="username">Loading...</span></h1>
     <p id="subtitle">Fetching profile...</p>
   </div>
 
@@ -146,7 +153,7 @@ const params=new URLSearchParams(window.location.search);
 const profileUsername=params.get("user");
 if(!profileUsername) location.href="index.html";
 
-/* STAFF ROLES */
+/* STAFF COLORS */
 const roleColor={
   "Head Administrator":"ha",
   "Internal Affairs":"ia",
@@ -167,7 +174,7 @@ const deptIcons={
   "Civilian Operations":"https://i.imgur.com/DZBwCeX.png"
 };
 
-/* ROLES THAT COUNT AS ALL DEPARTMENTS */
+/* ALL-DEPARTMENT ROLES */
 const ADMIN_ROLES=["Head Administrator","Internal Affairs","Administration"];
 
 async function loadProfile(){
@@ -175,26 +182,30 @@ async function loadProfile(){
   const u=users.find(x=>x.username.toLowerCase()===profileUsername.toLowerCase());
   if(!u) return document.getElementById("username").textContent="User Not Found";
 
+  /* Username */
   document.getElementById("username").textContent=u.username;
 
-  /* SUBTITLE / STAFF TAG */
-  const subtitle=document.getElementById("subtitle");
-  if(u.role!=="user"){
-    subtitle.innerHTML=`Staff Member — <span class="staff-badge ${roleColor[u.role]||""}">${u.role}</span>`;
-  } else subtitle.textContent="Shore Roleplay Member";
+  /* Profile Picture */
+  document.getElementById("pfp").src=u.pfp || "https://i.imgur.com/8eO8KZB.png";
 
-  /* ACCOUNT INFO (NON PRIVATE) */
+  /* Subtitle / Staff Badge */
+  const st=document.getElementById("subtitle");
+  if(u.role!=="user"){
+    st.innerHTML=`Staff Member — <span class="staff-badge ${roleColor[u.role]||""}">${u.role}</span>`;
+  } else st.textContent="Shore Roleplay Member";
+
+  /* Public Info */
   document.getElementById("infoBox").innerHTML=`
     <strong>Username:</strong> ${u.username}<br>
     <strong>Role:</strong> ${u.role}<br>
     <strong>Joined:</strong> ${u.createdAt?new Date(u.createdAt).toLocaleDateString():"Unknown"}
   `;
 
-  /* APPLICATIONS */
+  /* Applications */
   const apps=await fetch(API+"/applications").then(r=>r.json());
   const myApps=apps.filter(a=>a.username.toLowerCase()===profileUsername.toLowerCase());
-
   const appsList=document.getElementById("appsList");
+
   myApps.forEach(app=>{
     appsList.innerHTML+=`
       <div class="app-card">
@@ -203,14 +214,15 @@ async function loadProfile(){
       </div>`;
   });
 
-  /* DEPARTMENTS */
+  /* Departments */
   const dept=document.getElementById("deptList");
 
   if(ADMIN_ROLES.includes(u.role)){
     Object.keys(deptIcons).forEach(d=>{
       dept.innerHTML+=`
       <div class="dept">
-        <img src="${deptIcons[d]}"><div><strong>${d}</strong><br>Administrative Access</div>
+        <img src="${deptIcons[d]}">
+        <div><strong>${d}</strong><br>Administrative Access</div>
       </div>`;
     });
   } else {
@@ -219,11 +231,13 @@ async function loadProfile(){
     accepted.forEach(app=>{
       dept.innerHTML+=`
       <div class="dept">
-        <img src="${deptIcons[app.department]}"><div><strong>${app.department}</strong><br>Active Department Member</div>
+        <img src="${deptIcons[app.department]}">
+        <div><strong>${app.department}</strong><br>Active Department Member</div>
       </div>`;
     });
   }
 }
+
 loadProfile();
 </script>
 
