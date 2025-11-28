@@ -109,7 +109,7 @@ document.getElementById("registerForm").addEventListener("submit", async(e)=>{
     password: password.value.trim()
   };
 
-  const res = await fetch(API + "/register",{
+  const res = await fetch(API + "/users/register",{
     method:"POST",
     headers:{ "Content-Type":"application/json" },
     body: JSON.stringify(body)
