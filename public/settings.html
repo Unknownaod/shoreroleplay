@@ -234,25 +234,26 @@ async function changePassword(){
 }
 
 /* DELETE ACCOUNT */
-async function deleteAccount(){
-  if(!confirm("⚠ Are you sure you want to delete your account? This cannot be undone.")) return;
+async function deleteAccount() {
+  if (!confirm("⚠ Are you sure you want to delete your account? This cannot be undone.")) return;
 
-  const res = await fetch(API + "/users/delete",{
-    method:"DELETE",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ email:user.email })
+  const user = JSON.parse(localStorage.getItem("shoreUser"));
+  if (!user) return alert("Not logged in.");
+
+  const res = await fetch(`${API}/users/${user.id}`, {
+    method: "DELETE"
   });
 
-  const msg=document.getElementById("deleteMsg");
+  const msg = document.getElementById("deleteMsg");
 
-  if(res.ok){
-    msg.style.color="#2ecc71";
-    msg.textContent="✔ Account deleted.";
+  if (res.ok) {
+    msg.style.color = "#2ecc71";
+    msg.textContent = "✔ Account deleted.";
     localStorage.removeItem("shoreUser");
-    setTimeout(()=>location.href="index.html",1500);
-  }else{
-    msg.style.color="#e74c3c";
-    msg.textContent="❌ Unable to delete account.";
+    setTimeout(() => location.href = "index.html", 1500);
+  } else {
+    msg.style.color = "#e74c3c";
+    msg.textContent = "❌ Unable to delete account.";
   }
 }
 </script>
