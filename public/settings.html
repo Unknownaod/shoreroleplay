@@ -5,19 +5,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+:root {
+  --accent:#4ea3ff;
+  --bg:#000000c7;
+  --card:#0c111a;
+  --text:#fff;
+}
+[data-theme="light"] {
+  --bg:#e8ecf6;
+  --card:#ffffff;
+  --text:#000;
+  --accent:#2c6ae8;
+}
 body{
   font-family:"Inter",sans-serif;
   background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
-  color:#fff;overflow-x:hidden;
+  color:var(--text);overflow-x:hidden;
+  transition:.3s;
 }
-a{color:#4ea3ff;text-decoration:none}
-
-/* NAV */
 nav{
   background:rgba(0,0,0,.55);
   backdrop-filter:blur(18px);
@@ -27,72 +36,73 @@ nav{
   position:fixed;top:0;width:100%;z-index:20;
 }
 nav .nav-left a{
-  margin-right:28px;font-size:15px;opacity:.85;
+  margin-right:28px;font-size:15px;opacity:.85;color:#dbe6ff;
 }
 nav .nav-left a:hover{
-  color:#4ea3ff;text-shadow:0 0 10px #4ea3ff;
+  color:var(--accent);text-shadow:0 0 10px var(--accent);
 }
-#logoutBtn{
-  font-weight:600;font-size:15px;cursor:pointer;
-  background:#4ea3ff;padding:8px 16px;border-radius:8px;
+.nav-right{display:flex;align-items:center;gap:14px}
+button.btn{
+  background:var(--accent);padding:8px 16px;border-radius:8px;
+  border:none;color:#fff;font-weight:600;cursor:pointer;
   box-shadow:0 0 12px rgba(78,163,255,.4);
 }
 
 /* MAIN */
 main{
   max-width:1100px;margin:140px auto 60px;
-  background:rgba(0,0,0,.75);border-radius:14px;
+  background:var(--bg);border-radius:14px;
   border:1px solid rgba(255,255,255,.1);
   box-shadow:0 0 45px rgba(0,0,0,.6);padding:40px;
 }
-
 h1{font-size:2.6rem;margin-bottom:8px}
-.sub{opacity:.75;margin-bottom:28px;font-size:1.1rem}
+.sub{opacity:.75;margin-bottom:28px;font-size:1.08rem}
 
-/* SECTION */
+/* CARDS */
 .section{margin-top:38px}
 .section h2{
   font-size:1.45rem;margin-bottom:12px;
-  border-left:4px solid #4ea3ff;padding-left:10px;
+  border-left:4px solid var(--accent);padding-left:10px;
 }
 .card{
-  background:#0c111a;border-radius:10px;
+  background:var(--card);border-radius:10px;
   border:1px solid rgba(255,255,255,.12);
-  padding:16px;margin:8px 0;font-size:.95rem;
+  padding:18px;margin:8px 0;font-size:.95rem;
 }
 input{
   width:100%;padding:14px;border-radius:8px;
   border:1px solid rgba(255,255,255,.2);
-  background:#0c111a;color:#fff;margin-top:8px;
+  background:var(--card);color:var(--text);margin-top:8px;
 }
-input:focus{border-color:#4ea3ff;outline:none}
+input:focus{border-color:var(--accent);outline:none}
 button.action{
-  margin-top:14px;padding:12px 16px;width:100%;
-  background:#4ea3ff;border:none;color:#fff;
+  margin-top:10px;padding:12px 16px;width:100%;
+  background:var(--accent);border:none;color:#fff;
   font-weight:600;border-radius:8px;cursor:pointer;
 }
 button.action:hover{filter:brightness(1.1)}
-button.delete{
-  background:#e74c3c;margin-top:18px;
+.delete{background:#e74c3c}
+
+/* BADGES */
+.badge{
+  padding:5px 10px;border-radius:6px;font-size:.8rem;font-weight:600;
+  display:inline-block;margin-top:3px;
 }
-#msg,#deleteMsg{margin-top:12px;font-weight:600;text-align:center}
-.status-badge{
-  display:inline-block;padding:3px 8px;border-radius:6px;
-  margin-top:6px;font-size:.78rem;font-weight:600;
-}
+.user{background:#4ea3ff22;border:1px solid #4ea3ff}
+.staff{background:#ffd00033;border:1px solid #ffd000;color:#ffd000}
+.ha{background:#ff3b3b33;border:1px solid #ff3b3b;color:#ff7979}
+
+.status-badge{display:inline-block;padding:3px 8px;border-radius:6px;margin-top:6px;font-size:.78rem;font-weight:600}
 .pending{background:#ffb703;color:#000}
 .denied{background:#e74c3c}
 .accepted{background:#2ecc71;color:#000}
 
-.dept{
-  background:#111722;border:1px solid rgba(255,255,255,.14);
-  display:flex;align-items:center;padding:12px 16px;
-  border-radius:10px;margin:8px 0;
-}
-.dept img{
-  width:48px;height:48px;margin-right:14px;
-}
 footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
+.toggle{
+  cursor:pointer;font-weight:600;padding:6px 10px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.3);
+  background:rgba(0,0,0,.35);
+}
 </style>
 </head>
 <body>
@@ -104,52 +114,70 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
     <a href="rules.html">Rules</a>
     <a href="apply.html">Apply</a>
   </div>
-  <div id="logoutBtn">Logout</div>
+  <div class="nav-right">
+    <span id="themeToggle" class="toggle">🌗 Theme</span>
+    <button class="btn" id="logoutBtn">Logout</button>
+  </div>
 </nav>
 
 <main>
   <h1 id="username">Loading...</h1>
   <p class="sub" id="email"></p>
+  <p id="roleBadge"></p>
 
-  <!-- APPLICATION SECTIONS -->
+  <!-- ACCOUNT IDENTIFIERS -->
   <div class="section">
-    <h2>Pending Applications</h2>
-    <div id="pendingList"></div>
+    <h2>Your System Identifier</h2>
+    <div class="card">
+      <strong>HWID:</strong> <span id="hwid"></span><br>
+      <strong>Last Login IP:</strong> <span id="lastIP"></span><br>
+      <strong>Last Login:</strong> <span id="lastLogin"></span>
+    </div>
   </div>
 
+  <!-- APPLICATIONS -->
   <div class="section">
-    <h2>Denied Applications</h2>
-    <div id="deniedList"></div>
+    <h2>Your Applications</h2>
+    <h3 style="margin-top:10px">Pending</h3><div id="pendingList"></div>
+    <h3>Accepted</h3><div id="acceptedList"></div>
+    <h3>Denied</h3><div id="deniedList"></div>
   </div>
 
+  <!-- USERNAME CHANGE -->
   <div class="section">
-    <h2>Accepted Applications</h2>
-    <div id="acceptedList"></div>
+    <h2>Profile Settings</h2>
+    <div class="card">
+      <label>Change Username</label>
+      <input id="newUser" placeholder="New username">
+      <button class="action" onclick="changeUsername()">Update Username</button>
+      <p id="userMsg"></p>
+    </div>
   </div>
 
-  <div class="section">
-    <h2>Your Current Departments</h2>
-    <div id="deptList"></div>
-  </div>
-
-  <!-- ACCOUNT SETTINGS -->
+  <!-- PASSWORD -->
   <div class="section">
     <h2>Account Security</h2>
-
     <div class="card">
       <label>New Password</label>
-      <input type="password" id="newPass" placeholder="Enter new password">
-
+      <input type="password" id="newPass">
       <label>Confirm Password</label>
-      <input type="password" id="confirmPass" placeholder="Re-enter new password">
-
+      <input type="password" id="confirmPass">
+      <div id="strength"></div>
       <button class="action" onclick="changePassword()">Update Password</button>
       <p id="msg"></p>
     </div>
 
+    <!-- SESSION -->
+    <div class="card">
+      <h3>Session Management</h3>
+      <button class="action" onclick="logoutAll()">Logout All Devices</button>
+      <p id="sessMsg"></p>
+    </div>
+
+    <!-- DELETE -->
     <div class="card" style="border-color:#e74c3c">
       <h3 style="color:#e74c3c">Delete Account</h3>
-      <p>This action is irreversible and removes ALL applications and user data.</p>
+      <p>This action is irreversible.</p>
       <button class="action delete" onclick="deleteAccount()">Delete My Account</button>
       <p id="deleteMsg"></p>
     </div>
@@ -157,105 +185,94 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
 
 </main>
 
-<footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
+<footer>© 2025 Shore Roleplay</footer>
 
 <script>
-const API = "https://shoreroleplay.onrender.com";
-const user = JSON.parse(localStorage.getItem("shoreUser")); // FIXED
+const API="https://shoreroleplay.onrender.com";
+const user=JSON.parse(localStorage.getItem("shoreUser"));
+if(!user) location.href="login.html";
 
-if (!user) location.href = "login.html";
-
-document.getElementById("username").textContent = user.username;
-document.getElementById("email").textContent = user.email;
-
-document.getElementById("logoutBtn").onclick = () => {
-  localStorage.removeItem("shoreUser"); // FIXED
-  location.href = "index.html";
-};
-
-/* LOAD APPLICATIONS */
-async function loadApps(){
-  const res = await fetch(API + "/applications");
-  const apps = await res.json();
-  const mine = apps.filter(a => a.email.toLowerCase() === user.email.toLowerCase());
-
-  const pending=document.getElementById("pendingList");
-  const denied=document.getElementById("deniedList");
-  const accepted=document.getElementById("acceptedList");
-  const dept=document.getElementById("deptList");
-
-  pending.innerHTML = denied.innerHTML = accepted.innerHTML = dept.innerHTML = "";
-
-  mine.forEach(app=>{
-    if(app.status==="pending") pending.innerHTML+=card(app,"pending");
-    if(app.status==="denied") denied.innerHTML+=card(app,"denied");
-    if(app.status==="accepted"){
-      accepted.innerHTML+=card(app,"accepted");
-      dept.innerHTML+=department(app.department);
-    }
-  });
-}
-function card(app,status){
-  return `<div class="card">
-  <strong>${app.department}</strong> — ${new Date(app.submittedAt).toLocaleString()}
-  <div class="status-badge ${status}">${status.toUpperCase()}</div></div>`;
-}
-function department(name){
-  return `<div class="dept">
-  <img src="/"><div><strong>${name}</strong><br>Active Department Member</div></div>`;
-}
+/* USER UI INIT */
+document.getElementById("username").textContent=user.username;
+document.getElementById("email").textContent=user.email;
+renderRole();
+loadIdentifiers();
 loadApps();
 
-/* CHANGE PASSWORD */
+/* BADGES */
+function renderRole(){
+  let badge="user";
+  if(user.role==="HA") badge="ha";
+  if(user.role==="staff") badge="staff";
+  document.getElementById("roleBadge").innerHTML=`<span class="badge ${badge}">${badge.toUpperCase()}</span>`;
+}
+
+/* IDENTIFIERS */
+async function loadIdentifiers(){
+  const res=await fetch(API+"/users/"+user.id);
+  const u=await res.json();
+  document.getElementById("hwid").textContent=u.hwid||"—";
+  document.getElementById("lastIP").textContent=u.lastIP||"—";
+  document.getElementById("lastLogin").textContent=u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString():"—";
+}
+
+/* APPLICATIONS */
+async function loadApps(){
+  const res=await fetch(API+"/applications");
+  const mine=(await res.json()).filter(a=>a.email===user.email);
+  const cats={pending:"pendingList",accepted:"acceptedList",denied:"deniedList"};
+  mine.forEach(a=>{
+    document.getElementById(cats[a.status]).innerHTML+=
+      `<div class="card"><strong>${a.department}</strong> — ${new Date(a.submittedAt).toLocaleString()}
+      <span class="status-badge ${a.status}">${a.status.toUpperCase()}</span></div>`;
+  });
+}
+
+/* THEME */
+document.getElementById("themeToggle").onclick=()=>{
+  document.body.dataset.theme=document.body.dataset.theme==="light"?"dark":"light";
+};
+
+/* USERNAME */
+async function changeUsername(){
+  const n=document.getElementById("newUser").value.trim();
+  const p=document.getElementById("userMsg");
+  if(n.length<3) return p.textContent="Too short.";
+  const r=await fetch(API+"/users/change-username",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:user.id,username:n})});
+  if(r.ok){user.username=n;localStorage.setItem("shoreUser",JSON.stringify(user));p.textContent="Updated!";setTimeout(()=>location.reload(),800)}
+}
+
+/* PASSWORD + STRENGTH */
+document.getElementById("newPass").oninput=e=>{
+  const m=document.getElementById("strength");
+  const v=e.target.value.length;
+  m.textContent=v<6?"Weak":v<10?"Medium":"Strong";
+  m.style.color=v<6?"#e74c3c":v<10?"#f1c40f":"#2ecc71";
+};
 async function changePassword(){
-  const msg=document.getElementById("msg");
-  const pass=document.getElementById("newPass").value.trim();
-  const conf=document.getElementById("confirmPass").value.trim();
-
-  if(pass.length < 6){
-    msg.style.color="#e74c3c";
-    msg.textContent="Password must be at least 6 characters.";
-    return;
-  }
-  if(pass!==conf){
-    msg.style.color="#e74c3c";
-    msg.textContent="Passwords do not match.";
-    return;
-  }
-
-  const res = await fetch(API + "/users/update-password",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ email:user.email, password:pass })
-  });
-
-  msg.style.color = res.ok ? "#2ecc71" : "#e74c3c";
-  msg.textContent = res.ok ? "✔ Password updated!" : "❌ Failed to update password";
+  const p=document.getElementById("newPass").value.trim();
+  const c=document.getElementById("confirmPass").value.trim();
+  const m=document.getElementById("msg");
+  if(p!==c) return m.textContent="Does not match";
+  const r=await fetch(API+"/users/update-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:user.email,password:p})});
+  m.textContent=r.ok?"Updated":"Failed";
 }
 
-/* DELETE ACCOUNT */
-async function deleteAccount() {
-  if (!confirm("⚠ Are you sure you want to delete your account? This cannot be undone.")) return;
-
-  const user = JSON.parse(localStorage.getItem("shoreUser"));
-  if (!user) return alert("Not logged in.");
-
-  const res = await fetch(`${API}/users/${user.id}`, {
-    method: "DELETE"
-  });
-
-  const msg = document.getElementById("deleteMsg");
-
-  if (res.ok) {
-    msg.style.color = "#2ecc71";
-    msg.textContent = "✔ Account deleted.";
-    localStorage.removeItem("shoreUser");
-    setTimeout(() => location.href = "index.html", 1500);
-  } else {
-    msg.style.color = "#e74c3c";
-    msg.textContent = "❌ Unable to delete account.";
-  }
+/* LOGOUT ALL */
+async function logoutAll(){
+  localStorage.removeItem("shoreUser");
+  document.getElementById("sessMsg").textContent="All sessions cleared.";
+  setTimeout(()=>location.href="index.html",1200);
 }
+
+/* DELETE */
+async function deleteAccount(){
+  if(!confirm("Delete account?"))return;
+  const r=await fetch(API+"/users/"+user.id,{method:"DELETE"});
+  const m=document.getElementById("deleteMsg");
+  if(r.ok){localStorage.removeItem("shoreUser");m.textContent="Deleted";setTimeout(()=>location.href="index.html",1e3)}
+}
+document.getElementById("logoutBtn").onclick=logoutAll;
 </script>
 
 </body>
