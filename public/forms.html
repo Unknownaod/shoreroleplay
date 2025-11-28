@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Shore Roleplay | Community Forums</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Inter",sans-serif;
+  background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+  color:#fff;
+  overflow-x:hidden;
+}
+
+/* NAV */
+nav{
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.12);
+  padding:18px 60px;
+  display:flex;justify-content:space-between;align-items:center;
+  position:fixed;top:0;width:100%;z-index:50;
+}
+nav a{
+  margin-right:26px;font-size:15px;color:#d0e2ff;
+  text-decoration:none;transition:.2s;
+}
+nav a:hover{color:#4ea3ff}
+#logoutBtn{
+  background:#4ea3ff;padding:8px 16px;border-radius:7px;
+  cursor:pointer;font-weight:600;box-shadow:0 0 14px #4ea3ff;
+}
+
+/* MAIN */
+main{
+  max-width:1200px;margin:140px auto 60px;padding:0 20px;
+}
+.section-title{font-size:2.2rem;margin-bottom:18px}
+
+/* CATEGORIES */
+.category{
+  background:rgba(0,0,0,.65);
+  border:1px solid rgba(255,255,255,.12);
+  padding:18px 24px;border-radius:12px;margin-bottom:14px;
+  cursor:pointer;transition:.25s;
+}
+.category:hover{
+  border-color:#4ea3ff;
+  background:rgba(78,163,255,.18);
+}
+.category h3{font-size:1.3rem;font-weight:600}
+.category p{opacity:.75;margin-top:6px;font-size:.9rem}
+
+/* THREAD LIST */
+.thread{
+  background:rgba(0,0,0,.45);
+  border:1px solid rgba(255,255,255,.1);
+  padding:16px 20px;border-radius:10px;
+  margin-bottom:10px;cursor:pointer;transition:.2s;
+}
+.thread:hover{background:rgba(255,255,255,.08)}
+.thread .meta{opacity:.7;font-size:.78rem;margin-top:4px}
+
+/* POST BUTTON */
+#createThreadBtn{
+  background:#4ea3ff;padding:12px 20px;border-radius:10px;
+  font-weight:600;font-size:15px;cursor:pointer;
+  margin:18px 0;display:none; /* HIDDEN UNTIL VERIFIED */
+  box-shadow:0 0 16px #4ea3ff;
+}
+#lockedMsg{
+  padding:14px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,0,0,.15);
+  font-size:.95rem;margin:18px 0;display:none;
+}
+
+/* MODAL */
+#modal{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,.7);
+  display:none;justify-content:center;align-items:center;
+}
+.modal-box{
+  background:#0d1119;padding:28px;width:500px;
+  border-radius:12px;border:1px solid rgba(255,255,255,.12);
+}
+input,textarea{
+  width:100%;margin-top:10px;padding:12px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.2);
+  background:#111722;color:#fff;
+}
+textarea{height:130px;resize:none}
+button{
+  margin-top:14px;padding:12px 18px;border-radius:8px;
+  border:none;cursor:pointer;font-weight:600;
+}
+.btn-primary{background:#4ea3ff}
+.btn-close{background:#e74c3c}
+footer{text-align:center;margin-top:40px;opacity:.5}
+</style>
+</head>
+<body>
+
+<nav>
+  <div>
+    <a href="index.html">Home</a>
+    <a href="apply.html">Apply</a>
+    <a href="forums.html" style="color:#4ea3ff">Forums</a>
+  </div>
+  <div id="logoutBtn">Logout</div>
+</nav>
+
+<main>
+  <h1 class="section-title">Community Forums</h1>
+  <p style="opacity:.75;margin-bottom:18px;">Discuss roleplay, departments, ideas, and more.</p>
+
+  <!-- LOCKED INFO -->
+  <div id="lockedMsg">
+    🚫 You must be an **accepted member of a department** to create posts or reply.
+    <br>Apply here: <a href="apply.html" style="color:#4ea3ff">Application Page</a>
+  </div>
+
+  <!-- CREATE THREAD BUTTON -->
+  <button id="createThreadBtn" onclick="openModal()">+ Start New Discussion</button>
+
+  <!-- FORUM CATEGORIES -->
+  <div class="category" onclick="loadThreads('general')">
+    <h3>General Discussion</h3>
+    <p>Talk about anything related to the server.</p>
+  </div>
+
+  <div class="category" onclick="loadThreads('departments')">
+    <h3>Departments</h3>
+    <p>Share SOP ideas, announcements, and unit coordination.</p>
+  </div>
+
+  <div class="category" onclick="loadThreads('technical')">
+    <h3>Technical Support</h3>
+    <p>Report bugs, request features, discuss CAD systems.</p>
+  </div>
+
+  <div id="threads"></div>
+</main>
+
+<!-- CREATE THREAD MODAL -->
+<div id="modal">
+  <div class="modal-box">
+    <h2>Create Thread</h2>
+    <input id="threadTitle" placeholder="Thread Title">
+    <textarea id="threadBody" placeholder="Write your post..."></textarea>
+    <button class="btn-primary" onclick="createThread()">Post Thread</button>
+    <button class="btn-close" onclick="closeModal()">Cancel</button>
+  </div>
+</div>
+
+<footer>© Shore Roleplay 2025</footer>
+
+<script>
+const API = "https://shoreroleplay.onrender.com";
+const user = JSON.parse(localStorage.getItem("shoreUser"));
+if(!user) location.href = "login.html";
+document.getElementById("logoutBtn").onclick = () => {
+  localStorage.removeItem("shoreUser"); location.href="index.html";
+};
+
+/* VERIFY IF USER CAN POST */
+async function verifyPermissions(){
+  const apps = await fetch(API+"/applications").then(r=>r.json());
+  const accepted = apps.filter(a => a.email.toLowerCase() === user.email.toLowerCase() && a.status==="accepted");
+
+  if(accepted.length > 0){
+    document.getElementById("createThreadBtn").style.display="block";
+  } else {
+    document.getElementById("lockedMsg").style.display="block";
+  }
+}
+verifyPermissions();
+
+/* THREAD LOADERS (placeholder) */
+function loadThreads(cat){
+  document.getElementById("threads").innerHTML =
+  `<div class="thread"><strong>Example Thread for ${cat}</strong>
+  <div class="meta">Posted by System — Never</div></div>`;
+}
+
+/* MODAL CONTROLS */
+function openModal(){ document.getElementById("modal").style.display="flex"; }
+function closeModal(){ document.getElementById("modal").style.display="none"; }
+
+/* THREAD CREATION (READY FOR BACKEND ROUTE) */
+async function createThread(){
+  const title = document.getElementById("threadTitle").value.trim();
+  const body = document.getElementById("threadBody").value.trim();
+
+  if(title.length < 4 || body.length < 10) return alert("Write more content.");
+
+  alert("Thread posting is connected — backend endpoint needed.\n(This is ready to plug into /threads)");
+  closeModal();
+}
+</script>
+
+</body>
+</html>
