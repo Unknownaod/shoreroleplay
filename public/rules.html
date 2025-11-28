@@ -18,7 +18,7 @@
       overflow-x:hidden;
     }
 
-    /* NAVIGATION (IDENTICAL TO HOME) */
+    /* NAVIGATION */
     nav{
       display:flex;justify-content:space-between;align-items:center;
       padding:18px 70px;
@@ -29,10 +29,19 @@
       animation:navFade .7s ease forwards;
     }
     @keyframes navFade{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-    nav a{
-      color:#fff;text-decoration:none;margin-right:32px;font-weight:500;transition:.25s;
+
+    nav a, nav span{
+      color:#fff;text-decoration:none;
+      margin-right:32px;font-weight:500;
+      transition:.25s;cursor:pointer;
     }
-    nav a:hover{color:#4ea3ff;text-shadow:0 0 12px #4ea3ff}
+    nav a:hover{
+      color:#4ea3ff;text-shadow:0 0 12px #4ea3ff;
+    }
+    nav span{
+      opacity:.45;cursor:default;
+    }
+
     .nav-links{display:flex;gap:32px}
 
     /* HERO */
@@ -41,7 +50,8 @@
       background:url('https://i.imgur.com/vbt5BPF.jpeg') center/cover no-repeat fixed;
       display:flex;justify-content:center;align-items:center;
       flex-direction:column;text-align:center;
-      padding-top:60px;animation:fadeIn 1.4s ease forwards;
+      padding-top:60px;
+      animation:fadeIn 1.4s ease forwards;
     }
     @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
@@ -96,10 +106,11 @@
 <!-- NAV -->
 <nav>
   <div class="nav-links">
-    <a href="/">Home</a>
-    <span style="opacity:.55;">Rules</span>
-    <a href="/apply.html">Apply</a>
-    <a href="/staff.html">Staff Panel</a>
+    <a href="index.html">Home</a>
+    <span>Rules</span>
+    <a href="departments.html">Departments</a>
+    <a href="apply.html">Apply</a>
+    <a href="staff.html">Staff Panel</a>
   </div>
 </nav>
 
@@ -121,7 +132,7 @@
 
   <h2 class="section-title">2 — Roleplay Standards</h2>
   <ul>
-    <li>Characters must behave realistically no FailRP, trolling, or absurd behavior.</li>
+    <li>Characters must behave realistically — no FailRP, trolling, or absurd behavior.</li>
     <li>No metagaming, powergaming, or exploiting mechanics.</li>
     <li>Story-building and progression are expected at all times.</li>
   </ul>
@@ -130,7 +141,7 @@
   <ul>
     <li>Random killing (RDM) and vehicle attacks (VDM) are strictly prohibited.</li>
     <li>Major crimes must be supported by proper RP.</li>
-    <li>Value your life act as if consequences matter.</li>
+    <li>Value your life — act as if consequences matter.</li>
   </ul>
 
   <h2 class="section-title">4 — Vehicles & Pursuits</h2>
@@ -159,5 +170,3 @@
 
 </body>
 </html>
-
-
