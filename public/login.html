@@ -112,12 +112,35 @@ footer{opacity:.55;text-align:center;margin-top:50px;padding:20px;font-size:.85r
 <script>
 const API = "https://shoreroleplay.onrender.com";
 
+// Generate a hardware fingerprint (simple persistent client ID)
+function getHWID() {
+  let hwid = localStorage.getItem("shoreHWID");
+  if (!hwid) {
+    hwid = crypto.randomUUID();
+    localStorage.setItem("shoreHWID", hwid);
+  }
+  return hwid;
+}
+
+// Capture public IP
+async function getIP() {
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    const data = await res.json();
+    return data.ip || "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   const msg = document.getElementById("msg");
+  const hwid = getHWID();
+  const ip = await getIP();
 
   if (!email || !password) {
     msg.style.color = "#e74c3c";
@@ -125,28 +148,35 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     return;
   }
 
-  const res = await fetch(API + "/users/login", { // 🔥 correct route
+  const res = await fetch(API + "/users/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password, hwid, ip })
   });
 
   const data = await res.json();
 
-  if (data.success) {
-    // Save logged-in user to local session
-    localStorage.setItem("shoreUser", JSON.stringify(data.user));
-
-    msg.style.color = "#2ecc71";
-    msg.textContent = "✔ Login successful! Redirecting...";
-
-    setTimeout(() => {
-      window.location.href = "apply.html"; // redirect after login
-    }, 1200);
-  } else {
+  if (!data.success) {
     msg.style.color = "#e74c3c";
     msg.textContent = data.error || "❌ Invalid credentials";
+    return;
   }
+
+  // 🔥 USER IS BANNED → REDIRECT
+  if (data.user.banned) {
+    window.location.href = `banned.html?reason=${encodeURIComponent(data.user.banReason || "No reason provided")}`;
+    return;
+  }
+
+  // Save logged-in user to local session
+  localStorage.setItem("shoreUser", JSON.stringify(data.user));
+
+  msg.style.color = "#2ecc71";
+  msg.textContent = "✔ Login successful! Redirecting...";
+
+  setTimeout(() => {
+    window.location.href = "apply.html"; 
+  }, 1200);
 });
 </script>
 
