@@ -5,100 +5,130 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
+*{margin:0;padding:0;box-sizing:border-box}
 body{
-  background:#161a21 url('https://i.imgur.com/k7ECz7H.png') repeat;
-  color:#fff;font-family:Segoe UI, sans-serif;margin:0;
+  font-family:"Inter",sans-serif;
+  background:#05070a url('https://i.imgur.com/vbt5BPF.jpeg') center/cover fixed;
+  color:#fff;overflow-x:hidden;
 }
-header{
-  padding:40px;text-align:center;
+
+/* HERO STATUS BANNER */
+.hero{
+  text-align:center;
+  padding:120px 20px 60px;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
-.status-banner{
-  background:#0effff;color:#000;font-size:1.4rem;
-  padding:22px;border-radius:10px;display:inline-block;
-  font-weight:700;box-shadow:0 0 18px #0effff;
+.hero h1{
+  font-size:3.2rem;font-weight:700;
+  text-shadow:0 0 25px rgba(78,163,255,.45);
 }
-.container{
-  max-width:1280px;margin:30px auto;padding:20px;
+.status-pill{
+  display:inline-block;
+  margin-top:18px;
+  padding:10px 22px;border-radius:8px;
+  background:#4ea3ff;color:#000;font-weight:700;
+  box-shadow:0 0 18px #4ea3ff;
+  font-size:1.1rem;
 }
+
+/* CONTAINER */
+.wrapper{
+  max-width:1200px;margin:45px auto;padding:0 25px;
+}
+
+/* SERVICE BOX */
 .service-box{
-  background:rgba(255,255,255,0.06);padding:25px;
-  border-radius:10px;margin-top:25px;border:1px solid rgba(255,255,255,.1);
+  background:rgba(0,0,0,.35);
+  backdrop-filter:blur(22px);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  padding:28px;margin-bottom:32px;
+  box-shadow:0 0 26px rgba(0,0,0,.55);
 }
-.service-header{
-  font-size:1.3rem;font-weight:600;margin-bottom:12px;
+.service-title{
+  font-size:1.4rem;font-weight:700;
+  color:#4ea3ff;margin-bottom:18px;
+  border-left:4px solid #4ea3ff;padding-left:10px;
+  text-transform:uppercase;
 }
-.service-row{
-  display:flex;justify-content:space-between;
-  border-bottom:1px solid rgba(255,255,255,.12);
-  padding:10px 0;font-size:15px;
+
+/* ROWS */
+.row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 0;font-size:15px;
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
-.good{color:#0effff;font-weight:600}
-.bad{color:#ff3b3b;font-weight:600}
-.bar{
-  height:14px;background:#0effff;border-radius:5px;margin-top:6px;
-  box-shadow:0 0 10px #0effff;animation:grow .8s ease;
+
+/* STATUS TEXT */
+.good{color:#4ea3ff;font-weight:600;text-shadow:0 0 10px #4ea3ff}
+.bad{color:#ff4e4e;font-weight:600;text-shadow:0 0 10px #ff4e4e}
+
+/* REFRESH NOTE */
+footer{
+  text-align:center;padding:25px;opacity:.45;margin-top:40px;font-size:.85rem;
 }
-@keyframes grow{from{width:0}to{width:100%}}
 </style>
 </head>
 <body>
 
-<header>
-  <div id="overall" class="status-banner">Checking system status...</div>
-</header>
+<section class="hero">
+  <h1>SYSTEM STATUS</h1>
+  <span id="overall" class="status-pill">Checking system...</span>
+</section>
 
-<div class="container">
+<div class="wrapper">
 
   <div class="service-box">
-    <div class="service-header">API Services</div>
-    <div class="service-row"><span>Web API</span><span id="web">Checking...</span></div>
-    <div class="bar"></div>
+    <div class="service-title">API Core</div>
+    <div class="row"><span>Web API</span><span id="web">Checking...</span></div>
   </div>
 
   <div class="service-box">
-    <div class="service-header">Authentication Services</div>
-    <div class="service-row"><span>Staff Auth</span><span id="staffAuth">Checking...</span></div>
-    <div class="service-row"><span>HA Auth</span><span id="haAuth">Checking...</span></div>
-    <div class="service-row"><span>User Login</span><span id="login">Checking...</span></div>
-    <div class="bar"></div>
+    <div class="service-title">Authentication Services</div>
+    <div class="row"><span>Staff Authentication</span><span id="staffAuth">Checking...</span></div>
+    <div class="row"><span>HA Authentication</span><span id="haAuth">Checking...</span></div>
+    <div class="row"><span>Account Login</span><span id="login">Checking...</span></div>
   </div>
 
   <div class="service-box">
-    <div class="service-header">User Services</div>
-    <div class="service-row"><span>Users Index</span><span id="users">Checking...</span></div>
-    <div class="service-row"><span>User Actions</span><span id="userActions">Checking...</span></div>
-    <div class="bar"></div>
+    <div class="service-title">User Services</div>
+    <div class="row"><span>User Directory</span><span id="users">Checking...</span></div>
+    <div class="row"><span>User Actions</span><span id="userActions">Checking...</span></div>
   </div>
 
   <div class="service-box">
-    <div class="service-header">Application Services</div>
-    <div class="service-row"><span>Applications</span><span id="apps">Checking...</span></div>
-    <div class="service-row"><span>Application Decisions</span><span id="decisions">Checking...</span></div>
-    <div class="bar"></div>
+    <div class="service-title">Application System</div>
+    <div class="row"><span>Applications</span><span id="apps">Checking...</span></div>
+    <div class="row"><span>Application Decisions</span><span id="decisions">Checking...</span></div>
   </div>
 
   <div class="service-box">
-    <div class="service-header">Forum Tools</div>
-    <div class="service-row"><span>Threads</span><span id="threads">Checking...</span></div>
-    <div class="service-row"><span>Posting & Restrictions</span><span id="posting">Checking...</span></div>
-    <div class="bar"></div>
+    <div class="service-title">Forum Tools</div>
+    <div class="row"><span>Threads System</span><span id="threads">Checking...</span></div>
+    <div class="row"><span>Posting / Restrictions</span><span id="posting">Checking...</span></div>
   </div>
 
 </div>
 
+<footer>Auto-refreshing every 60 seconds · © Shore Roleplay</footer>
+
 <script>
 const API = "https://shoreroleplay.onrender.com";
 
-async function check(url, elementId){
+async function check(url, id){
   try{
-    const r = await fetch(url,{method:"GET"});
-    document.getElementById(elementId).innerHTML =
+    const r = await fetch(url);
+    document.getElementById(id).innerHTML =
       r.ok ? `<span class="good">Operational</span>` :
-      `<span class="bad">Issues Detected</span>`;
+             `<span class="bad">Issues Detected</span>`;
     return r.ok;
   }catch(e){
-    document.getElementById(elementId).innerHTML = `<span class="bad">Offline</span>`;
+    document.getElementById(id).innerHTML = `<span class="bad">Offline</span>`;
     return false;
   }
 }
@@ -120,12 +150,12 @@ async function runStatus(){
   ok.push(await check(API + "/threads", "threads"));
   ok.push(await check(API + "/users/1/restrict", "posting"));
 
-  document.getElementById("overall").innerText =
-    ok.every(s => s) ? "All Systems Operational" : "Service Disruptions Detected";
+  document.getElementById("overall").innerHTML =
+    ok.every(v => v) ? "All Systems Operational" : "Service Interruptions";
 }
 
 runStatus();
-setInterval(runStatus, 60000); // refresh every 1 min
+setInterval(runStatus, 60000);
 </script>
 
 </body>
