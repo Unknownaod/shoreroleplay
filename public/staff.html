@@ -194,6 +194,7 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
   <div class="tabs">
     <div class="tab active" onclick="switchTab('pending')">Pending Applications</div>
     <div class="tab" onclick="switchTab('all')">Previous Applications</div>
+    <div class="tab" onclick="switchTab('all')">Forum Tools</div>
     <div class="tab" onclick="switchTab('ha')">HA Tab (Head Administration)</div>
   </div>
 
@@ -214,6 +215,28 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
     </table>
   </div>
 
+<!-- FORUM MODERATION -->
+<div id="forumsSection">
+  <h2 class="section-title">Forum Moderation Panel</h2>
+  <p style="opacity:.7;margin-bottom:18px;font-size:14px;">
+    View users and perform forum-related moderation actions.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>USERNAME</th>
+        <th>EMAIL</th>
+        <th>ROLE</th>
+        <th>POSTING STATUS</th>
+        <th>ACTIONS</th>
+      </tr>
+    </thead>
+    <tbody id="forumUsers"></tbody>
+  </table>
+</div>
+
+  
   <!-- HA / USERS SECTION -->
   <div id="haSection" style="display:none;margin-top:10px;">
     <h3 style="margin-bottom:10px;">User Management (HA Only)</h3>
@@ -603,6 +626,64 @@ function copyHwid(hwid){
     alert("Clipboard API not available.");
   }
 }
+
+// FORUM RESTRICTION/MODERATION
+/* ========== FORUM USER MODERATION ========== */
+
+const forumUsers = document.getElementById("forumUsers");
+
+/* Load forum users into table */
+async function loadForumUsers(){
+  try {
+    const res = await fetch(`${API}/users`);
+    const users = await res.json();
+
+    forumUsers.innerHTML = "";
+
+    users.forEach(u => {
+      forumUsers.innerHTML += `
+        <tr>
+          <td>${u.username}</td>
+          <td>${u.email}</td>
+          <td>${u.role || "User"}</td>
+          <td style="color:${u.restricted ? "red" : "lime"};">
+            ${u.restricted ? "Restricted" : "Allowed to Post"}
+          </td>
+          <td>
+            <button class="btn deny" onclick="toggleRestrict('${u.id}', ${u.restricted})">
+              ${u.restricted ? "Unrestrict" : "Restrict Posting"}
+            </button>
+
+            <button class="btn delete" onclick="banUser('${u.id}')">
+              Ban User
+            </button>
+
+            <button class="btn view" onclick="location.href='profile.html?user=${u.username}'">
+              View Profile
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  } catch (err) {
+    console.error("Forum users failed to load:", err);
+    forumUsers.innerHTML = `<tr><td colspan="5">Failed to load forum users.</td></tr>`;
+  }
+}
+
+/* Toggle posting ability → /users/:id/restrict */
+async function toggleRestrict(id, current){
+  if(!confirm(`Are you sure you want to ${current ? "unrestrict" : "restrict"} this user from posting?`)) return;
+
+  await fetch(`${API}/users/${id}/restrict`, {
+    method:"PATCH",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ restricted: !current })
+  });
+
+  loadForumUsers();
+}
+  
 </script>
 
 </body>
