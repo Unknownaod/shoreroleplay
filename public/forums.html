@@ -1,280 +1,683 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Shore Roleplay | Community Forums</title>
+  <title>Shore Roleplay | Forums</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-  font-family:"Inter",sans-serif;
-  background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
-  color:#fff;overflow-x:hidden;
-}
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:"Inter",sans-serif;
+      background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+      color:#fff;overflow-x:hidden;
+    }
 
-/* NAV */
-nav{
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(18px);
-  border-bottom:1px solid rgba(255,255,255,.12);
-  padding:18px 60px;
-  display:flex;justify-content:space-between;align-items:center;
-  position:fixed;top:0;width:100%;z-index:50;
-}
-nav a{
-  margin-right:26px;font-size:15px;color:#d0e2ff;
-  text-decoration:none;transition:.25s;
-}
-nav a:hover{color:#4ea3ff}
-#logoutBtn{
-  background:#4ea3ff;padding:8px 16px;border-radius:7px;
-  cursor:pointer;font-weight:600;box-shadow:0 0 14px #4ea3ff;
-}
+    a{color:#4ea3ff;text-decoration:none}
 
-/* MAIN */
-main{
-  max-width:1200px;margin:140px auto 60px;padding:0 20px;
-}
-.section-title{font-size:2.3rem;margin-bottom:14px;font-weight:700}
+    /* NAV */
+    nav{
+      background:rgba(0,0,0,.55);
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      padding:18px 60px;
+      display:flex;justify-content:space-between;align-items:center;
+      position:fixed;top:0;width:100%;z-index:20;
+    }
+    nav .nav-left a{
+      margin-right:28px;font-size:15px;opacity:.85;cursor:pointer;
+    }
+    nav .nav-left a:hover{
+      color:#4ea3ff;text-shadow:0 0 12px #4ea3ff;
+    }
+    .nav-right{
+      display:flex;align-items:center;gap:12px;font-size:14px;
+    }
+    .nav-btn{
+      padding:6px 14px;border-radius:4px;border:1px solid rgba(255,255,255,.28);
+      background:rgba(255,255,255,.05);color:#fff;font-weight:500;
+      cursor:pointer;transition:.25s;
+    }
+    .nav-btn.primary{background:#4ea3ff;border-color:#4ea3ff}
+    .nav-btn:hover{background:rgba(255,255,255,.15)}
 
-/* CATEGORIES */
-.category{
-  background:rgba(0,0,0,.65);
-  border:1px solid rgba(255,255,255,.12);
-  padding:18px 24px;border-radius:12px;margin-bottom:14px;
-  cursor:pointer;transition:.25s;
-}
-.category:hover{background:rgba(78,163,255,.18);border-color:#4ea3ff}
-.category h3{font-size:1.3rem;font-weight:600}
-.category p{opacity:.75;margin-top:6px;font-size:.9rem}
+    /* LAYOUT */
+    .page-wrap{
+      max-width:1200px;margin:140px auto 60px;padding:0 30px;
+      display:grid;grid-template-columns:2.2fr 1fr;gap:26px;
+    }
 
-/* THREADS */
-.thread{
-  background:rgba(0,0,0,.45);
-  border:1px solid rgba(255,255,255,.12);
-  padding:16px 20px;border-radius:10px;margin-bottom:10px;
-  cursor:pointer;transition:.2s;
-}
-.thread:hover{background:rgba(255,255,255,.08)}
-.thread .meta{opacity:.75;font-size:.8rem;margin-top:4px}
-.staff-badge{
-  padding:2px 8px;border-radius:6px;font-size:.75rem;
-  margin-left:6px;font-weight:700;
-}
-.ha{background:#f1c40f;color:#000;}
-.ia{background:#ff5050}
-.adm{background:#3498db}
-.jadm{background:#6741ff}
-.sstaff{background:#ffaa00}
-.staff{background:#27ae60}
-.sit{background:#16a085}
+    .panel{
+      background:rgba(0,0,0,.78);
+      border-radius:14px;border:1px solid rgba(255,255,255,.11);
+      box-shadow:0 0 35px rgba(0,0,0,.7);
+      padding:24px 26px;
+    }
 
-/* POST BUTTON */
-#createThreadBtn{
-  background:#4ea3ff;padding:12px 20px;font-weight:600;
-  border-radius:10px;font-size:15px;margin:18px 0;
-  cursor:pointer;display:none;box-shadow:0 0 16px #4ea3ff;
-}
-#lockedMsg{
-  display:none;background:rgba(255,0,0,.12);
-  border:1px solid rgba(255,0,0,.3);
-  padding:14px;border-radius:10px;margin:18px 0;
-}
+    .panel header{
+      margin-bottom:16px;
+      display:flex;align-items:center;justify-content:space-between;gap:8px;
+    }
+    .panel-title{
+      font-size:1.6rem;font-weight:700;
+      text-shadow:0 0 16px rgba(78,163,255,.4);
+    }
+    .panel-sub{
+      font-size:.9rem;opacity:.8;
+    }
 
-/* MODAL */
-#modal{
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,.7);display:none;justify-content:center;align-items:center;
-}
-.modal-box{
-  background:#0d1119;padding:28px;width:540px;border-radius:12px;
-  border:1px solid rgba(255,255,255,.12);
-}
-input,textarea{
-  width:100%;padding:12px;border-radius:8px;margin-top:8px;
-  border:1px solid rgba(255,255,255,.2);
-  background:#111722;color:#fff;
-}
-textarea{height:140px;resize:none}
-button{
-  padding:12px 18px;border-radius:8px;border:none;
-  margin-top:12px;font-weight:600;cursor:pointer;
-}
-.btn-primary{background:#4ea3ff}
-.btn-close{background:#e74c3c}
+    /* THREAD CONTROLS */
+    .toolbar{
+      display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;
+      align-items:center;
+    }
+    select, input, textarea{
+      border-radius:8px;border:1px solid rgba(255,255,255,.22);
+      background:rgba(7,10,16,.95);color:#fff;
+      padding:8px 10px;font-family:inherit;font-size:.9rem;
+    }
+    select:focus, input:focus, textarea:focus{outline:none;border-color:#4ea3ff}
+    .pill{
+      padding:6px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.2);
+      font-size:.8rem;cursor:pointer;opacity:.85;
+      background:rgba(255,255,255,.04);
+    }
+    .pill.active{
+      border-color:#4ea3ff;background:rgba(78,163,255,.18);opacity:1;
+    }
 
-footer{text-align:center;margin-top:40px;opacity:.45}
-</style>
+    /* NEW THREAD FORM */
+    .new-thread{
+      margin-top:10px;margin-bottom:20px;
+      background:rgba(5,8,14,.95);
+      border-radius:12px;border:1px solid rgba(255,255,255,.12);
+      padding:16px 16px 14px;
+    }
+    .new-thread-row{
+      display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;
+      align-items:center;
+    }
+    .new-thread-row label{
+      font-size:.82rem;opacity:.8;
+    }
+    .new-thread-row small{font-size:.75rem;opacity:.7}
+    .new-thread input[type="text"]{width:100%}
+    .new-thread textarea{
+      width:100%;min-height:90px;resize:vertical;margin-top:6px;
+    }
+    .checkbox-inline{
+      display:flex;align-items:center;gap:6px;font-size:.82rem;
+    }
+    .checkbox-inline input{width:auto;margin-top:0}
+
+    .btn{
+      padding:9px 16px;border-radius:8px;border:none;
+      background:#4ea3ff;color:#fff;font-weight:600;font-size:.9rem;
+      cursor:pointer;transition:.2s;
+    }
+    .btn.secondary{
+      background:transparent;border:1px solid rgba(255,255,255,.35);
+    }
+    .btn.small{padding:6px 11px;font-size:.8rem}
+    .btn:disabled{opacity:.35;cursor:not-allowed}
+    .btn:hover:not(:disabled){filter:brightness(1.05);}
+
+    .alert{
+      margin-top:6px;font-size:.85rem;
+    }
+    .alert.error{color:#ff6b6b}
+    .alert.good{color:#2ecc71}
+
+    /* THREAD LIST */
+    .thread-list{margin-top:8px;}
+    .thread-row{
+      padding:14px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;flex-direction:column;gap:6px;
+    }
+    .thread-row:last-child{border-bottom:none;}
+    .thread-title-line{
+      display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    }
+    .thread-title{
+      font-size:1rem;font-weight:600;cursor:pointer;
+    }
+    .thread-meta{
+      font-size:.78rem;opacity:.75;
+      display:flex;gap:10px;flex-wrap:wrap;
+    }
+    .tag{
+      font-size:.72rem;font-weight:600;
+      padding:3px 7px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.3);
+      text-transform:uppercase;letter-spacing:.04em;
+    }
+    .tag.staff{border-color:#ffbf47;color:#ffbf47;background:rgba(255,191,71,.09);}
+    .tag.dept{border-color:#4ea3ff;color:#4ea3ff;background:rgba(78,163,255,.12);}
+    .tag.type{border-color:#7bed9f;color:#7bed9f;background:rgba(123,237,159,.1);}
+    .tag.ann{border-color:#ff7675;color:#ff7675;background:rgba(255,118,117,.08);}
+
+    .empty-state{
+      padding:28px 16px;text-align:center;font-size:.9rem;opacity:.8;
+    }
+
+    /* SIDEBAR */
+    .side-card{
+      background:rgba(0,0,0,.82);
+      border-radius:12px;border:1px solid rgba(255,255,255,.1);
+      padding:18px 18px 16px;margin-bottom:18px;
+      box-shadow:0 0 30px rgba(0,0,0,.7);
+      font-size:.9rem;
+    }
+    .side-card h3{font-size:1rem;margin-bottom:8px;font-weight:600;}
+    .side-card ul{margin-left:18px;margin-top:4px}
+    .side-card li{margin:4px 0;opacity:.88;}
+    .badge-access{
+      display:inline-block;margin-top:6px;
+      padding:4px 9px;border-radius:999px;
+      background:#1b2638;border:1px solid rgba(255,255,255,.18);
+      font-size:.78rem;
+    }
+    .badge-access.ok{border-color:#2ecc71;color:#2ecc71;background:rgba(46,204,113,.08);}
+    .badge-access.no{border-color:#e74c3c;color:#e74c3c;background:rgba(231,76,60,.08);}
+
+    .dept-chip{
+      display:inline-block;margin:3px 4px 0 0;
+      padding:4px 7px;border-radius:999px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.14);
+      font-size:.75rem;
+    }
+
+    @media(max-width:980px){
+      .page-wrap{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
 <body>
 
 <nav>
-  <div>
+  <div class="nav-left">
     <a href="index.html">Home</a>
+    <a href="departments.html">Departments</a>
+    <a href="rules.html">Rules</a>
     <a href="apply.html">Apply</a>
-    <a href="forums.html" style="color:#4ea3ff">Forums</a>
+    <a href="forums.html">Forums</a>
+    <a href="staff.html">Staff Panel</a>
   </div>
-  <div id="logoutBtn">Logout</div>
+  <div class="nav-right" id="navUserBox"></div>
 </nav>
 
-<main>
-  <h1 class="section-title">Community Forums</h1>
-  <p style="opacity:.75;margin-bottom:14px;">Discuss topics related to the Shore Roleplay community.</p>
+<div class="page-wrap">
 
-  <!-- LOCKED IF NOT ACCEPTED -->
-  <div id="lockedMsg">
-    🚫 Posting is restricted. You must be part of a department with an <strong>accepted application</strong>.  
-    <a href="apply.html" style="color:#4ea3ff">Apply here</a>.
-  </div>
+  <!-- MAIN FORUM PANEL -->
+  <section class="panel" id="forumPanel">
+    <header>
+      <div>
+        <div class="panel-title">ShoreRP Forums</div>
+        <div class="panel-sub" id="accessSub">Loading your access...</div>
+      </div>
+      <button class="btn small" id="refreshBtn">⟳ Refresh</button>
+    </header>
 
-  <button id="createThreadBtn" onclick="openModal()">+ Start New Discussion</button>
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div>
+        <label style="font-size:.8rem;opacity:.78;">Category</label><br>
+        <select id="categorySelect">
+          <option value="general">General Discussion</option>
+          <option value="patrol">Patrol & Operations</option>
+          <option value="staff">Staff Lounge</option>
+          <option value="suggestions">Suggestions</option>
+          <option value="bug-reports">Bug Reports</option>
+        </select>
+      </div>
 
-  <!-- CATEGORIES -->
-  <div class="category" onclick="loadThreads('general')">
-    <h3>General Discussion</h3>
-    <p>Talk about anything server-related.</p>
-  </div>
+      <div>
+        <label style="font-size:.8rem;opacity:.78;">Thread Type</label><br>
+        <select id="threadTypeSelect">
+          <option value="normal">Normal Thread</option>
+          <option value="announcement">Announcement</option>
+          <option value="suggestion">Suggestion</option>
+          <option value="bug">Bug Report</option>
+        </select>
+      </div>
 
-  <div class="category" onclick="loadThreads('departments')">
-    <h3>Departments</h3>
-    <p>Inter-agency communication, SOP ideas & department news.</p>
-  </div>
+      <div class="checkbox-inline">
+        <input type="checkbox" id="staffOnlyChk">
+        <label for="staffOnlyChk">Staff Thread (adds [STAFF] tag)</label>
+      </div>
+    </div>
 
-  <div class="category" onclick="loadThreads('technical')">
-    <h3>Tech & Support</h3>
-    <p>Bugs, suggestions, server systems, CAD support.</p>
-  </div>
+    <!-- NEW THREAD FORM -->
+    <div class="new-thread" id="newThreadBox">
+      <div class="new-thread-row">
+        <label for="threadTitle">Thread Title</label>
+        <input id="threadTitle" type="text" placeholder="Short, descriptive title">
+      </div>
 
-  <div id="threads"></div>
-</main>
+      <div class="new-thread-row">
+        <label for="threadBody">Content</label>
+        <textarea id="threadBody" placeholder="Write your post here..."></textarea>
+      </div>
 
-<!-- CREATE THREAD MODAL -->
-<div id="modal">
-  <div class="modal-box">
-    <h2>Create New Thread</h2>
-    <input id="threadTitle" placeholder="Thread Title">
-    <textarea id="threadBody" placeholder="Write your message..."></textarea>
-    <button class="btn-primary" onclick="createThread()">Post Thread</button>
-    <button class="btn-close" onclick="closeModal()">Cancel</button>
-  </div>
+      <div class="new-thread-row" style="justify-content:space-between;">
+        <small>
+          Tip: Staff threads or announcements will get automatic tags like
+          <strong>[STAFF]</strong> or <strong>[ANNOUNCEMENT]</strong>.
+        </small>
+        <button class="btn small" id="postBtn">Post Thread</button>
+      </div>
+
+      <div id="postMsg" class="alert"></div>
+    </div>
+
+    <!-- If user has no access -->
+    <div id="noAccessBox" class="new-thread" style="display:none;">
+      <strong>You don’t have permission to post threads.</strong>
+      <p style="font-size:.88rem;opacity:.82;margin-top:4px;">
+        You must either be accepted into at least one department or hold a staff rank
+        to create threads or replies. You can still read public threads.
+      </p>
+    </div>
+
+    <!-- THREAD LIST -->
+    <div class="thread-list" id="threadList">
+      <div class="empty-state">Loading threads...</div>
+    </div>
+  </section>
+
+  <!-- SIDEBAR -->
+  <aside>
+
+    <!-- ACCESS CARD -->
+    <div class="side-card" id="accessCard">
+      <h3>Your Forum Access</h3>
+      <p id="accessSummary">Checking your departments and staff status...</p>
+      <div id="accessBadges" style="margin-top:6px;"></div>
+      <div id="deptList" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- RULES CARD -->
+    <div class="side-card">
+      <h3>Forum Rules</h3>
+      <ul>
+        <li>Follow ShoreRP community rules at all times.</li>
+        <li>No harassment, doxxing, or hate speech.</li>
+        <li>No leaking staff-only or sensitive information.</li>
+        <li>Use correct categories (bugs, suggestions, etc.).</li>
+        <li>Staff decisions on threads/posts are final.</li>
+      </ul>
+      <p style="margin-top:8px;opacity:.8;font-size:.85rem;">
+        Threads that break these rules may be locked, deleted, or result in
+        disciplinary action in-game and on Discord.
+      </p>
+    </div>
+
+    <!-- LIVE STATUS CARD -->
+    <div class="side-card">
+      <h3>Live Status</h3>
+      <p id="liveStatus" style="opacity:.85;font-size:.87rem;">
+        Auto-refresh is enabled. New threads will appear here shortly after they’re posted.
+      </p>
+    </div>
+
+  </aside>
+
 </div>
 
-<footer>© Shore Roleplay 2025</footer>
+<footer style="text-align:center;opacity:.6;padding:20px;font-size:.85rem;">
+  © 2025 Shore Roleplay — All Rights Reserved
+</footer>
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
-const user = JSON.parse(localStorage.getItem("shoreUser"));
-if (!user) location.href = "login.html";
+const STAFF_ROLES = [
+  "Head Administrator",
+  "Internal Affairs",
+  "Administration",
+  "Junior Administration",
+  "Senior Staff",
+  "Staff",
+  "Staff In Training"
+];
 
-/* Logout */
-document.getElementById("logoutBtn").onclick = () => {
+const shoreUser = JSON.parse(localStorage.getItem("shoreUser") || "null");
+let acceptedDepartments = [];
+let canPost = false;
+let authorMap = {};
+let currentCategory = "general";
+let autoRefreshTimer = null;
+
+/* NAV USER DISPLAY */
+const navBox = document.getElementById("navUserBox");
+if (!shoreUser) {
+  navBox.innerHTML = `
+    <button class="nav-btn" onclick="location.href='login.html'">Login</button>
+    <button class="nav-btn primary" onclick="location.href='register.html'">Register</button>
+  `;
+} else {
+  navBox.innerHTML = `
+    Logged in as <strong>${shoreUser.username}</strong>
+    <button class="nav-btn" onclick="location.href='profile.html?user=${encodeURIComponent(shoreUser.username)}'">Profile</button>
+    <button class="nav-btn" onclick="location.href='settings.html'">Settings</button>
+    <button class="nav-btn primary" onclick="logout()">Logout</button>
+  `;
+}
+function logout() {
   localStorage.removeItem("shoreUser");
   location.href = "index.html";
-};
-
-/* STAFF COLOR MAP */
-const staffColors = {
-  "Head Administrator": "ha",
-  "Internal Affairs": "ia",
-  "Administration": "adm",
-  "Junior Administration": "jadm",
-  "Senior Staff": "sstaff",
-  "Staff": "staff",
-  "Staff In Training": "sit"
-};
-
-// staff roles that bypass dept requirement
-const STAFF_ROLES = Object.keys(staffColors);
-
-/* PERMISSION CHECK */
-async function verifyPermissions() {
-  // If staff → full access, bypass everything
-  if (STAFF_ROLES.includes(user.role)) {
-    document.getElementById("createThreadBtn").style.display = "block";
-    document.getElementById("lockedMsg").style.display = "none";
-    return;
-  }
-
-  // normal user → must have accepted application
-  const apps = await fetch(API + "/applications").then(r => r.json());
-  const accepted = apps.some(
-    a => a.email.toLowerCase() === user.email.toLowerCase() && a.status === "accepted"
-  );
-
-  if (accepted) document.getElementById("createThreadBtn").style.display = "block";
-  else document.getElementById("lockedMsg").style.display = "block";
 }
 
-verifyPermissions();
+/* INIT */
+const accessSub = document.getElementById("accessSub");
+const accessSummary = document.getElementById("accessSummary");
+const accessBadges = document.getElementById("accessBadges");
+const deptList = document.getElementById("deptList");
+const threadList = document.getElementById("threadList");
+const newThreadBox = document.getElementById("newThreadBox");
+const noAccessBox = document.getElementById("noAccessBox");
+const postMsg = document.getElementById("postMsg");
+const categorySelect = document.getElementById("categorySelect");
+const threadTypeSelect = document.getElementById("threadTypeSelect");
+const staffOnlyChk = document.getElementById("staffOnlyChk");
+const refreshBtn = document.getElementById("refreshBtn");
+const liveStatus = document.getElementById("liveStatus");
 
-/* CURRENT CATEGORY MEMORY */
-let currentCategory = "general";
+document.getElementById("postBtn").onclick = createThread;
+refreshBtn.onclick = () => loadThreads(currentCategory, false);
 
-/* LOAD THREADS */
-async function loadThreads(category) {
-  currentCategory = category;
+/* ---------- LOAD USERS FOR AUTHOR TAGS ---------- */
+async function loadUsers() {
+  try {
+    const res = await fetch(API + "/users");
+    const users = await res.json();
+    authorMap = {};
+    users.forEach(u => { authorMap[u.id] = u; });
+  } catch (err) {
+    console.warn("User list failed:", err);
+  }
+}
 
-  const container = document.getElementById("threads");
-  container.innerHTML = "Loading threads...";
-
-  const threads = await fetch(`${API}/threads/${category}`).then(r => r.json());
-
-  if (threads.length === 0) {
-    container.innerHTML = "<p style='opacity:.6;margin-top:10px'>No threads yet.</p>";
+/* ---------- LOAD ACCESS (DEPARTMENTS + STAFF) ---------- */
+async function loadAccess() {
+  if (!shoreUser) {
+    canPost = false;
+    accessSub.textContent = "You’re not logged in. You can read threads but not post.";
+    accessSummary.textContent = "Log in and get accepted to a department to post threads.";
+    accessBadges.innerHTML = `<span class="badge-access no">No posting access</span>`;
+    deptList.innerHTML = "";
+    newThreadBox.style.display = "none";
+    noAccessBox.style.display = "block";
     return;
   }
 
-  container.innerHTML = threads.map(t => `
-    <div class="thread" onclick="viewThread('${t.id}')">
-      <strong>${t.title}</strong>
-      <div class="meta">by ${t.author.username}
-        ${t.author.staffTag ? 
-          `<span class="staff-badge ${staffColors[t.author.role]}">${t.author.staffTag}</span>`
-        : ""}
-        — ${new Date(t.createdAt).toLocaleDateString()}
+  try {
+    const res = await fetch(API + "/applications");
+    const apps = await res.json();
+    acceptedDepartments = apps
+      .filter(a => a.email === shoreUser.email && a.status === "accepted")
+      .map(a => a.department);
+
+    const isStaff = STAFF_ROLES.includes(shoreUser.role);
+    canPost = isStaff || acceptedDepartments.length > 0;
+
+    // Sub header
+    if (isStaff && acceptedDepartments.length > 0) {
+      accessSub.textContent = "You are staff and a member of at least one department.";
+    } else if (isStaff) {
+      accessSub.textContent = "You are staff. You may post in any forum category.";
+    } else if (acceptedDepartments.length > 0) {
+      accessSub.textContent = "You are accepted into a department. You may post in forums.";
+    } else {
+      accessSub.textContent = "You can currently view but not post in forums.";
+    }
+
+    // Sidebar summary
+    if (canPost) {
+      accessSummary.textContent = "You are allowed to create threads and replies.";
+      accessBadges.innerHTML = `<span class="badge-access ok">Posting enabled</span>`;
+    } else {
+      accessSummary.textContent =
+        "You must be staff or in at least one accepted department to post.";
+      accessBadges.innerHTML = `<span class="badge-access no">Read-only access</span>`;
+    }
+
+    // Dept chips
+    if (acceptedDepartments.length) {
+      deptList.innerHTML = acceptedDepartments
+        .map(d => `<span class="dept-chip">${d}</span>`)
+        .join("");
+    } else {
+      deptList.innerHTML = `<span style="opacity:.75;font-size:.85rem;">No accepted departments yet.</span>`;
+    }
+
+    // Toggle forms
+    if (canPost) {
+      newThreadBox.style.display = "block";
+      noAccessBox.style.display = "none";
+    } else {
+      newThreadBox.style.display = "none";
+      noAccessBox.style.display = "block";
+    }
+
+  } catch (err) {
+    console.error("Access check error:", err);
+    accessSub.textContent = "Failed to load your access (server error).";
+  }
+}
+
+/* ---------- PARSE BADGES FROM TITLE ---------- */
+function extractBadges(rawTitle) {
+  let title = rawTitle || "";
+  const badges = [];
+
+  // Only parse tags from the beginning like [TAG]
+  while (title.startsWith("[")) {
+    const close = title.indexOf("]");
+    if (close === -1) break;
+    const token = title.slice(1, close).trim();
+    if (!token) break;
+    badges.push(token.toUpperCase());
+    title = title.slice(close + 1).trim();
+  }
+
+  return { cleanTitle: title || rawTitle, badges };
+}
+
+/* ---------- RENDER THREADS ---------- */
+function renderThreads(threads) {
+  if (!threads || !threads.length) {
+    threadList.innerHTML = `<div class="empty-state">No threads in this category yet.</div>`;
+    return;
+  }
+
+  threadList.innerHTML = "";
+
+  threads.forEach(t => {
+    const { cleanTitle, badges } = extractBadges(t.title || "Untitled");
+    const author = authorMap[t.authorId];
+    const created = t.createdAt
+      ? new Date(t.createdAt).toLocaleString()
+      : "Unknown";
+    const replies = typeof t.replies === "number" ? t.replies : 0;
+
+    const isStaffAuthor = author && STAFF_ROLES.includes(author.role);
+
+    let badgeHTML = "";
+
+    // from title tags
+    badges.forEach(b => {
+      if (b === "STAFF") {
+        badgeHTML += `<span class="tag staff">Staff</span>`;
+      } else if (b === "ANNOUNCEMENT") {
+        badgeHTML += `<span class="tag ann">Announcement</span>`;
+      } else if (b === "SUGGESTION") {
+        badgeHTML += `<span class="tag type">Suggestion</span>`;
+      } else if (b === "BUG") {
+        badgeHTML += `<span class="tag type">Bug</span>`;
+      }
+    });
+
+    // from author role
+    if (isStaffAuthor && !badges.includes("STAFF")) {
+      badgeHTML += `<span class="tag staff">${author.role}</span>`;
+    }
+
+    // category tag
+    badgeHTML += `<span class="tag dept">${t.category || "general"}</span>`;
+
+    const staffTag = author && author.staffTag
+      ? `<span class="tag staff">${author.staffTag}</span>`
+      : "";
+
+    const authorPart = author
+      ? `${author.username}${author.role ? " • " + author.role : ""}`
+      : "Unknown";
+
+    const html = `
+      <div class="thread-row">
+        <div class="thread-title-line">
+          <span class="thread-title">${cleanTitle}</span>
+          ${badgeHTML}
+          ${staffTag}
+        </div>
+        <div class="thread-meta">
+          <span>By ${authorPart}</span>
+          <span>${created}</span>
+          <span>${replies} repl${replies === 1 ? "y" : "ies"}</span>
+        </div>
       </div>
-    </div>
-  `).join("");
-}
-
-/* OPEN THREAD PAGE */
-function viewThread(id) {
-  location.href = `thread.html?id=${id}`;
-}
-
-/* MODAL OPEN/CLOSE */
-function openModal(){ document.getElementById("modal").style.display="flex"; }
-function closeModal(){ document.getElementById("modal").style.display="none"; }
-
-/* CREATE THREAD */
-async function createThread() {
-  const title = threadTitle.value.trim();
-  const body = threadBody.value.trim();
-
-  if (title.length < 4 || body.length < 10)
-    return alert("Thread content too short.");
-
-  const res = await fetch(API + "/threads", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      title, body, category: currentCategory, userId: user.id
-    })
+    `;
+    threadList.insertAdjacentHTML("beforeend", html);
   });
-
-  if (res.ok) {
-    alert("Thread posted!");
-    closeModal();
-    loadThreads(currentCategory);
-  } else alert("Failed to post thread.");
 }
 
-// load initial category
-loadThreads("general");
+/* ---------- LOAD THREADS ---------- */
+async function loadThreads(category, silent = false) {
+  currentCategory = category;
+  if (!silent) {
+    threadList.innerHTML = `<div class="empty-state">Loading threads...</div>`;
+  }
+  try {
+    const res = await fetch(API + "/threads/" + encodeURIComponent(category));
+    if (!res.ok) throw new Error("Threads fetch failed");
+    const data = await res.json();
+    renderThreads(data);
+  } catch (err) {
+    console.error("Load threads error:", err);
+    threadList.innerHTML = `<div class="empty-state">Failed to load threads.</div>`;
+  }
+}
+
+/* ---------- CREATE THREAD ---------- */
+async function createThread() {
+  if (!shoreUser || !canPost) {
+    postMsg.textContent = "You don’t have permission to post.";
+    postMsg.className = "alert error";
+    return;
+  }
+
+  const titleInput = document.getElementById("threadTitle");
+  const bodyInput = document.getElementById("threadBody");
+
+  let title = titleInput.value.trim();
+  const body = bodyInput.value.trim();
+  const category = categorySelect.value || "general";
+  const type = threadTypeSelect.value;
+  const staffOnly = staffOnlyChk.checked;
+
+  postMsg.textContent = "";
+  postMsg.className = "alert";
+
+  if (title.length < 4) {
+    postMsg.textContent = "Title needs to be at least 4 characters.";
+    postMsg.className = "alert error";
+    return;
+  }
+  if (body.length < 10) {
+    postMsg.textContent = "Body needs to be at least 10 characters.";
+    postMsg.className = "alert error";
+    return;
+  }
+
+  // Add tags to title (this stays 100% backend-compatible)
+  const tags = [];
+
+  if (staffOnly && STAFF_ROLES.includes(shoreUser.role)) {
+    tags.push("STAFF");
+  }
+  if (type === "announcement") tags.push("ANNOUNCEMENT");
+  if (type === "suggestion") tags.push("SUGGESTION");
+  if (type === "bug") tags.push("BUG");
+
+  if (tags.length) {
+    const tagPrefix = tags.map(t => `[${t}]`).join(" ");
+    title = `${tagPrefix} ${title}`;
+  }
+
+  const payload = {
+    title,
+    body,
+    category,
+    userId: shoreUser.id
+  };
+
+  try {
+    const res = await fetch(API + "/threads", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      postMsg.textContent = data.error || "Failed to create thread.";
+      postMsg.className = "alert error";
+      return;
+    }
+
+    titleInput.value = "";
+    bodyInput.value = "";
+    postMsg.textContent = "Thread posted!";
+    postMsg.className = "alert good";
+
+    // reload threads for current category
+    loadThreads(currentCategory, false);
+
+  } catch (err) {
+    console.error("Create thread error:", err);
+    postMsg.textContent = "Server error while posting.";
+    postMsg.className = "alert error";
+  }
+}
+
+/* ---------- CATEGORY CHANGE ---------- */
+categorySelect.onchange = () => {
+  const cat = categorySelect.value || "general";
+  loadThreads(cat, false);
+};
+
+/* ---------- AUTO REFRESH ("LIVE") ---------- */
+function startAutoRefresh() {
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+  autoRefreshTimer = setInterval(() => {
+    loadThreads(currentCategory, true);
+  }, 10000); // 10s poll
+}
+
+/* ---------- BOOTSTRAP ---------- */
+(async function init() {
+  await loadUsers();
+  await loadAccess();
+  await loadThreads(currentCategory, false);
+  startAutoRefresh();
+})();
 </script>
 
 </body>
