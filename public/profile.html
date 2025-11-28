@@ -40,17 +40,21 @@ main{
   padding:40px;
 }
 
-/* HEADER */
+/* PROFILE HEADER */
 .profile-header{text-align:center;margin-bottom:32px}
 .profile-header h1{
   font-size:2.8rem;margin-bottom:6px;
-  display:flex;justify-content:center;align-items:center;gap:12px
+  display:flex;justify-content:center;align-items:center;gap:10px
 }
+
+/* PROFILE IMAGE */
 #pfp{
-  width:64px;height:64px;border-radius:10px;
+  width:160px;height:160px;
+  border-radius:100px;
+  border:3px solid #4ea3ff;
   object-fit:cover;
-  border:2px solid #4ea3ff;
-  box-shadow:0 0 14px rgba(78,163,255,.45);
+  box-shadow:0 0 25px rgba(78,163,255,.6);
+  margin-bottom:14px;
 }
 
 /* STAFF BADGE */
@@ -65,6 +69,14 @@ main{
 .sstaff{background:#ffaa00;color:#000}
 .staff{background:#27ae60;color:#000}
 .sit{background:#16a085}
+
+/* BIO */
+.bio-box{
+  background:#0b0f16;
+  padding:18px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.14);
+  font-size:1rem;margin-top:10px;line-height:1.55;
+}
 
 /* SECTIONS */
 .section{margin-top:45px}
@@ -88,9 +100,7 @@ main{
   border:1px solid rgba(255,255,255,.14);
   padding:14px 18px;margin:8px 0;border-radius:10px;
 }
-.dept img{
-  width:52px;height:52px;margin-right:18px;
-}
+.dept img{width:52px;height:52px;margin-right:18px}
 
 /* APPLICATIONS */
 .app-card{
@@ -123,9 +133,10 @@ footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem
 <main>
 
   <div class="profile-header">
-    <!-- PROFILE PICTURE NOW INCLUDED -->
-    <h1><img id="pfp" src=""> <span id="username">Loading...</span></h1>
+    <img id="pfp" src="https://i.imgur.com/8eO8KZB.png">
+    <h1 id="username">Loading...</h1>
     <p id="subtitle">Fetching profile...</p>
+    <div id="bio" class="bio-box" style="display:none"></div>
   </div>
 
   <div class="section">
@@ -153,7 +164,10 @@ const params=new URLSearchParams(window.location.search);
 const profileUsername=params.get("user");
 if(!profileUsername) location.href="index.html";
 
-/* STAFF COLORS */
+/* ADMIN ROLES */
+const ADMIN_ROLES=["Head Administrator","Internal Affairs","Administration"];
+
+/* ROLE COLORS */
 const roleColor={
   "Head Administrator":"ha",
   "Internal Affairs":"ia",
@@ -174,49 +188,48 @@ const deptIcons={
   "Civilian Operations":"https://i.imgur.com/DZBwCeX.png"
 };
 
-/* ALL-DEPARTMENT ROLES */
-const ADMIN_ROLES=["Head Administrator","Internal Affairs","Administration"];
-
 async function loadProfile(){
   const users=await fetch(API+"/users").then(r=>r.json());
   const u=users.find(x=>x.username.toLowerCase()===profileUsername.toLowerCase());
   if(!u) return document.getElementById("username").textContent="User Not Found";
 
-  /* Username */
   document.getElementById("username").textContent=u.username;
+  document.getElementById("pfp").src=u.pfp||"https://i.imgur.com/8eO8KZB.png";
 
-  /* Profile Picture */
-  document.getElementById("pfp").src=u.pfp || "https://i.imgur.com/8eO8KZB.png";
-
-  /* Subtitle / Staff Badge */
-  const st=document.getElementById("subtitle");
+  /* STAFF BADGE */
+  const subtitle=document.getElementById("subtitle");
   if(u.role!=="user"){
-    st.innerHTML=`Staff Member — <span class="staff-badge ${roleColor[u.role]||""}">${u.role}</span>`;
-  } else st.textContent="Shore Roleplay Member";
+    subtitle.innerHTML=`Staff Member — <span class="staff-badge ${roleColor[u.role]||""}">${u.role}</span>`;
+  } else subtitle.textContent="Shore Roleplay Member";
 
-  /* Public Info */
+  /* BIO */
+  if(u.bio){
+    const bio=document.getElementById("bio");
+    bio.style.display="block";
+    bio.textContent=u.bio;
+  }
+
+  /* INFO */
   document.getElementById("infoBox").innerHTML=`
     <strong>Username:</strong> ${u.username}<br>
     <strong>Role:</strong> ${u.role}<br>
     <strong>Joined:</strong> ${u.createdAt?new Date(u.createdAt).toLocaleDateString():"Unknown"}
   `;
 
-  /* Applications */
+  /* APPLICATIONS */
   const apps=await fetch(API+"/applications").then(r=>r.json());
   const myApps=apps.filter(a=>a.username.toLowerCase()===profileUsername.toLowerCase());
   const appsList=document.getElementById("appsList");
-
   myApps.forEach(app=>{
     appsList.innerHTML+=`
-      <div class="app-card">
-        <strong>${app.department}</strong> — ${new Date(app.submittedAt).toLocaleDateString()}
-        <div class="badge ${app.status}">${app.status.toUpperCase()}</div>
-      </div>`;
+    <div class="app-card">
+      <strong>${app.department}</strong> — ${new Date(app.submittedAt).toLocaleDateString()}
+      <div class="badge ${app.status}">${app.status.toUpperCase()}</div>
+    </div>`;
   });
 
-  /* Departments */
+  /* DEPARTMENTS */
   const dept=document.getElementById("deptList");
-
   if(ADMIN_ROLES.includes(u.role)){
     Object.keys(deptIcons).forEach(d=>{
       dept.innerHTML+=`
@@ -227,7 +240,7 @@ async function loadProfile(){
     });
   } else {
     const accepted=myApps.filter(a=>a.status==="accepted");
-    if(accepted.length===0) dept.innerHTML="<p>No accepted departments.</p>";
+    if(!accepted.length) dept.innerHTML="<p>No accepted departments.</p>";
     accepted.forEach(app=>{
       dept.innerHTML+=`
       <div class="dept">
@@ -237,7 +250,6 @@ async function loadProfile(){
     });
   }
 }
-
 loadProfile();
 </script>
 
