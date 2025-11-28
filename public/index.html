@@ -503,45 +503,47 @@ const API = "https://shoreroleplay.onrender.com";
 async function loadSession() {
   const user = JSON.parse(localStorage.getItem("shoreUser") || "null");
 
-  // No session → render logged out state
+  // Not logged in
   if (!user) return renderState(null);
 
   try {
-    // Validate user still exists + fetch latest status
     const res = await fetch(`${API}/users/${user.id}`);
     if (!res.ok) throw new Error("User not found");
 
     const fresh = await res.json();
 
-    // Update localStorage with fresh DB values
+    // Save updated DB user into storage
     localStorage.setItem("shoreUser", JSON.stringify(fresh));
 
-    // === BANNED CHECK ===
-    if (fresh.banned?.status === true) {
-      // Force redirect to banned page
-      if (!location.pathname.includes("appeal") && !location.pathname.includes("banned")) {
+    /* ============================
+       BAN ENFORCEMENT
+    ============================= */
+    if (fresh.banned === true) {
+      // Prevent accessing any other page except banned/appeal
+      const path = location.pathname.toLowerCase();
+
+      if (!path.includes("banned") && !path.includes("appeal")) {
         location.href = "banned.html";
         return;
       }
     }
 
-    // Render UI
     renderState(fresh);
 
   } catch (err) {
-    console.warn("Session expired or invalid → logging out.");
+    console.warn("Session invalid → logging out.", err);
     logout();
   }
 }
 
 /* ============================================
-   RENDER STATE INTO USER BAR
+   RENDER TOP USER BAR
 ============================================ */
 function renderState(user) {
-  const bar = document.getElementsByClassName("user-bar")[0];
+  const bar = document.querySelector(".user-bar");
   if (!bar) return;
 
-  // Logged-out UI
+  // Logged-out
   if (!user) {
     bar.innerHTML = `
       <div class="user-bar-left">
@@ -555,12 +557,13 @@ function renderState(user) {
     return;
   }
 
-  // Logged-in UI
+  // Logged-in
   bar.innerHTML = `
     <div class="user-bar-left">
       Welcome back, <strong>${user.username}</strong>
-      ${user.banned?.status ? `<span style="color:#ff4d4d">[BANNED]</span>` : ""}
+      ${user.banned ? `<span style="color:#ff4d4d">[BANNED]</span>` : ""}
     </div>
+
     <div class="user-bar-right">
       <button class="btn-chip" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
       <button class="btn-chip" onclick="location.href='settings.html'">Settings</button>
@@ -586,8 +589,10 @@ loadSession();
 
 
 
+
 </body>
 </html>
+
 
 
 
