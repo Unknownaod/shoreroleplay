@@ -196,25 +196,46 @@ footer{
 const API = "https://shoreroleplay.onrender.com";
 const btn = document.getElementById("submitBtn");
 
-// Check login session
+// Load logged in session
 const user = JSON.parse(localStorage.getItem("shoreUser"));
 if (!user) {
   alert("You must be logged in to submit an application.");
   window.location.href = "login.html";
 }
 
-// Autofill user data
+/* Check if banned before allowing access */
+async function checkBanStatus() {
+  try {
+    const res = await fetch(`${API}/users/${user.id}/status`);
+    const data = await res.json();
+
+    if (data.banned) {
+      // Save ban reason for banned.html page
+      localStorage.setItem("shoreBanReason", data.reason || "No reason provided");
+      localStorage.removeItem("shoreUser");
+
+      // Force redirect
+      window.location.href = "banned.html";
+    }
+  } catch (e) {
+    console.warn("Ban check failed", e);
+  }
+}
+
+checkBanStatus();
+
+// Autofill user fields
 document.getElementById("username").value = user.username;
 document.getElementById("email").value = user.email;
 
-// Agreement handler
-function checkAgreements(){
+/* Agreement handler */
+function checkAgreements() {
   btn.disabled = !(document.getElementById("agreeLogging").checked && document.getElementById("agreeDiscord").checked);
 }
 document.getElementById("agreeLogging").addEventListener("change", checkAgreements);
 document.getElementById("agreeDiscord").addEventListener("change", checkAgreements);
 
-// Submit Handler
+/* Submit Handler */
 document.getElementById("applyForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   btn.disabled = true;
@@ -231,23 +252,27 @@ document.getElementById("applyForm").addEventListener("submit", async (e) => {
   };
 
   const res = await fetch(API + "/apply", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify(body)
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
   });
 
   const msg = document.getElementById("msg");
-  if(res.ok){
-    msg.style.color="#2ecc71";
+
+  if (res.ok) {
+    msg.style.color = "#2ecc71";
     msg.textContent = "✔ Application submitted successfully!";
-    e.target.reset(); btn.disabled = true;
-  }else{
-    msg.style.color="#e74c3c";
+    e.target.reset();
+    btn.disabled = true;
+  } else {
+    msg.style.color = "#e74c3c";
     msg.textContent = "❌ Something went wrong — please ensure all fields are valid.";
   }
 
   btn.textContent = "Submit Application";
 });
 </script>
+
 </body>
 </html>
+
