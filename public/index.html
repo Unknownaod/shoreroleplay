@@ -503,25 +503,24 @@ const API = "https://shoreroleplay.onrender.com";
 async function loadSession() {
   const user = JSON.parse(localStorage.getItem("shoreUser") || "null");
 
-  // Not logged in
-  if (!user) return renderState(null);
+  if (!user) {
+    renderState(null);
+    renderJoinCard(null);
+    return;
+  }
 
   try {
     const res = await fetch(`${API}/users/${user.id}`);
     if (!res.ok) throw new Error("User not found");
 
     const fresh = await res.json();
-
-    // Save updated DB user into storage
     localStorage.setItem("shoreUser", JSON.stringify(fresh));
 
     /* ============================
        BAN ENFORCEMENT
     ============================= */
     if (fresh.banned === true) {
-      // Prevent accessing any other page except banned/appeal
       const path = location.pathname.toLowerCase();
-
       if (!path.includes("banned") && !path.includes("appeal")) {
         location.href = "banned.html";
         return;
@@ -529,6 +528,7 @@ async function loadSession() {
     }
 
     renderState(fresh);
+    renderJoinCard(fresh);
 
   } catch (err) {
     console.warn("Session invalid → logging out.", err);
@@ -543,7 +543,6 @@ function renderState(user) {
   const bar = document.querySelector(".user-bar");
   if (!bar) return;
 
-  // Logged-out
   if (!user) {
     bar.innerHTML = `
       <div class="user-bar-left">
@@ -557,7 +556,6 @@ function renderState(user) {
     return;
   }
 
-  // Logged-in
   bar.innerHTML = `
     <div class="user-bar-left">
       Welcome back, <strong>${user.username}</strong>
@@ -571,6 +569,32 @@ function renderState(user) {
       <button class="btn-chip btn-chip-primary" onclick="logout()">Logout</button>
     </div>
   `;
+}
+
+/* ============================================
+   RENDER JOIN CARD BUTTONS
+   (Interested in joining? box)
+============================================ */
+function renderJoinCard(user) {
+  const box = document.getElementById("joinButtons");
+  if (!box) return;
+
+  if (!user) {
+    box.innerHTML = `
+      <button class="user-btn" onclick="location.href='login.html'">Sign In</button>
+      <button class="user-btn" onclick="location.href='register.html'">Sign Up</button>
+      <button class="user-btn discord-btn" onclick="location.href='https://discord.com/oauth2/authorize?...'">
+        <i class="fab fa-discord"></i> Login with Discord
+      </button>
+    `;
+  } else {
+    box.innerHTML = `
+      <button class="user-btn" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
+      <button class="user-btn" onclick="location.href='settings.html'">Settings</button>
+      ${user.role === "HA" ? `<button class="user-btn" onclick="location.href='ha.html'">HA Panel</button>` : ""}
+      <button class="user-btn logout-btn" onclick="logout()">Logout</button>
+    `;
+  }
 }
 
 /* ============================================
@@ -592,6 +616,7 @@ loadSession();
 
 </body>
 </html>
+
 
 
 
