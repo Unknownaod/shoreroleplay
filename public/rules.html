@@ -161,29 +161,62 @@
 <footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
 
 <script>
+const API = "https://shoreroleplay.onrender.com";
+
 /* ========== LOGIN STATE HANDLER ========== */
 const user = JSON.parse(localStorage.getItem("shoreUser"));
 const box = document.getElementById("userControls");
 
-if(!user){
-  box.innerHTML = `
-    <button class="user-btn" onclick="location.href='login.html'">Login</button>
-    <button class="user-btn logout-btn" onclick="location.href='register.html'">Register</button>
-  `;
-} else {
-  box.innerHTML = `
-    Logged in as <strong>${user.username}</strong>
-    <button class="user-btn" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
-    <button class="user-btn" onclick="location.href='settings.html'">Settings</button>
-    <button class="user-btn logout-btn" onclick="logout()">Logout</button>
-  `;
+/* BAN CHECK */
+async function checkBan() {
+  if (!user) return;
+
+  try {
+    const res = await fetch(`${API}/users/${user.id}/status`);
+    const data = await res.json();
+
+    if (data.banned) {
+      // store ban reason for banned.html page
+      localStorage.setItem("shoreBanReason", data.reason || "No reason provided");
+      localStorage.removeItem("shoreUser");
+
+      // redirect
+      window.location.href = "banned.html";
+    }
+  } catch (err) {
+    console.warn("⚠️ Ban check failed:", err);
+  }
 }
 
-function logout(){
+/* RENDER USER STATE */
+function renderNav() {
+  if (!user) {
+    box.innerHTML = `
+      <button class="user-btn" onclick="location.href='login.html'">Login</button>
+      <button class="user-btn logout-btn" onclick="location.href='register.html'">Register</button>
+    `;
+  } else {
+    box.innerHTML = `
+      Logged in as <strong>${user.username}</strong>
+      <button class="user-btn" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
+      <button class="user-btn" onclick="location.href='settings.html'">Settings</button>
+      <button class="user-btn logout-btn" onclick="logout()">Logout</button>
+    `;
+  }
+}
+
+/* LOGOUT */
+function logout() {
   localStorage.removeItem("shoreUser");
   location.reload();
 }
+
+/* EXECUTE */
+renderNav();
+checkBan();
 </script>
+
 
 </body>
 </html>
+
