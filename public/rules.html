@@ -18,54 +18,44 @@
       overflow-x:hidden;
     }
 
-    /* NAVIGATION */
+    /* NAV */
     nav{
       display:flex;justify-content:space-between;align-items:center;
       padding:18px 70px;
-      background:rgba(0,0,0,0.35);
-      backdrop-filter:blur(18px);
+      background:rgba(0,0,0,.35);backdrop-filter:blur(18px);
       border-bottom:1px solid rgba(255,255,255,.08);
       position:fixed;top:0;width:100%;z-index:1000;
-      animation:navFade .7s ease forwards;
     }
-    @keyframes navFade{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-
-    nav a, nav span{
-      color:#fff;text-decoration:none;
-      margin-right:32px;font-weight:500;
-      transition:.25s;cursor:pointer;
+    nav a,nav span{
+      color:#fff;text-decoration:none;margin-right:32px;
+      font-weight:500;transition:.25s;cursor:pointer;
     }
     nav a:hover{color:#4ea3ff;text-shadow:0 0 12px #4ea3ff}
-    nav span{opacity:.45;cursor:default}
+    .active-page{opacity:1;color:#4ea3ff;text-shadow:0 0 10px #4ea3ff}
     .nav-links{display:flex;gap:32px}
 
+    /* USER CONTROLS */
     .user-controls{
-      display:flex;gap:14px;align-items:center;
-      font-size:14px;
+      display:flex;gap:14px;align-items:center;font-size:14px;
     }
     .user-btn{
       padding:6px 14px;border-radius:4px;border:1px solid rgba(255,255,255,.28);
-      background:rgba(255,255,255,.05);color:#fff;font-weight:500;
-      cursor:pointer;transition:.25s;
+      background:rgba(255,255,255,.05);color:#fff;font-weight:500;cursor:pointer;transition:.25s;
     }
     .user-btn:hover{background:rgba(255,255,255,.18)}
-    .logout-btn{background:#4ea3ff;border-color:#4ea3ff}
+    .logout-btn{
+      background:#4ea3ff;border-color:#4ea3ff;
+    }
     .logout-btn:hover{filter:brightness(1.07)}
 
     /* HERO */
     .hero{
-      height:60vh;
-      background:url('https://i.imgur.com/vbt5BPF.jpeg') center/cover no-repeat fixed;
-      display:flex;justify-content:center;align-items:center;
-      flex-direction:column;text-align:center;
-      padding-top:60px;
-      animation:fadeIn 1.4s ease forwards;
+      height:60vh;background:url('https://i.imgur.com/vbt5BPF.jpeg') center/cover no-repeat fixed;
+      display:flex;justify-content:center;align-items:center;flex-direction:column;
+      text-align:center;padding-top:60px;
     }
-    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
     .hero h1{
-      font-size:4rem;font-weight:700;
-      text-shadow:0 0 28px rgba(78,163,255,.45);
+      font-size:4rem;font-weight:700;text-shadow:0 0 28px rgba(78,163,255,.45);
     }
     .hero p{margin-top:12px;font-size:1.2rem;opacity:.84;max-width:700px}
 
@@ -78,19 +68,11 @@
     .section-title{
       margin-top:40px;font-size:1.6rem;font-weight:700;color:#4ea3ff;
       border-left:4px solid #4ea3ff;padding-left:12px;text-transform:uppercase;
-      letter-spacing:.6px;
     }
     ul{margin:14px 0 0 24px}
     li{margin:8px 0;font-size:1.05rem;opacity:.9}
 
     footer{padding:25px;text-align:center;opacity:.65;margin-top:35px;font-size:14px}
-
-    @media(max-width:780px){
-      nav{padding:18px 25px}
-      .hero h1{font-size:2.7rem}
-      .hero p{font-size:1.05rem}
-      .rules-container{margin:45px 12px;padding:30px}
-    }
   </style>
 </head>
 <body>
@@ -99,9 +81,10 @@
 <nav>
   <div class="nav-links">
     <a href="index.html">Home</a>
-    <span>Rules</span>
+    <span class="active-page">Rules</span>
     <a href="departments.html">Departments</a>
     <a href="apply.html">Apply</a>
+    <a href="forums.html">Forums</a>
     <a href="staff.html">Staff Panel</a>
   </div>
 
@@ -126,33 +109,33 @@
 
   <h2 class="section-title">2 — Roleplay Standards</h2>
   <ul>
-    <li>Characters must behave realistically — no FailRP, trolling, or absurd behavior.</li>
-    <li>No metagaming, powergaming, or exploiting mechanics.</li>
-    <li>Story-building and progression are expected at all times.</li>
+    <li>No FailRP, trolling, or unrealistic behavior.</li>
+    <li>No metagaming, powergaming, or exploiting.</li>
+    <li>Maintain realism and story progression.</li>
   </ul>
 
   <h2 class="section-title">3 — Crime & Combat</h2>
   <ul>
-    <li>Random killing (RDM) and vehicle attacks (VDM) are strictly prohibited.</li>
-    <li>Major crimes must be supported by proper RP.</li>
-    <li>Value your life — act as if consequences matter.</li>
+    <li>No RDM/VDM.</li>
+    <li>Major crime requires proper RP justification.</li>
+    <li>Your character must value their life.</li>
   </ul>
 
   <h2 class="section-title">4 — Vehicles & Pursuits</h2>
   <ul>
     <li>No unrealistic vehicles unless approved.</li>
-    <li>Pursuit tactics must be logical and grounded in RP.</li>
+    <li>Pursuits must make logical RP sense.</li>
   </ul>
 
   <h2 class="section-title">5 — Discord Requirements</h2>
   <ul>
-    <li>You must remain in the official Discord server at all times.</li>
+    <li>You must remain in the official Discord.</li>
     <li>Impersonation of staff or departments results in removal.</li>
   </ul>
 
   <h2 class="section-title">6 — Enforcement</h2>
   <ul>
-    <li>Violations will result in warnings, suspensions, or permanent bans.</li>
+    <li>Rule violations may result in warnings or bans.</li>
     <li>Staff decisions are final.</li>
   </ul>
 
@@ -162,33 +145,26 @@
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
-
-/* ========== LOGIN STATE HANDLER ========== */
 const user = JSON.parse(localStorage.getItem("shoreUser"));
 const box = document.getElementById("userControls");
 
-/* BAN CHECK */
+/* BAN CHECK — uses correct backend route /users/:id */
 async function checkBan() {
   if (!user) return;
 
   try {
-    const res = await fetch(`${API}/users/${user.id}/status`);
+    const res = await fetch(`${API}/users/${user.id}`);
     const data = await res.json();
 
     if (data.banned) {
-      // store ban reason for banned.html page
-      localStorage.setItem("shoreBanReason", data.reason || "No reason provided");
+      localStorage.setItem("shoreBanReason", data.banReason || "No reason provided");
       localStorage.removeItem("shoreUser");
-
-      // redirect
-      window.location.href = "banned.html";
+      location.href = "banned.html";
     }
-  } catch (err) {
-    console.warn("⚠️ Ban check failed:", err);
-  }
+  } catch(err) {}
 }
 
-/* RENDER USER STATE */
+/* DISPLAY NAV STATE */
 function renderNav() {
   if (!user) {
     box.innerHTML = `
@@ -205,18 +181,14 @@ function renderNav() {
   }
 }
 
-/* LOGOUT */
 function logout() {
   localStorage.removeItem("shoreUser");
   location.reload();
 }
 
-/* EXECUTE */
 renderNav();
 checkBan();
 </script>
 
-
 </body>
 </html>
-
