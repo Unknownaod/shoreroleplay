@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Shore Roleplay | Profile</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Inter",sans-serif;
+  background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+  color:#fff;overflow-x:hidden;
+}
+a{color:#4ea3ff;text-decoration:none}
+
+/* NAV */
+nav{
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.12);
+  padding:18px 60px;
+  display:flex;justify-content:space-between;align-items:center;
+  position:fixed;top:0;width:100%;z-index:20;
+}
+nav span,nav a{margin-right:28px;font-size:15px;opacity:.85;cursor:pointer}
+nav a:hover{color:#4ea3ff;text-shadow:0 0 12px #4ea3ff}
+
+/* MAIN */
+main{
+  max-width:1000px;
+  margin:150px auto 60px;
+  background:rgba(0,0,0,.75);
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.11);
+  box-shadow:0 0 45px rgba(0,0,0,.6);
+  padding:40px;
+}
+
+/* HEADER */
+.profile-header{
+  text-align:center;margin-bottom:32px;
+}
+.profile-header h1{font-size:2.7rem;margin-bottom:6px}
+.profile-header p{opacity:.78}
+
+/* SECTIONS */
+.section{margin-top:45px}
+.section h2{
+  font-size:1.45rem;margin-bottom:16px;
+  border-left:4px solid #4ea3ff;padding-left:10px;
+}
+.dept{
+  display:flex;align-items:center;
+  background:#111722;
+  border:1px solid rgba(255,255,255,.14);
+  padding:14px 18px;margin:8px 0;
+  border-radius:10px;
+}
+.dept img{
+  width:52px;height:52px;margin-right:18px;
+  filter:drop-shadow(0 0 10px rgba(0,0,0,.55));
+}
+.app-card{
+  background:#0b1019;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;
+  padding:14px;margin:8px 0;
+  font-size:.95rem;
+}
+.badge{
+  padding:4px 10px;border-radius:6px;
+  display:inline-block;margin-top:6px;
+  font-size:.78rem;font-weight:600
+}
+.accepted{background:#2ecc71;color:#000}
+
+footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div>
+    <a href="index.html">Home</a>
+    <a href="departments.html">Departments</a>
+    <a href="rules.html">Rules</a>
+    <a href="apply.html">Apply</a>
+  </div>
+</nav>
+
+<main>
+
+  <div class="profile-header">
+    <h1 id="username">Loading...</h1>
+    <p id="subtitle">Fetching profile...</p>
+  </div>
+
+  <div class="section">
+    <h2>Departments</h2>
+    <div id="deptList"></div>
+  </div>
+
+  <div class="section">
+    <h2>Public Applications</h2>
+    <div id="appsList"></div>
+  </div>
+
+</main>
+
+<footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
+
+<script>
+const API = "https://shoreroleplay.onrender.com";
+const urlParams = new URLSearchParams(window.location.search);
+const username = urlParams.get("user");
+
+if(!username){
+  location.href = "index.html";
+}
+
+/* BADGES MAP */
+const badges = {
+  "Police Department":"https://i.imgur.com/3Uhtndq.png",
+  "State Police":"https://i.imgur.com/24jUZlT.png",
+  "Sheriff's Office":"https://i.imgur.com/3Uhtndq.png",
+  "Fire Department":"https://i.imgur.com/cgD0S1f.png",
+  "Communications":"https://i.imgur.com/Saa1GSc.png",
+  "Civilian Operations":"https://i.imgur.com/DZBwCeX.png",
+  "DevOps":"https://i.imgur.com/DAlxtWE.png"
+};
+
+/* LOAD PROFILE DATA */
+async function loadProfile(){
+  const res = await fetch(API + "/applications");
+  const apps = await res.json();
+
+  const userApps = apps.filter(
+    a => a.username.toLowerCase() === username.toLowerCase()
+  );
+
+  document.getElementById("username").textContent = username;
+
+  if(userApps.length === 0){
+    document.getElementById("subtitle").textContent = "No public data found.";
+    return;
+  }
+
+  const accepted = userApps.filter(a => a.status === "accepted");
+
+  document.getElementById("subtitle").textContent =
+    accepted.length > 0 ? "Active Shore Roleplay Member" : "Applicant";
+
+  const deptList = document.getElementById("deptList");
+  const appsList = document.getElementById("appsList");
+
+  if(accepted.length === 0){
+    deptList.innerHTML = "<p>No accepted departments yet.</p>";
+  }
+
+  accepted.forEach(app => {
+    deptList.innerHTML += `
+      <div class="dept">
+        <img src="${badges[app.department] || badges['Civilian Operations']}">
+        <div>
+          <strong>${app.department}</strong><br>
+          Verified Member
+        </div>
+      </div>`;
+    appsList.innerHTML += `
+      <div class="app-card">
+        <strong>${app.department}</strong> — ${new Date(app.submittedAt).toLocaleDateString()}
+        <div class="badge accepted">ACCEPTED</div>
+      </div>`;
+  });
+}
+
+loadProfile();
+</script>
+
+</body>
+</html>
