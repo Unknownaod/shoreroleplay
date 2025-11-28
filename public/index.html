@@ -438,17 +438,20 @@
   <aside class="page-sidebar">
 
     <!-- Interested in joining -->
-    <div class="sidebar-card" id="joinCard">
-      <h3>Interested in joining?</h3>
-      <p>Please make an account and submit an application to get started.</p>
-      <div class="sidebar-actions">
-        <button class="sidebar-btn" onclick="location.href='login.html'">Sign In</button>
-        <button class="sidebar-btn" onclick="location.href='register.html'">Sign Up</button>
-        <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">
-          <i class="fa-brands fa-discord"></i> Login with Discord
-        </button>
-      </div>
-    </div>
+<div class="sidebar-card" id="joinCard">
+  <h3>Interested in joining?</h3>
+  <p>Please make an account and submit an application to get started.</p>
+
+  <div class="sidebar-actions" id="joinButtons">
+    <!-- JS will inject Sign In / Sign Up / Discord OR Profile / Settings / Logout -->
+    <button class="sidebar-btn" onclick="location.href='login.html'">Sign In</button>
+    <button class="sidebar-btn" onclick="location.href='register.html'">Sign Up</button>
+    <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">
+      <i class="fa-brands fa-discord"></i> Login with Discord
+    </button>
+  </div>
+</div>
+
 
     <!-- Open Applications -->
     <div class="sidebar-card">
@@ -616,6 +619,7 @@ loadSession();
 
 </body>
 </html>
+
 
 
 
