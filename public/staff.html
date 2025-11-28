@@ -131,6 +131,18 @@ th{text-transform:uppercase;font-size:12px;letter-spacing:.8px;color:#4ea3ff;opa
 .role-staff{background:#2980b933;border:1px solid #3498db;color:#d6ecff}
 .role-sit{background:#f39c1233;border:1px solid #f39c12;color:#ffe8c0}
 
+/* ROLE SELECT DROPDOWN */
+.role-select{
+  width:100%;
+  background:#111820;
+  border:1px solid rgba(255,255,255,.25);
+  color:#fff;
+  padding:4px 6px;
+  border-radius:6px;
+  font-size:12px;
+  margin-bottom:6px;
+}
+
 /* MODAL */
 #modal{
   position:fixed;top:0;left:0;width:100%;height:100%;
@@ -242,6 +254,18 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
 const API = "https://shoreroleplay.onrender.com";
 let currentTab = 'pending';
 let haUnlocked = false;
+
+/* Allowed staff roles for HA role editor */
+const ROLE_OPTIONS = [
+  "User",
+  "Staff In Training",
+  "Staff",
+  "Senior Staff",
+  "Junior Administration",
+  "Administration",
+  "Internal Affairs",
+  "Head Administrator"
+];
 
 /* ========== USER NAV STATE ========== */
 const user = JSON.parse(localStorage.getItem("shoreUser"));
@@ -428,23 +452,68 @@ async function removeApp(id){
 
 /* ========== HA / USERS SECTION ========== */
 
-/* Map backend role strings (Option A) to nice colored badges */
+/* Map backend role strings to nice colored badges */
 function renderRoleBadge(roleRaw){
-  const role = (roleRaw || "user").trim();
+  const role = (roleRaw || "User").trim();
 
   let cls = "role-user";
   let label = role;
 
-  if(role === "Head Administrator"){ cls = "role-ha"; }
+  // Support both new names and legacy short codes
+  if(role === "Head Administrator" || role === "HA"){ cls = "role-ha"; label = "Head Administrator"; }
   else if(role === "Internal Affairs"){ cls = "role-ia"; }
   else if(role === "Administration"){ cls = "role-admin"; }
   else if(role === "Junior Administration"){ cls = "role-junior-admin"; }
   else if(role === "Senior Staff"){ cls = "role-senior-staff"; }
-  else if(role === "Staff"){ cls = "role-staff"; }
+  else if(role === "Staff" || role.toLowerCase() === "staff"){ cls = "role-staff"; label = "Staff"; }
   else if(role === "Staff In Training"){ cls = "role-sit"; }
-  else if(!role || role === "user"){ label = "User"; }
+  else if(role.toLowerCase() === "user"){ cls = "role-user"; label = "User"; }
 
   return `<span class="role-badge ${cls}">${label}</span>`;
+}
+
+/* Build the role dropdown for HA tab */
+function buildRoleSelect(roleRaw, userId){
+  let current = (roleRaw || "User").trim();
+
+  // Normalize legacy values
+  if(current === "HA") current = "Head Administrator";
+  else if(current.toLowerCase() === "staff") current = "Staff";
+  else if(current.toLowerCase() === "user") current = "User";
+
+  const optionsHtml = ROLE_OPTIONS.map(r => {
+    const selected = (current.toLowerCase() === r.toLowerCase()) ? "selected" : "";
+    return `<option value="${r}" ${selected}>${r}</option>`;
+  }).join("");
+
+  return `
+    <select id="role-${userId}" class="role-select">
+      ${optionsHtml}
+    </select>
+  `;
+}
+
+/* Change a user's role via /users/:id/role */
+async function changeUserRole(id, role){
+  if(!confirm(`Set this user's role to "${role}"?`)) return;
+
+  try{
+    const res = await fetch(`${API}/users/${id}/role`, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ role })
+    });
+
+    if(res.ok){
+      alert("Role updated.");
+      loadUsers();
+    }else{
+      alert("Failed to update role.");
+    }
+  }catch(err){
+    console.error("Role update error:", err);
+    alert("Error updating role.");
+  }
 }
 
 /* GET ALL USERS → /users */
@@ -474,6 +543,8 @@ async function loadUsers(){
       <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}</td>
       <td>${u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : "—"}</td>
       <td>
+        ${buildRoleSelect(u.role, u.id)}
+        <button class="btn neutral" onclick="changeUserRole('${u.id}', document.getElementById('role-${u.id}').value)">Set Role</button><br>
         <button class="btn deny"   onclick="banUser('${u.id}')">Ban</button>
         <button class="btn accept" onclick="unbanUser('${u.id}')">Unban</button>
         <button class="btn delete" onclick="deleteUser('${u.id}')">Delete</button>
