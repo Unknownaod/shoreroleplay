@@ -35,14 +35,22 @@
       margin-right:32px;font-weight:500;
       transition:.25s;cursor:pointer;
     }
-    nav a:hover{
-      color:#4ea3ff;text-shadow:0 0 12px #4ea3ff;
-    }
-    nav span{
-      opacity:.45;cursor:default;
-    }
-
+    nav a:hover{color:#4ea3ff;text-shadow:0 0 12px #4ea3ff}
+    nav span{opacity:.45;cursor:default}
     .nav-links{display:flex;gap:32px}
+
+    .user-controls{
+      display:flex;gap:14px;align-items:center;
+      font-size:14px;
+    }
+    .user-btn{
+      padding:6px 14px;border-radius:4px;border:1px solid rgba(255,255,255,.28);
+      background:rgba(255,255,255,.05);color:#fff;font-weight:500;
+      cursor:pointer;transition:.25s;
+    }
+    .user-btn:hover{background:rgba(255,255,255,.18)}
+    .logout-btn{background:#4ea3ff;border-color:#4ea3ff}
+    .logout-btn:hover{filter:brightness(1.07)}
 
     /* HERO */
     .hero{
@@ -59,39 +67,23 @@
       font-size:4rem;font-weight:700;
       text-shadow:0 0 28px rgba(78,163,255,.45);
     }
-    .hero p{
-      margin-top:12px;font-size:1.2rem;opacity:.84;max-width:700px;
-    }
+    .hero p{margin-top:12px;font-size:1.2rem;opacity:.84;max-width:700px}
 
-    /* CONTENT BOX */
+    /* CONTENT */
     .rules-container{
-      max-width:1000px;
-      margin:80px auto 60px;
-      padding:45px;
-      background:#090c12;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;
-      box-shadow:0 0 35px rgba(0,0,0,.55);
+      max-width:1000px;margin:80px auto 60px;padding:45px;
+      background:#090c12;border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;box-shadow:0 0 35px rgba(0,0,0,.55);
     }
-
     .section-title{
-      margin-top:40px;
-      font-size:1.6rem;
-      font-weight:700;
-      color:#4ea3ff;
-      border-left:4px solid #4ea3ff;
-      padding-left:12px;
-      text-transform:uppercase;
+      margin-top:40px;font-size:1.6rem;font-weight:700;color:#4ea3ff;
+      border-left:4px solid #4ea3ff;padding-left:12px;text-transform:uppercase;
       letter-spacing:.6px;
     }
-
     ul{margin:14px 0 0 24px}
     li{margin:8px 0;font-size:1.05rem;opacity:.9}
 
-    footer{
-      padding:25px;text-align:center;opacity:.65;
-      margin-top:35px;font-size:14px;
-    }
+    footer{padding:25px;text-align:center;opacity:.65;margin-top:35px;font-size:14px}
 
     @media(max-width:780px){
       nav{padding:18px 25px}
@@ -112,6 +104,8 @@
     <a href="apply.html">Apply</a>
     <a href="staff.html">Staff Panel</a>
   </div>
+
+  <div id="userControls" class="user-controls"></div>
 </nav>
 
 <!-- HERO -->
@@ -120,7 +114,7 @@
   <p>All players are expected to operate within these guidelines at all times.</p>
 </section>
 
-<!-- RULES BLOCK -->
+<!-- RULES -->
 <section class="rules-container">
 
   <h2 class="section-title">1 — Community Conduct</h2>
@@ -164,9 +158,32 @@
 
 </section>
 
-<footer>
-  © 2025 Shore Roleplay — All Rights Reserved
-</footer>
+<footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
+
+<script>
+/* ========== LOGIN STATE HANDLER ========== */
+const user = JSON.parse(localStorage.getItem("shoreUser"));
+const box = document.getElementById("userControls");
+
+if(!user){
+  box.innerHTML = `
+    <button class="user-btn" onclick="location.href='login.html'">Login</button>
+    <button class="user-btn logout-btn" onclick="location.href='register.html'">Register</button>
+  `;
+} else {
+  box.innerHTML = `
+    Logged in as <strong>${user.username}</strong>
+    <button class="user-btn" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
+    <button class="user-btn" onclick="location.href='settings.html'">Settings</button>
+    <button class="user-btn logout-btn" onclick="logout()">Logout</button>
+  `;
+}
+
+function logout(){
+  localStorage.removeItem("shoreUser");
+  location.reload();
+}
+</script>
 
 </body>
 </html>
