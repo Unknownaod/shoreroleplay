@@ -1,152 +1,459 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Shore Roleplay | Home</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shore Roleplay | Home</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- FONTS -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-/* GLOBALS */
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-  font-family:"Inter",sans-serif;
-  background:url('https://i.imgur.com/vbt5BPF.jpeg') center/cover fixed;
-  color:#fff;overflow-x:hidden;
-}
+  <!-- OPTIONAL ICONS (for social buttons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
-/* TOP BAR (Sign in + Logo Bar) */
-.topbar{
-  width:100%;background:rgba(0,0,0,.55);
-  border-bottom:1px solid rgba(255,255,255,.08);
-  padding:12px 35px;display:flex;justify-content:space-between;
-  align-items:center;backdrop-filter:blur(16px);
-}
-.topbar-left img{height:42px;} /* SHORE LOGO TOP LEFT */
-.topbar-right a{
-  color:#fff;font-size:14px;margin-left:18px;text-decoration:none;
-  background:rgba(255,255,255,.1);padding:6px 14px;
-  border-radius:6px;transition:.2s;
-}
-.topbar-right a:hover{background:#4ea3ff;}
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
 
-/* NAV BAR */
-nav{
-  width:100%;display:flex;justify-content:center;
-  background:rgba(0,0,0,.55);backdrop-filter:blur(14px);
-  border-bottom:1px solid rgba(255,255,255,.07);
-  padding:12px 0;gap:45px;
-}
-nav a{
-  color:#dbe6ff;text-decoration:none;font-size:15px;
-  transition:.25s;
-}
-nav a:hover{text-shadow:0 0 10px #4ea3ff;color:#4ea3ff}
+    body{
+      font-family:"Inter",sans-serif;
+      background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+      color:#fff;
+      overflow-x:hidden;
+    }
 
-/* LAYOUT */
-.page{
-  display:flex;justify-content:center;padding:60px 40px;
-  gap:45px;max-width:1600px;margin:auto;
-}
+    a{color:inherit;text-decoration:none}
 
-/* CENTER PANEL */
-.center-panel{
-  width:760px;background:rgba(0,0,0,.6);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:14px;padding:45px;
-  backdrop-filter:blur(28px);
-  box-shadow:0 0 45px rgba(0,0,0,.55);
-  text-align:center;
-}
-.center-panel img{width:300px;margin-bottom:18px;filter:drop-shadow(0 0 8px #fff);}
-.center-panel h1{text-shadow:0 0 15px rgba(78,163,255,.45);margin-bottom:18px;}
+    /* =========================
+       TOP HEADER (LOGO BAR)
+    ========================== */
+    .top-header{
+      width:100%;
+      background:rgba(0,0,0,.7);
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;justify-content:center;align-items:center;
+      padding:14px 20px;
+    }
+    .top-header img{
+      height:44px;
+      filter:drop-shadow(0 0 10px rgba(0,0,0,.8));
+    }
 
-/* RIGHT SIDEBAR */
-.sidebar{
-  width:360px;display:flex;flex-direction:column;gap:18px;
-}
-.sidebar-card{
-  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.08);
-  border-radius:12px;padding:20px;backdrop-filter:blur(18px)
-}
-.sidebar-card h3{margin-bottom:12px;font-size:1rem;color:#4ea3ff;}
+    /* =========================
+       USER BAR
+    ========================== */
+    .user-bar{
+      width:100%;
+      background:rgba(8,10,16,.85);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      padding:8px 40px;
+      display:flex;justify-content:space-between;align-items:center;
+      font-size:14px;
+    }
+    .user-bar-left{
+      opacity:.9;
+    }
+    .user-bar-right{
+      display:flex;gap:10px;
+    }
+    .btn-chip{
+      padding:6px 14px;
+      border-radius:4px;
+      border:1px solid rgba(255,255,255,.3);
+      background:rgba(255,255,255,.05);
+      cursor:pointer;
+      font-weight:500;
+      transition:.2s;
+    }
+    .btn-chip-primary{
+      border-color:#4ea3ff;
+      background:#4ea3ff;
+    }
+    .btn-chip:hover{background:rgba(255,255,255,.18);}
+    .btn-chip-primary:hover{filter:brightness(1.05);}
 
-.sidebar-card button{
-  width:100%;padding:12px;border:none;border-radius:8px;
-  font-weight:600;background:#4ea3ff;color:#fff;cursor:pointer;
-}
-.sidebar-card button:hover{box-shadow:0 0 15px #4ea3ff}
+    /* =========================
+       MAIN NAV
+    ========================== */
+    .main-nav{
+      width:100%;
+      background:rgba(5,7,12,.9);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(18px);
+      padding:10px 40px;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .nav-left{
+      display:flex;align-items:center;gap:18px;
+      font-size:15px;
+    }
+    .nav-brand{
+      font-weight:700;font-size:16px;
+    }
+    .nav-link{
+      opacity:.85;cursor:pointer;
+      position:relative;
+    }
+    .nav-link::after{
+      content:"";
+      position:absolute;left:0;bottom:-3px;
+      width:0;height:2px;
+      background:#4ea3ff;
+      transition:.2s;
+    }
+    .nav-link:hover{opacity:1;}
+    .nav-link:hover::after{width:100%;}
 
-footer{
-  margin-top:85px;text-align:center;padding:25px;font-size:14px;
-  opacity:.45;border-top:1px solid rgba(255,255,255,.08);
-}
-</style>
+    .nav-right{
+      display:flex;align-items:center;gap:14px;
+    }
+    .nav-search{
+      position:relative;
+    }
+    .nav-search input{
+      background:#111521;
+      border-radius:4px;
+      border:1px solid rgba(255,255,255,.16);
+      padding:6px 28px 6px 8px;
+      color:#fff;
+      font-size:13px;
+    }
+    .nav-search i{
+      position:absolute;right:8px;top:50%;
+      transform:translateY(-50%);
+      font-size:12px;opacity:.7;
+    }
+    .nav-icon-btn{
+      width:26px;height:26px;border-radius:4px;
+      background:#20263a;border:1px solid rgba(255,255,255,.15);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;font-size:13px;
+      transition:.2s;
+    }
+    .nav-icon-btn:hover{background:#4ea3ff;border-color:#4ea3ff;}
+
+    /* =========================
+       PAGE LAYOUT
+    ========================== */
+    .page-wrap{
+      max-width:1500px;
+      margin:40px auto 60px;
+      padding:0 40px;
+      display:flex;
+      gap:26px;
+    }
+    .page-main{
+      flex:1 1 0;
+      max-width:900px;
+    }
+    .page-sidebar{
+      width:340px;
+      flex-shrink:0;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    /* =========================
+       MAIN PANEL
+    ========================== */
+    .panel{
+      background:rgba(0,0,0,.78);
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.11);
+      box-shadow:0 0 38px rgba(0,0,0,.7);
+      padding:40px 46px 46px;
+    }
+    .panel-header{
+      text-align:center;margin-bottom:26px;
+    }
+    .panel-header img{
+      width:180px;margin-bottom:16px;
+      filter:drop-shadow(0 0 10px rgba(0,0,0,.8));
+    }
+    .panel-header h1{
+      font-size:1.6rem;
+      margin-bottom:6px;
+      font-weight:700;
+    }
+    .panel-header h2{
+      font-size:1.05rem;
+      font-weight:500;
+      opacity:.8;
+    }
+    .panel-body p{
+      font-size:.96rem;
+      line-height:1.65;
+      opacity:.9;
+      margin-bottom:12px;
+    }
+    .panel-body h3{
+      margin:22px 0 8px;
+      font-size:1.05rem;
+    }
+    .panel-body ul{
+      margin-left:18px;
+      font-size:.96rem;
+      line-height:1.7;
+      opacity:.9;
+    }
+
+    /* =========================
+       SIDEBAR CARDS
+    ========================== */
+    .sidebar-card{
+      background:rgba(0,0,0,.8);
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      padding:16px 18px;
+      box-shadow:0 0 22px rgba(0,0,0,.75);
+      font-size:.9rem;
+    }
+    .sidebar-card h3{
+      font-size:.95rem;
+      margin-bottom:10px;
+      font-weight:600;
+    }
+    .sidebar-card p{
+      opacity:.85;
+      margin-bottom:10px;
+    }
+    .sidebar-actions{
+      display:flex;flex-direction:column;gap:8px;margin-top:6px;
+    }
+    .sidebar-btn{
+      width:100%;padding:9px 10px;
+      border-radius:6px;
+      border:none;
+      background:#252b3d;
+      color:#fff;
+      font-size:.85rem;
+      font-weight:600;
+      cursor:pointer;
+      text-align:center;
+      transition:.2s;
+    }
+    .sidebar-btn.primary{
+      background:#4e6dff;
+    }
+    .sidebar-btn.discord{
+      background:#5865F2;
+    }
+    .sidebar-btn:hover{filter:brightness(1.06);}
+
+    .sidebar-list-item{
+      padding:8px 0;
+      border-top:1px solid rgba(255,255,255,.09);
+      font-size:.87rem;
+    }
+    .sidebar-list-item:first-of-type{border-top:none;}
+    .sidebar-list-item span{
+      display:block;
+      opacity:.8;
+    }
+    .sidebar-tag{
+      display:inline-block;
+      font-size:.75rem;
+      padding:2px 6px;
+      border-radius:4px;
+      background:#262d42;
+      margin-top:4px;
+      opacity:.9;
+    }
+
+    /* =========================
+       FOOTER
+    ========================== */
+    footer{
+      text-align:center;
+      padding:26px 20px 34px;
+      font-size:.82rem;
+      background:rgba(0,0,0,.75);
+      border-top:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(14px);
+      margin-top:20px;
+      opacity:.8;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================== */
+    @media (max-width:1000px){
+      .page-wrap{
+        flex-direction:column;
+        padding:0 20px;
+      }
+      .page-sidebar{
+        width:100%;
+      }
+    }
+
+    @media (max-width:700px){
+      .user-bar,.main-nav{
+        padding:8px 12px;
+        flex-wrap:wrap;
+        gap:8px;
+      }
+      .page-wrap{
+        margin-top:25px;
+      }
+      .panel{
+        padding:28px 18px 30px;
+      }
+      .panel-header h1{font-size:1.3rem;}
+    }
+  </style>
 </head>
 <body>
 
-<!-- TOP BAR / LOGIN AREA -->
-<div class="topbar">
-  <div class="topbar-left">
-    <img src="https://i.imgur.com/P15LI6g.png">
+<!-- TOP LOGO BAR -->
+<header class="top-header">
+  <!-- SHORE ROLEPLAY LOGO -->
+  <img src="https://i.imgur.com/P15LI6g.png" alt="Shore Roleplay">
+</header>
+
+<!-- USER BAR -->
+<div class="user-bar">
+  <div class="user-bar-left">
+    Existing user? <strong>Sign In</strong> to continue.
   </div>
-  <div class="topbar-right">
-    <a href="/login.html">Sign In</a>
-    <a href="/register.html">Sign Up</a>
+  <div class="user-bar-right">
+    <button class="btn-chip" onclick="location.href='/login'">Sign In</button>
+    <button class="btn-chip btn-chip-primary" onclick="location.href='/register'">Sign Up</button>
   </div>
 </div>
 
-<!-- NAV -->
-<nav>
-  <a href="/">Home</a>
-  <a href="/apply.html">Apply</a>
-  <a href="/rules.html">Rules</a>
-  <a href="/staff.html">Staff Panel</a>
+<!-- MAIN NAV -->
+<nav class="main-nav">
+  <div class="nav-left">
+    <span class="nav-brand">Shore Roleplay</span>
+    <span class="nav-link">Home</span>
+    <span class="nav-link">ShoreRP Life</span>
+    <span class="nav-link">Departments</span>
+    <span class="nav-link">Resources</span>
+  </div>
+  <div class="nav-right">
+    <div class="nav-search">
+      <input type="text" placeholder="Search…">
+      <i class="fa fa-search"></i>
+    </div>
+    <div class="nav-icon-btn" title="All Activity">
+      <i class="fa fa-bell"></i>
+    </div>
+    <div class="nav-icon-btn" title="Discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">
+      <i class="fa-brands fa-discord"></i>
+    </div>
+    <div class="nav-icon-btn" title="YouTube">
+      <i class="fa-brands fa-youtube"></i>
+    </div>
+  </div>
 </nav>
 
-<!-- PAGE LAYOUT -->
-<div class="page">
+<!-- PAGE BODY -->
+<main class="page-wrap">
+  <!-- CENTER CONTENT -->
+  <section class="page-main">
+    <article class="panel">
+      <div class="panel-header">
+        <!-- MAIN SHORE LOGO / BADGES (you can swap for a collage image like DOJ) -->
+        <img src="https://i.imgur.com/P15LI6g.png" alt="Shore Roleplay Logo">
+        <h1>Welcome to the Shore Roleplay Community</h1>
+        <h2>Serious, story-driven FiveM roleplay built on professionalism and immersion.</h2>
+      </div>
 
-  <!-- CENTER PANEL -->
-  <div class="center-panel">
-    <img src="https://i.imgur.com/P15LI6g.png">
-    <h1>Welcome to Shore Roleplay</h1>
+      <div class="panel-body">
+        <p>
+          Shore Roleplay is committed to providing a high-quality, immersive Grand Theft Auto V roleplay
+          experience. Our community is built around professionalism, respect, and storytelling that makes
+          every scene feel meaningful.
+        </p>
 
-    <p>ShoreRP delivers immersive, realistic roleplay powered by a passionate team and a growing community.</p><br>
+        <p>
+          Whether you’re a seasoned roleplayer or just getting started, ShoreRP offers a place to grow,
+          collaborate, and create memorable experiences — from high-intensity emergency responses to
+          grounded civilian life and everything in between.
+        </p>
 
-    <p>Apply today and join our departments, civilian operations, emergency services, and more.</p>
-  </div>
+        <h3>Are You Ready to Join?</h3>
+        <p>
+          Explore our departments and discover where you fit best. Applications are open year-round, and
+          our staff team is here to support you every step of the way.
+        </p>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
+        <h3>Community Requirements</h3>
+        <ul>
+          <li>Be 16 years of age or older (or your community’s requirement).</li>
+          <li>Understand and speak clear English.</li>
+          <li>Own a legal copy of Grand Theft Auto V.</li>
+          <li>Have a working microphone and stable internet connection.</li>
+          <li>Agree to follow all Shore Roleplay community rules and guidelines.</li>
+        </ul>
+
+        <h3>Looking for More?</h3>
+        <p>
+          Join our Discord to learn more about departments, recruitment openings, live events, and how
+          you can become part of the ShoreRP story.
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="page-sidebar">
+
+    <!-- Interested in joining -->
     <div class="sidebar-card">
-      <h3>Interested in Joining?</h3>
-      <button onclick="location.href='/apply.html'">Apply Now</button>
-      <button onclick="window.open('https://discord.gg/shoreRP','_blank')">
-        Login with Discord
-      </button>
+      <h3>Interested in joining?</h3>
+      <p>Please make an account and submit an application to get started.</p>
+      <div class="sidebar-actions">
+        <button class="sidebar-btn" onclick="location.href='/login'">Sign In</button>
+        <button class="sidebar-btn" onclick="location.href='/register'">Sign Up</button>
+        <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">
+          <i class="fa-brands fa-discord"></i> Login with Discord
+        </button>
+      </div>
     </div>
 
+    <!-- Open Applications -->
     <div class="sidebar-card">
       <h3>Open Applications</h3>
-      <p>Applications are currently open.</p>
+      <div class="sidebar-list-item">
+        Law Enforcement Departments
+        <span>Apply for Police, Sheriff, or Highway units.</span>
+      </div>
+      <div class="sidebar-list-item">
+        Fire & EMS
+        <span>Help protect Shore County as Fire/Rescue or EMS.</span>
+      </div>
+      <div class="sidebar-list-item">
+        Civilian Operations
+        <span>Shape the world through creative civilian roleplay.</span>
+      </div>
     </div>
 
+    <!-- Upcoming Events -->
     <div class="sidebar-card">
       <h3>Upcoming Events</h3>
-      <p>No upcoming events.</p>
+      <p>No upcoming events found.</p>
     </div>
 
+    <!-- Our Picks -->
     <div class="sidebar-card">
       <h3>Our Picks</h3>
-      <p>Featured updates coming soon.</p>
+      <div class="sidebar-list-item">
+        ShoreRP Community Night
+        <span>Join us for patrols, events, and community meetups.</span>
+        <span class="sidebar-tag">Featured</span>
+      </div>
+      <div class="sidebar-list-item">
+        New Member Orientation
+        <span>Learn the basics of our rules, servers, and departments.</span>
+      </div>
     </div>
-  </div>
 
-</div>
+  </aside>
+</main>
 
 <footer>
   © 2025 Shore Roleplay — All Rights Reserved
