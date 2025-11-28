@@ -100,10 +100,10 @@ th{text-transform:uppercase;font-size:13px;letter-spacing:.8px;color:#4ea3ff;opa
 .accept:hover{background:#45ed8a}
 .deny{background:#e74c3c;border:1px solid #b23127}
 .deny:hover{background:#ff6a5e}
-.view{
-  background:#2980b9;border:1px solid #1f5f86;color:#fff;
-}
+.view{background:#2980b9;border:1px solid #1f5f86;color:#fff}
 .view:hover{background:#3498db}
+.delete{background:#6c63ff;border:1px solid #5148cc}
+delete:hover{background:#857dff}
 
 /* MODAL */
 #modal{
@@ -121,21 +121,17 @@ th{text-transform:uppercase;font-size:13px;letter-spacing:.8px;color:#4ea3ff;opa
   background:#4ea3ff;border:none;color:#fff;cursor:pointer;
 }
 
-.delete {
-  background:#6c63ff;border:1px solid #5148cc;
-}
-.delete:hover{background:#857dff}
-
+footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
 </style>
 </head>
 <body>
 
 <nav>
   <div>
-    <a href="/">Home</a>
+    <a href="index.html">Home</a>
     <span style="opacity:.55;">Staff Panel</span>
   </div>
-  <a href="/" style="background:#4ea3ff;padding:10px 22px;border-radius:8px;color:#fff;text-decoration:none;">⬅ Back to Home</a>
+  <a href="index.html" style="background:#4ea3ff;padding:10px 22px;border-radius:8px;color:#fff;text-decoration:none;">⬅ Back to Home</a>
 </nav>
 
 <header>
@@ -155,13 +151,11 @@ th{text-transform:uppercase;font-size:13px;letter-spacing:.8px;color:#4ea3ff;opa
 <div id="panel" class="panel">
   <h2 style="margin-bottom:18px;font-weight:600;color:#4ea3ff">Application Review Dashboard</h2>
 
-  <!-- TAB CONTROLS -->
   <div class="tabs">
     <div class="tab active" onclick="switchTab('pending')">Pending Applications</div>
     <div class="tab" onclick="switchTab('all')">Previous Applications</div>
   </div>
 
-  <!-- TABLE -->
   <table>
     <thead>
       <tr>
@@ -198,7 +192,7 @@ async function login(){
   }else document.getElementById("error").textContent="❌ Invalid Credential";
 }
 
-/* TAB SWITCH */
+/* TAB CHANGE */
 function switchTab(tab){
   currentTab=tab;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -208,11 +202,12 @@ function switchTab(tab){
 
 /* LOAD APPLICATIONS */
 async function loadApps(){
-  const data = await (await fetch(API+"/applications")).json();
+  const res = await fetch(API+"/applications");
+  const data = await res.json();
   const pending = data.filter(a => a.status==="pending");
-  const tableData = currentTab==='pending' ? pending : data;
+  const set = currentTab==='pending' ? pending : data;
 
-  document.getElementById("apps").innerHTML = tableData.map(app => `
+  document.getElementById("apps").innerHTML = set.map(app => `
     <tr>
       <td>${app.username}</td>
       <td>${app.email}</td>
@@ -231,7 +226,8 @@ async function loadApps(){
 
 /* VIEW FULL APPLICATION */
 async function viewApp(id){
-  const app = (await (await fetch(API+"/applications")).json()).find(a=>a.id===id);
+  const apps = await (await fetch(API+"/applications")).json();
+  const app = apps.find(a=>a.id===id);
   document.getElementById("modalTitle").textContent = `Application — ${app.username}`;
   document.getElementById("modalContent").textContent =
 `
@@ -243,35 +239,39 @@ Status: ${app.status}
 Submitted: ${app.submittedAt}
 
 Reason:
-${app.reason || "No reason provided"}
+${app.reason}
 
-Agreed to Logging: ${app.agreedLogging ? "YES" : "NO"}
-Agreed Discord Requirement: ${app.agreedDiscord ? "YES" : "NO"}
+Logging Agreement: ${app.agreedLogging ? "YES" : "NO"}
+Discord Requirement: ${app.agreedDiscord ? "YES" : "NO"}
 `;
   document.getElementById("modal").style.display="flex";
 }
-function closeModal(){document.getElementById("modal").style.display="none"}
 
-/* DECISION */
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+}
+
+/* DECIDE */
 async function decide(id,status){
   if(!confirm(`Confirm marking this application as ${status.toUpperCase()}?`))return;
-  await fetch(API+"/applications/"+id+"/decision",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})});
+  await fetch(`${API}/applications/${id}/decision`,{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({status})
+  });
   alert("Decision saved and applicant notified.");
   loadApps();
 }
-/// DELETE APPLICATION
-  async function removeApp(id) {
-  if (!confirm("Are you sure you want to permanently delete this application?")) return;
 
-  const res = await fetch(`${API}/applications/${id}`, { method: "DELETE" });
-  if (res.ok) {
+/* DELETE APPLICATION */
+async function removeApp(id){
+  if(!confirm("Are you sure you want to permanently delete this application?"))return;
+  const res = await fetch(`${API}/applications/${id}`,{method:"DELETE"});
+  if(res.ok){
     alert("Application deleted.");
     loadApps();
-  } else {
-    alert("Delete failed.");
-  }
+  }else alert("Delete failed.");
 }
-
 </script>
+
 </body>
 </html>
