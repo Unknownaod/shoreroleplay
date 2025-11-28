@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Shore Roleplay | Thread View</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:"Inter",sans-serif;
+      background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+      color:#fff;overflow-x:hidden;
+    }
+    a{text-decoration:none;color:#4ea3ff}
+
+    /* NAV */
+    nav{
+      background:rgba(0,0,0,.6);
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      padding:18px 60px;
+      display:flex;justify-content:space-between;align-items:center;
+      position:fixed;top:0;width:100%;z-index:20;
+    }
+    nav .nav-left a{
+      margin-right:24px;font-size:15px;opacity:.85;color:#dbe6ff;
+    }
+    nav .nav-left a:hover{
+      color:#4ea3ff;text-shadow:0 0 10px #4ea3ff;
+    }
+    nav .nav-right{
+      font-size:14px;display:flex;align-items:center;gap:10px;
+    }
+    .nav-btn{
+      padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.3);
+      background:rgba(255,255,255,.06);color:#fff;font-size:13px;
+      cursor:pointer;transition:.2s;
+    }
+    .nav-btn.primary{
+      background:#4ea3ff;border-color:#4ea3ff;
+    }
+    .nav-btn:hover{background:rgba(255,255,255,.18)}
+    .nav-btn.primary:hover{filter:brightness(1.03);}
+
+    /* PAGE LAYOUT */
+    .page-wrap{
+      max-width:1150px;
+      margin:120px auto 60px;
+      padding:0 20px 40px;
+      display:grid;grid-template-columns:minmax(0,3fr) minmax(260px,1.2fr);
+      gap:20px;
+    }
+    @media(max-width:960px){
+      .page-wrap{grid-template-columns:1fr;margin-top:110px}
+    }
+
+    .panel{
+      background:rgba(0,0,0,.78);
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 0 40px rgba(0,0,0,.7);
+      padding:26px 26px 30px 26px;
+    }
+
+    /* THREAD HEADER */
+    .thread-header{
+      border-bottom:1px solid rgba(255,255,255,.1);
+      padding-bottom:18px;margin-bottom:16px;
+    }
+    .thread-title{
+      font-size:1.5rem;font-weight:700;
+      margin-bottom:8px;
+    }
+    .thread-meta{
+      display:flex;flex-wrap:wrap;gap:10px;
+      font-size:.85rem;opacity:.85;align-items:center;
+    }
+    .chip{
+      display:inline-flex;align-items:center;
+      padding:4px 10px;border-radius:999px;
+      font-size:.75rem;font-weight:600;
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(10,12,24,.9);
+    }
+    .chip-category{border-color:#4ea3ff;color:#cfe3ff}
+    .chip-replies{border-color:#2ecc71;color:#b2ffd2}
+    .chip-time{border-color:rgba(255,255,255,.2);}
+
+    .author-block{
+      display:flex;align-items:center;gap:10px;
+      margin-top:4px;font-size:.86rem;
+    }
+    .author-pfp{
+      width:32px;height:32px;border-radius:50%;
+      background:rgba(255,255,255,.1);
+      display:flex;align-items:center;justify-content:center;
+      font-size:.8rem;font-weight:700;
+      border:1px solid rgba(255,255,255,.25);
+    }
+    .author-name{font-weight:600}
+
+    /* STAFF BADGES */
+    .badge{
+      display:inline-flex;align-items:center;
+      padding:4px 8px;border-radius:6px;
+      font-size:.72rem;font-weight:600;margin-left:4px;
+    }
+    .ha{background:#ffcd39;color:#000}
+    .ia{background:#ff4f4f;color:#000}
+    .admin{background:#3498db}
+    .jadmin{background:#8e44ad}
+    .sstaff{background:#f39c12;color:#000}
+    .staff{background:#27ae60}
+    .sit{background:#16a085}
+    .civ{background:#7f8c8d}
+
+    /* THREAD BODY */
+    .thread-body{
+      font-size:.98rem;line-height:1.6;
+      white-space:pre-wrap;
+    }
+
+    /* SIDEBAR */
+    .sidebar-card{
+      background:rgba(0,0,0,.82);
+      border-radius:12px;border:1px solid rgba(255,255,255,.16);
+      padding:16px 18px;margin-bottom:16px;font-size:.9rem;
+    }
+    .sidebar-card h3{font-size:.95rem;margin-bottom:6px;font-weight:600;}
+    .mod-buttons{
+      display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;
+    }
+    .mod-btn{
+      padding:6px 10px;font-size:.78rem;border-radius:6px;
+      border:none;cursor:pointer;font-weight:600;
+      background:rgba(255,255,255,.08);color:#fff;
+    }
+    .mod-btn.danger{background:#e74c3c}
+    .mod-btn:hover{filter:brightness(1.06)}
+
+    /* REPLIES */
+    .replies-header{
+      margin-top:22px;margin-bottom:6px;
+      font-weight:600;font-size:1rem;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    .replies-list{margin-top:6px}
+    .reply{
+      display:grid;grid-template-columns:70px minmax(0,1fr);
+      gap:10px;
+      border-top:1px solid rgba(255,255,255,.06);
+      padding:14px 0;
+    }
+    .reply:first-child{border-top:none;padding-top:4px}
+    .reply-author{
+      text-align:center;font-size:.78rem;
+    }
+    .reply-pfp{
+      width:46px;height:46px;border-radius:50%;
+      background:rgba(255,255,255,.1);
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 4px auto;
+      border:1px solid rgba(255,255,255,.28);
+      font-size:.78rem;font-weight:700;
+    }
+    .reply-body{
+      font-size:.95rem;line-height:1.5;
+    }
+    .reply-topline{
+      display:flex;justify-content:space-between;align-items:center;
+      margin-bottom:4px;font-size:.78rem;opacity:.85;
+    }
+    .reply-username{font-weight:600}
+    .reply-actions{
+      display:flex;gap:8px;font-size:.75rem;
+    }
+    .reply-actions button{
+      background:transparent;border:none;color:#ff7676;
+      cursor:pointer;padding:0;
+    }
+
+    /* REPLY FORM */
+    .reply-box{
+      margin-top:20px;border-top:1px solid rgba(255,255,255,.12);
+      padding-top:16px;
+    }
+    textarea{
+      width:100%;min-height:110px;margin-top:6px;
+      border-radius:8px;border:1px solid rgba(255,255,255,.2);
+      background:rgba(5,7,12,.95);color:#fff;
+      padding:10px;font-family:inherit;font-size:.95rem;
+      resize:vertical;
+    }
+    .reply-btn{
+      margin-top:8px;padding:10px 16px;border-radius:8px;
+      border:none;background:#4ea3ff;color:#fff;
+      font-weight:600;cursor:pointer;font-size:.9rem;
+    }
+    .reply-btn:hover{filter:brightness(1.05)}
+    .muted{opacity:.7;font-size:.86rem}
+
+    .error{color:#ff7676;font-size:.83rem;margin-top:4px;}
+    .success{color:#2ecc71;font-size:.83rem;margin-top:4px;}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="index.html">Home</a>
+    <a href="departments.html">Departments</a>
+    <a href="rules.html">Rules</a>
+    <a href="apply.html">Apply</a>
+    <a href="forums.html">Forums</a>
+    <a href="staff.html">Staff Panel</a>
+  </div>
+  <div class="nav-right" id="navUser">
+    <!-- filled by JS -->
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <!-- MAIN THREAD PANEL -->
+  <section class="panel" id="threadPanel">
+    <div class="thread-header">
+      <div class="thread-title" id="threadTitle">Loading thread...</div>
+      <div class="thread-meta">
+        <span class="chip chip-category" id="threadCategory">Category: —</span>
+        <span class="chip chip-replies" id="threadReplyCount">0 Replies</span>
+        <span class="chip chip-time" id="threadCreated">—</span>
+      </div>
+      <div class="author-block" id="threadAuthor">
+        <!-- author info -->
+      </div>
+    </div>
+
+    <div class="thread-body" id="threadBody">Please wait...</div>
+
+    <div class="replies-header">
+      <span>Replies</span>
+      <span id="refreshInfo" class="muted">Auto-refreshing every 10s</span>
+    </div>
+    <div class="replies-list" id="repliesList">
+      <!-- replies go here -->
+    </div>
+
+    <div class="reply-box" id="replyBox">
+      <!-- filled by JS depending on login -->
+    </div>
+  </section>
+
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="sidebar-card">
+      <h3>Thread Info</h3>
+      <p class="muted" id="threadIdLabel">ID: —</p>
+      <p class="muted" id="threadStats">—</p>
+    </div>
+
+    <div class="sidebar-card" id="staffTools" style="display:none;">
+      <h3>Staff Tools</h3>
+      <p class="muted">Visible to staff members only.</p>
+      <div class="mod-buttons">
+        <!-- lock/pin could be added later -->
+        <button class="mod-btn danger" onclick="deleteThread()">Delete Thread</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+const API = "https://shoreroleplay.onrender.com";
+const params = new URLSearchParams(window.location.search);
+const threadId = params.get("id");
+const currentUser = JSON.parse(localStorage.getItem("shoreUser"));
+
+if (!threadId) {
+  window.location.href = "forums.html";
+}
+
+const STAFF_ROLES = [
+  "Head Administrator",
+  "Internal Affairs",
+  "Administration",
+  "Junior Administration",
+  "Senior Staff",
+  "Staff",
+  "Staff In Training",
+];
+
+function isStaff(user){
+  if (!user) return false;
+  return STAFF_ROLES.includes(user.role);
+}
+
+/* NAV USER STATE */
+(function renderNavUser(){
+  const box = document.getElementById("navUser");
+  if (!currentUser){
+    box.innerHTML = `
+      <button class="nav-btn" onclick="location.href='login.html'">Login</button>
+      <button class="nav-btn primary" onclick="location.href='register.html'">Register</button>
+    `;
+  } else {
+    box.innerHTML = `
+      Logged in as <strong>${currentUser.username}</strong>
+      <button class="nav-btn" onclick="location.href='settings.html'">Settings</button>
+      <button class="nav-btn" onclick="logout()">Logout</button>
+    `;
+  }
+})();
+function logout(){
+  localStorage.removeItem("shoreUser");
+  location.href="index.html";
+}
+
+/* ROLE → BADGE CLASS */
+function roleClass(role){
+  switch(role){
+    case "Head Administrator": return "ha";
+    case "Internal Affairs": return "ia";
+    case "Administration": return "admin";
+    case "Junior Administration": return "jadmin";
+    case "Senior Staff": return "sstaff";
+    case "Staff": return "staff";
+    case "Staff In Training": return "sit";
+    default: return "civ";
+  }
+}
+
+/* INITIALS FOR PFP PLACEHOLDER */
+function initials(name){
+  if (!name) return "?";
+  return name.split(" ").map(p=>p[0]).join("").substring(0,2).toUpperCase();
+}
+
+/* DATE FORMATTER */
+function fmt(dt){
+  if (!dt) return "Unknown";
+  try{
+    return new Date(dt).toLocaleString();
+  }catch{
+    return dt;
+  }
+}
+
+/* GLOBAL THREAD DATA */
+let THREAD_DATA = null;
+
+/* LOAD THREAD + REPLIES */
+async function loadThread(){
+  const titleEl = document.getElementById("threadTitle");
+  const bodyEl = document.getElementById("threadBody");
+  const authorBox = document.getElementById("threadAuthor");
+  const catEl = document.getElementById("threadCategory");
+  const repliesCountEl = document.getElementById("threadReplyCount");
+  const createdEl = document.getElementById("threadCreated");
+  const repliesList = document.getElementById("repliesList");
+  const idLabel = document.getElementById("threadIdLabel");
+  const statsLabel = document.getElementById("threadStats");
+
+  try{
+    const res = await fetch(`${API}/thread/${threadId}`);
+    if (!res.ok){
+      titleEl.textContent = "Thread not found";
+      bodyEl.textContent = "This thread may have been deleted.";
+      repliesList.innerHTML = "";
+      return;
+    }
+    const data = await res.json();
+    const thread = data.thread;
+    const replies = data.replies || [];
+    THREAD_DATA = thread;
+
+    // header
+    titleEl.textContent = thread.title || "Untitled Thread";
+    catEl.textContent = thread.category ? `Category: ${thread.category}` : "Category: general";
+    repliesCountEl.textContent = `${replies.length} ${replies.length === 1 ? "Reply" : "Replies"}`;
+    createdEl.textContent = `Created: ${fmt(thread.createdAt)}`;
+
+    idLabel.textContent = `ID: ${thread.id || threadId}`;
+    statsLabel.textContent = `${replies.length} replies • Created ${fmt(thread.createdAt)}`;
+
+    // author info
+    const a = thread.author || {};
+    const displayName = a.username || "Unknown User";
+    const role = a.role || "Civilian";
+    const tag = a.staffTag || "";
+
+    authorBox.innerHTML = `
+      <div class="author-pfp">${initials(displayName)}</div>
+      <div>
+        <span class="author-name">${displayName}</span>
+        <span class="badge ${roleClass(role)}">${role}</span>
+        ${tag ? `<span class="badge civ">${tag}</span>` : ""}
+      </div>
+    `;
+
+    // body
+    bodyEl.textContent = thread.body || "";
+
+    // render replies
+    renderReplies(replies);
+
+    // reply box (only once)
+    renderReplyBox();
+
+    // staff tools visibility
+    const staffBox = document.getElementById("staffTools");
+    if (isStaff(currentUser)) staffBox.style.display = "block";
+    else staffBox.style.display = "none";
+
+  }catch(err){
+    console.error("Thread load error", err);
+    titleEl.textContent = "Error loading thread";
+    bodyEl.textContent = "Please try again later.";
+  }
+}
+
+/* RENDER REPLIES */
+function renderReplies(replies){
+  const container = document.getElementById("repliesList");
+  if (!replies || replies.length === 0){
+    container.innerHTML = `<p class="muted">No replies yet. Be the first to respond.</p>`;
+    document.getElementById("threadReplyCount").textContent = "0 Replies";
+    document.getElementById("threadStats").textContent =
+      `0 replies • Created ${fmt(THREAD_DATA?.createdAt)}`;
+    return;
+  }
+
+  document.getElementById("threadReplyCount").textContent =
+    `${replies.length} ${replies.length === 1 ? "Reply" : "Replies"}`;
+  document.getElementById("threadStats").textContent =
+    `${replies.length} replies • Created ${fmt(THREAD_DATA?.createdAt)}`;
+
+  container.innerHTML = replies.map(r=>{
+    const a = r.author || {};
+    const name = a.username || "Unknown User";
+    const role = a.role || "Civilian";
+    const tag = a.staffTag || "";
+
+    const canDelete = currentUser && isStaff(currentUser);
+
+    return `
+      <div class="reply">
+        <div class="reply-author">
+          <div class="reply-pfp">${initials(name)}</div>
+          <div class="reply-username">${name}</div>
+          <div><span class="badge ${roleClass(role)}">${role}</span></div>
+        </div>
+        <div class="reply-body">
+          <div class="reply-topline">
+            <span>Posted ${fmt(r.createdAt)}</span>
+            <div class="reply-actions">
+              ${canDelete ? `<button onclick="deleteReply('${r.id}')">Delete</button>` : ""}
+            </div>
+          </div>
+          <div>${escapeHtml(r.body || "")}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* ESCAPE BASIC HTML (very simple) */
+function escapeHtml(str){
+  return (str || "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[c]));
+}
+
+/* REPLY BOX RENDERING */
+function renderReplyBox(){
+  const box = document.getElementById("replyBox");
+  if (!currentUser){
+    box.innerHTML = `
+      <p class="muted">You must be logged in and accepted into a department to reply.</p>
+      <button class="reply-btn" onclick="location.href='login.html'">Login to Reply</button>
+    `;
+    return;
+  }
+
+  box.innerHTML = `
+    <h3 style="font-size:1rem;margin-bottom:4px;">Post a Reply</h3>
+    <textarea id="replyText" placeholder="Type your reply here..."></textarea>
+    <button class="reply-btn" onclick="submitReply()">Post Reply</button>
+    <div id="replyStatus" class="muted" style="margin-top:4px;"></div>
+  `;
+}
+
+/* SUBMIT REPLY */
+async function submitReply(){
+  const textArea = document.getElementById("replyText");
+  const status = document.getElementById("replyStatus");
+  if (!textArea) return;
+
+  const body = textArea.value.trim();
+  if (body.length < 2){
+    status.className="error";
+    status.textContent="Reply is too short.";
+    return;
+  }
+
+  status.className="muted";
+  status.textContent="Posting...";
+
+  try{
+    const res = await fetch(`${API}/thread/${threadId}/reply`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        userId: currentUser.id,
+        body
+      })
+    });
+
+    if (!res.ok){
+      const data = await res.json().catch(()=>({}));
+      status.className="error";
+      if (res.status === 403){
+        status.textContent = data.error || "You are not allowed to reply (must be accepted into a department).";
+      } else if (res.status === 401){
+        status.textContent = "You must be logged in to reply.";
+      } else {
+        status.textContent = data.error || "Failed to post reply.";
+      }
+      return;
+    }
+
+    textArea.value = "";
+    status.className="success";
+    status.textContent="Reply posted!";
+    await loadThread(); // refresh thread + replies
+
+  }catch(err){
+    console.error("Reply error", err);
+    status.className="error";
+    status.textContent="Network error while posting reply.";
+  }
+}
+
+/* DELETE THREAD (STAFF ONLY) */
+async function deleteThread(){
+  if (!currentUser || !isStaff(currentUser)) return alert("Staff only.");
+  if (!confirm("Are you sure you want to permanently delete this thread?")) return;
+
+  try{
+    const res = await fetch(`${API}/thread/${threadId}`,{
+      method:"DELETE",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ userId: currentUser.id })
+    });
+
+    if (!res.ok){
+      const d = await res.json().catch(()=>({}));
+      alert(d.error || "Failed to delete thread.");
+      return;
+    }
+    alert("Thread deleted.");
+    location.href="forums.html";
+  }catch(err){
+    console.error("Delete thread error", err);
+    alert("Network error deleting thread.");
+  }
+}
+
+/* DELETE REPLY (STAFF ONLY) */
+async function deleteReply(replyId){
+  if (!currentUser || !isStaff(currentUser)) return alert("Staff only.");
+  if (!confirm("Delete this reply?")) return;
+
+  try{
+    const res = await fetch(`${API}/reply/${replyId}`,{
+      method:"DELETE",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ userId: currentUser.id })
+    });
+
+    if (!res.ok){
+      const d = await res.json().catch(()=>({}));
+      alert(d.error || "Failed to delete reply.");
+      return;
+    }
+    await loadThread();
+  }catch(err){
+    console.error("Delete reply error", err);
+    alert("Network error deleting reply.");
+  }
+}
+
+/* AUTO REFRESH REPLIES EVERY 10s */
+setInterval(()=>{
+  loadThread();
+}, 10000);
+
+/* INITIAL LOAD */
+loadThread();
+</script>
+
+</body>
+</html>
