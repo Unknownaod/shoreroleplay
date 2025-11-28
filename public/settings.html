@@ -55,13 +55,37 @@ main{
   border:1px solid rgba(255,255,255,.1);
   box-shadow:0 0 45px rgba(0,0,0,.6);padding:40px;
 }
-h1{font-size:2.6rem;margin-bottom:8px}
-.sub{opacity:.75;margin-bottom:28px;font-size:1.08rem}
+h1{font-size:2.6rem;margin-bottom:4px}
+.sub{opacity:.75;margin-bottom:18px;font-size:1.05rem}
 
-/* CARDS */
-.section{margin-top:38px}
+/* PROFILE PICTURE */
+.pfp-box{
+  text-align:center;margin-bottom:30px;
+}
+#pfp{
+  width:120px;height:120px;border-radius:14px;
+  border:2px solid var(--accent);
+  object-fit:cover;box-shadow:0 0 16px rgba(0,0,0,.6);
+}
+.upload-box{
+  margin-top:12px;
+  display:flex;gap:10px;justify-content:center;
+}
+.upload-input{
+  width:65%;padding:12px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.25);
+  background:var(--card);color:var(--text);
+}
+button.upload-btn{
+  padding:12px 20px;border:none;border-radius:8px;
+  background:var(--accent);color:white;font-weight:600;
+  cursor:pointer;
+}
+
+/* SECTIONS */
+.section{margin-top:45px}
 .section h2{
-  font-size:1.45rem;margin-bottom:12px;
+  font-size:1.45rem;margin-bottom:14px;
   border-left:4px solid var(--accent);padding-left:10px;
 }
 .card{
@@ -69,12 +93,15 @@ h1{font-size:2.6rem;margin-bottom:8px}
   border:1px solid rgba(255,255,255,.12);
   padding:18px;margin:8px 0;font-size:.95rem;
 }
+
+/* INPUTS */
 input{
   width:100%;padding:14px;border-radius:8px;
   border:1px solid rgba(255,255,255,.2);
-  background:var(--card);color:var(--text);margin-top:8px;
+  background:var(--card);color:var(--text);margin-top:6px;
 }
-input:focus{border-color:var(--accent);outline:none}
+
+/* BUTTONS */
 button.action{
   margin-top:10px;padding:12px 16px;width:100%;
   background:var(--accent);border:none;color:#fff;
@@ -83,7 +110,7 @@ button.action{
 button.action:hover{filter:brightness(1.1)}
 .delete{background:#e74c3c}
 
-/* BADGES (FULL RANK SYSTEM) */
+/* BADGES */
 .badge{
   padding:5px 10px;border-radius:6px;font-size:.8rem;font-weight:600;
   display:inline-block;margin-top:3px;
@@ -97,12 +124,7 @@ button.action:hover{filter:brightness(1.1)}
 .sit{background:#4ea3ff33;border:1px solid #4ea3ff;color:#d7e8ff}
 .civ{background:#ffffff22;border:1px solid #fff;color:#fff}
 
-.status-badge{display:inline-block;padding:3px 8px;border-radius:6px;margin-top:6px;font-size:.78rem;font-weight:600}
-.pending{background:#ffb703;color:#000}
-.denied{background:#e74c3c}
-.accepted{background:#2ecc71;color:#000}
-
-footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
+footer{text-align:center;opacity:.55;margin-top:40px}
 .toggle{
   cursor:pointer;font-weight:600;padding:6px 10px;border-radius:8px;
   border:1px solid rgba(255,255,255,.3);
@@ -118,6 +140,8 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
     <a href="departments.html">Departments</a>
     <a href="rules.html">Rules</a>
     <a href="apply.html">Apply</a>
+    <a href="forums.html">Forums</a>
+    <a href="staff.html">Staff Panel</a>
   </div>
   <div class="nav-right">
     <span id="themeToggle" class="toggle">🌗 Theme</span>
@@ -130,6 +154,16 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
   <p class="sub" id="email"></p>
   <p id="roleBadge"></p>
 
+  <!-- PROFILE PICTURE -->
+  <div class="pfp-box">
+    <img id="pfp" src="https://i.imgur.com/8eO8KZB.png" alt="Profile Picture">
+    <div class="upload-box">
+      <input class="upload-input" id="newPFP" placeholder="Image URL (PNG/JPG only)">
+      <button class="upload-btn" onclick="updatePFP()">Save</button>
+    </div>
+    <p id="pfpMsg"></p>
+  </div>
+
   <!-- IDENTIFIERS -->
   <div class="section">
     <h2>Your System Identifier</h2>
@@ -140,7 +174,7 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
     </div>
   </div>
 
-  <!-- APPLICATION LOG -->
+  <!-- APPLICATIONS -->
   <div class="section">
     <h2>Your Applications</h2>
     <h3 style="margin-top:10px">Pending</h3><div id="pendingList"></div>
@@ -148,7 +182,7 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
     <h3>Denied</h3><div id="deniedList"></div>
   </div>
 
-  <!-- PROFILE -->
+  <!-- PROFILE SETTINGS -->
   <div class="section">
     <h2>Profile Settings</h2>
     <div class="card">
@@ -159,7 +193,7 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
     </div>
   </div>
 
-  <!-- PASSWORD -->
+  <!-- SECURITY -->
   <div class="section">
     <h2>Account Security</h2>
     <div class="card">
@@ -201,11 +235,44 @@ document.getElementById("email").textContent=user.email;
 renderRole();
 loadIdentifiers();
 loadApps();
+loadPFP();
 
-/* ROLE RENDER (NEW FULL MAP) */
-function renderRole() {
-  const role = user.role || "Civilian";
-  const roleMap = {
+/* LOAD PROFILE PICTURE */
+async function loadPFP(){
+  const res=await fetch(API+"/users/"+user.id);
+  const u=await res.json();
+  document.getElementById("pfp").src=u.pfp||"https://i.imgur.com/8eO8KZB.png";
+}
+
+/* UPDATE PROFILE PICTURE */
+async function updatePFP(){
+  const url=document.getElementById("newPFP").value.trim();
+  const msg=document.getElementById("pfpMsg");
+  if(!url || !url.match(/^https?:\/\/.*\.(png|jpg|jpeg)$/i))
+    return msg.textContent="Invalid image URL.";
+
+  const r=await fetch(API+"/users/update-pfp",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({id:user.id,pfp:url})
+  });
+
+  if(r.ok){
+    user.pfp=url;
+    localStorage.setItem("shoreUser",JSON.stringify(user));
+    document.getElementById("pfp").src=url;
+    msg.style.color="#2ecc71";
+    msg.textContent="Profile picture updated!";
+  } else {
+    msg.style.color="#e74c3c";
+    msg.textContent="Update failed.";
+  }
+}
+
+/* ROLE RENDER */
+function renderRole(){
+  const role=user.role||"Civilian";
+  const roleMap={
     "Head Administrator":"ha",
     "Internal Affairs":"ia",
     "Administration":"admin",
@@ -213,19 +280,9 @@ function renderRole() {
     "Senior Staff":"sstaff",
     "Staff":"staff",
     "Staff In Training":"sit",
-    "Civilian":"civ",
-
-    // legacy support
-    "HA":"ha",
-    "IA":"ia",
-    "ADMIN":"admin",
-    "JADMIN":"jadmin",
-    "SSTAFF":"sstaff",
-    "STAFF":"staff",
-    "SIT":"sit",
-    "USER":"civ"
+    "Civilian":"civ"
   };
-  document.getElementById("roleBadge").innerHTML =
+  document.getElementById("roleBadge").innerHTML=
     `<span class="badge ${roleMap[role]||'civ'}">${role}</span>`;
 }
 
@@ -235,19 +292,18 @@ async function loadIdentifiers(){
   const u=await res.json();
   document.getElementById("hwid").textContent=u.hwid||"—";
   document.getElementById("lastIP").textContent=u.lastIP||"—";
-  document.getElementById("lastLogin").textContent=u.lastLoginAt?
-    new Date(u.lastLoginAt).toLocaleString():"—";
+  document.getElementById("lastLogin").textContent=u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString():"—";
 }
 
-/* APPS */
+/* APPLICATIONS */
 async function loadApps(){
   const res=await fetch(API+"/applications");
   const mine=(await res.json()).filter(a=>a.email===user.email);
-  const cats={pending:"pendingList",accepted:"acceptedList",denied:"deniedList"};
+  const out={pending:"pendingList",accepted:"acceptedList",denied:"deniedList"};
   mine.forEach(a=>{
-    document.getElementById(cats[a.status]).innerHTML+=
-      `<div class="card"><strong>${a.department}</strong> — ${new Date(a.submittedAt).toLocaleString()}
-      <span class="status-badge ${a.status}">${a.status.toUpperCase()}</span></div>`;
+    document.getElementById(out[a.status]).innerHTML+=
+    `<div class="card"><strong>${a.department}</strong> — ${new Date(a.submittedAt).toLocaleString()}
+     <span class="status-badge ${a.status}">${a.status.toUpperCase()}</span></div>`;
   });
 }
 
@@ -256,44 +312,52 @@ document.getElementById("themeToggle").onclick=()=>{
   document.body.dataset.theme=document.body.dataset.theme==="light"?"dark":"light";
 };
 
-/* USERNAME */
+/* USERNAME CHANGE */
 async function changeUsername(){
-  const n=document.getElementById("newUser").value.trim();
+  const v=document.getElementById("newUser").value.trim();
   const p=document.getElementById("userMsg");
-  if(n.length<3) return p.textContent="Too short.";
-  const r=await fetch(API+"/users/change-username",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:user.id,username:n})});
-  if(r.ok){user.username=n;localStorage.setItem("shoreUser",JSON.stringify(user));p.textContent="Updated!";setTimeout(()=>location.reload(),800)}
+  if(v.length<3) return p.textContent="Too short.";
+  const r=await fetch(API+"/users/change-username",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({id:user.id,username:v})
+  });
+  if(r.ok){user.username=v;localStorage.setItem("shoreUser",JSON.stringify(user));p.textContent="Updated!";setTimeout(()=>location.reload(),900)}
 }
 
-/* PASSWORD */
+/* PASSWORD CHANGE */
 document.getElementById("newPass").oninput=e=>{
-  const m=document.getElementById("strength"),v=e.target.value.length;
-  m.textContent=v<6?"Weak":v<10?"Medium":"Strong";
-  m.style.color=v<6?"#e74c3c":v<10?"#f1c40f":"#2ecc71";
+  const m=document.getElementById("strength"),l=e.target.value.length;
+  m.textContent=l<6?"Weak":l<10?"Medium":"Strong";
+  m.style.color=l<6?"#e74c3c":l<10?"#f1c40f":"#2ecc71";
 };
 async function changePassword(){
   const p=document.getElementById("newPass").value.trim();
   const c=document.getElementById("confirmPass").value.trim();
   const m=document.getElementById("msg");
   if(p!==c) return m.textContent="Does not match";
-  const r=await fetch(API+"/users/update-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:user.email,password:p})});
+  const r=await fetch(API+"/users/update-password",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email:user.email,password:p})
+  });
   m.textContent=r.ok?"Updated":"Failed";
 }
 
 /* LOGOUT ALL */
-async function logoutAll(){
+function logoutAll(){
   localStorage.removeItem("shoreUser");
   document.getElementById("sessMsg").textContent="All sessions cleared.";
   setTimeout(()=>location.href="index.html",1200);
 }
 
-/* DELETE */
+/* DELETE ACCOUNT */
 async function deleteAccount(){
-  if(!confirm("Delete account?"))return;
+  if(!confirm("Are you sure?"))return;
   const r=await fetch(API+"/users/"+user.id,{method:"DELETE"});
   const m=document.getElementById("deleteMsg");
-  if(r.ok){localStorage.removeItem("shoreUser");m.textContent="Deleted";setTimeout(()=>location.href="index.html",1e3)}
+  if(r.ok){localStorage.removeItem("shoreUser");m.textContent="Deleted";setTimeout(()=>location.href="index.html",900)}
 }
+
+/* LOGOUT BUTTON */
 document.getElementById("logoutBtn").onclick=logoutAll;
 </script>
 
