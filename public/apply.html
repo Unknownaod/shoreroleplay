@@ -131,15 +131,6 @@ footer{
   opacity:.42;font-size:14px;
   border-top:1px solid rgba(255,255,255,.08);
 }
-
-/* ===== RESPONSIVE ===== */
-@media(max-width:780px){
-  nav{padding:16px 28px}
-  nav a,nav span{margin-right:18px;font-size:14px}
-  h1{font-size:2.9rem}
-  p.lead{font-size:1.05rem}
-  form{padding:35px}
-}
 </style>
 </head>
 <body>
@@ -162,10 +153,10 @@ footer{
 
   <form id="applyForm">
     <label>Discord Username</label>
-    <input type="text" id="username" placeholder="Example#0001" required>
+    <input type="text" id="username" readonly>
 
     <label>Email Address</label>
-    <input type="email" id="email" placeholder="you@example.com" required>
+    <input type="email" id="email" readonly>
 
     <label>Preferred Department</label>
     <select id="department" required>
@@ -205,20 +196,34 @@ footer{
 const API = "https://shoreroleplay.onrender.com";
 const btn = document.getElementById("submitBtn");
 
+// Check login session
+const user = JSON.parse(localStorage.getItem("shoreUser"));
+if (!user) {
+  alert("You must be logged in to submit an application.");
+  window.location.href = "login.html";
+}
+
+// Autofill user data
+document.getElementById("username").value = user.username;
+document.getElementById("email").value = user.email;
+
+// Agreement handler
 function checkAgreements(){
   btn.disabled = !(document.getElementById("agreeLogging").checked && document.getElementById("agreeDiscord").checked);
 }
 document.getElementById("agreeLogging").addEventListener("change", checkAgreements);
 document.getElementById("agreeDiscord").addEventListener("change", checkAgreements);
 
+// Submit Handler
 document.getElementById("applyForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  btn.disabled = true; btn.textContent = "Submitting...";
+  btn.disabled = true;
+  btn.textContent = "Submitting...";
 
   const body = {
     id: crypto.randomUUID(),
-    username: document.getElementById("username").value.trim(),
-    email: document.getElementById("email").value.trim(),
+    username: user.username,
+    email: user.email,
     department: document.getElementById("department").value,
     reason: document.getElementById("reason").value.trim(),
     agreedLogging: true,
