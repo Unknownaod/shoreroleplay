@@ -9,13 +9,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
-/* same styling as login for consistency */
 *{margin:0;padding:0;box-sizing:border-box}
 body{
   background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
   font-family:"Inter",sans-serif;color:#fff;
 }
-
 /* NAV */
 nav{
   display:flex;align-items:center;
@@ -100,27 +98,27 @@ footer{text-align:center;margin-top:50px;opacity:.55;font-size:.85rem}
 <script>
 const API = "https://shoreroleplay.onrender.com";
 
-// Generate persistent HWID if not already stored
+/* =====================================================
+   GENERATE HARDWARE-ID (persistent)
+===================================================== */
+function generateHWID() {
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return [...arr].map(x => x.toString(16).padStart(2,"0")).join("");
+}
+
 function getHWID() {
   let hwid = localStorage.getItem("shoreHWID");
   if (!hwid) {
-    hwid = crypto.randomUUID();
+    hwid = generateHWID();
     localStorage.setItem("shoreHWID", hwid);
   }
   return hwid;
 }
 
-// Capture public IP
-async function getIP() {
-  try {
-    const res = await fetch("https://api.ipify.org?format=json");
-    const data = await res.json();
-    return data.ip || "unknown";
-  } catch {
-    return "unknown";
-  }
-}
-
+/* =====================================================
+   REGISTRATION HANDLER
+===================================================== */
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -130,19 +128,24 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  if (!email || !username || !password) {
+  // stronger front-end validation
+  if (username.length < 3) {
     msg.style.color = "#e74c3c";
-    msg.textContent = "Please complete all fields.";
+    msg.textContent = "Username must be 3+ characters.";
+    return;
+  }
+  if (password.length < 6) {
+    msg.style.color = "#e74c3c";
+    msg.textContent = "Password must be 6+ characters.";
     return;
   }
 
-  const hwid = getHWID();
-  const ip = await getIP();
+  const hwid = getHWID(); // stored locally – backend generates its own anyway
 
   const res = await fetch(API + "/users/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, username, password, hwid, ip })
+    headers: { "Content-Type":"application/json" },
+    body: JSON.stringify({ email, username, password, hwid })
   });
 
   const data = await res.json();
