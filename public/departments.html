@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Shore Roleplay | Departments</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Inter",sans-serif;
+  background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+  color:#fff;overflow-x:hidden;
+}
+
+/* ----- SHARED HEADER + NAV (same as homepage) ----- */
+.top-header{
+  width:100%;background:rgba(0,0,0,.7);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;justify-content:center;align-items:center;
+  padding:14px 20px;
+}
+.top-header img{height:44px;}
+
+.user-bar{
+  width:100%;background:rgba(8,10,16,.85);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  padding:8px 40px;display:flex;justify-content:space-between;align-items:center;
+  font-size:14px;
+}
+.btn-chip{
+  padding:6px 14px;border-radius:4px;border:1px solid rgba(255,255,255,.3);
+  background:rgba(255,255,255,.05);cursor:pointer;font-weight:500;transition:.2s;
+}
+.btn-chip-primary{background:#4ea3ff;border-color:#4ea3ff;}
+.btn-chip:hover{background:rgba(255,255,255,.18);}
+.btn-chip-primary:hover{filter:brightness(1.05);}
+
+.main-nav{
+  width:100%;background:rgba(5,7,12,.9);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(18px);
+  padding:10px 40px;display:flex;align-items:center;justify-content:space-between;
+}
+.nav-left{display:flex;align-items:center;gap:18px;font-size:15px;}
+.nav-brand{font-weight:700;font-size:16px;}
+.nav-link{opacity:.85;cursor:pointer;position:relative;transition:.2s;}
+.nav-link::after{
+  content:"";position:absolute;left:0;bottom:-3px;width:0;height:2px;background:#4ea3ff;transition:.2s;
+}
+.nav-link:hover{opacity:1;}
+.nav-link:hover::after{width:100%;}
+
+.nav-right{display:flex;align-items:center;gap:14px;}
+.nav-right .nav-icon-btn{
+  width:26px;height:26px;border-radius:4px;background:#20263a;
+  border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:13px;transition:.2s;
+}
+.nav-right .nav-icon-btn:hover{background:#4ea3ff;border-color:#4ea3ff;}
+
+.nav-search{position:relative}
+.nav-search input{
+  background:#111521;border-radius:4px;border:1px solid rgba(255,255,255,.16);
+  padding:6px 28px 6px 8px;color:#fff;font-size:13px;
+}
+.nav-search i{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;opacity:.7;
+}
+
+/* ----- PAGE WRAPPER ----- */
+.page-wrap{
+  max-width:1500px;margin:40px auto 60px;padding:0 40px;
+  display:flex;gap:26px;
+}
+.page-main{
+  flex:1 1 0;max-width:900px;
+}
+.page-sidebar{
+  width:340px;flex-shrink:0;display:flex;flex-direction:column;gap:18px;
+}
+
+/* ----- PANEL ----- */
+.panel{
+  background:rgba(0,0,0,.78);
+  border-radius:14px;border:1px solid rgba(255,255,255,.11);
+  box-shadow:0 0 38px rgba(0,0,0,.7);
+  padding:46px;
+}
+.panel-header{text-align:center;margin-bottom:32px;}
+.panel-header h1{font-size:1.9rem;font-weight:700;text-shadow:0 0 15px rgba(78,163,255,.45);}
+.panel-header p{opacity:.85;font-size:.95rem;margin-top:6px;}
+
+/* ----- DEPARTMENT GRID ----- */
+.dept-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:26px;
+}
+.dept-card{
+  background:rgba(10,12,20,.85);
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.12);
+  text-align:center;
+  padding:28px;
+  backdrop-filter:blur(16px);
+  transition:.3s;
+}
+.dept-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 0 22px rgba(78,163,255,.45);
+}
+.dept-card img{
+  width:120px;margin-bottom:14px;
+  filter:drop-shadow(0 0 10px rgba(255,255,255,.2));
+}
+.dept-card h3{
+  font-size:1.05rem;font-weight:600;margin-bottom:6px;
+  text-shadow:0 0 14px rgba(78,163,255,.35);
+}
+.dept-card p{
+  font-size:.87rem;opacity:.82;line-height:1.45;
+}
+
+/* ----- SIDEBAR (reuse homepage style) ----- */
+.sidebar-card{
+  background:rgba(0,0,0,.8);
+  border-radius:10px;border:1px solid rgba(255,255,255,.12);
+  padding:16px 18px;box-shadow:0 0 22px rgba(0,0,0,.75);
+  font-size:.9rem;
+}
+.sidebar-card h3{font-size:.95rem;margin-bottom:10px;font-weight:600;}
+.sidebar-card p{opacity:.85;margin-bottom:10px;}
+.sidebar-btn{
+  width:100%;padding:9px 10px;border-radius:6px;border:none;
+  background:#4e6dff;color:#fff;font-size:.85rem;font-weight:600;
+  cursor:pointer;text-align:center;transition:.2s;
+}
+.sidebar-btn:hover{filter:brightness(1.07);}
+.sidebar-btn.discord{background:#5865F2}
+
+/* ----- FOOTER ----- */
+footer{
+  text-align:center;padding:26px 20px 34px;font-size:.82rem;
+  background:rgba(0,0,0,.75);border-top:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(14px);margin-top:40px;opacity:.8;
+}
+
+/* ----- RESPONSIVE ----- */
+@media(max-width:1000px){
+  .page-wrap{flex-direction:column;padding:0 20px;}
+  .page-sidebar{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP LOGO HEADER -->
+<div class="top-header">
+  <img src="https://i.imgur.com/P15LI6g.png" alt="ShoreRP">
+</div>
+
+<!-- USER BAR -->
+<div class="user-bar">
+  <span>Explore our departments and find your place in Shore Roleplay.</span>
+  <div>
+    <button class="btn-chip" onclick="location.href='/login'">Sign In</button>
+    <button class="btn-chip btn-chip-primary" onclick="location.href='/register'">Sign Up</button>
+  </div>
+</div>
+
+<!-- MAIN NAV -->
+<nav class="main-nav">
+  <div class="nav-left">
+    <span class="nav-brand">Shore Roleplay</span>
+    <span class="nav-link" onclick="location.href='/'">Home</span>
+    <span class="nav-link">Departments</span>
+    <span class="nav-link" onclick="location.href='/rules.html'">Rules</span>
+    <span class="nav-link" onclick="location.href='/apply.html'">Apply</span>
+  </div>
+</nav>
+
+<!-- PAGE CONTENT -->
+<div class="page-wrap">
+
+  <!-- MAIN PANEL -->
+  <section class="page-main">
+    <article class="panel">
+      <div class="panel-header">
+        <h1>Departments of Shore Roleplay</h1>
+        <p>Select a department below to learn more and start your journey.</p>
+      </div>
+
+      <div class="dept-grid">
+
+        <!-- DevOps -->
+        <div class="dept-card">
+          <img src="https://i.imgur.com/DAlxtWE.png">
+          <h3>DevOps Division</h3>
+          <p>Infrastructure, server stability, technical optimization, and backend maintenance for ShoreRP.</p>
+        </div>
+
+        <!-- State Patrol -->
+        <div class="dept-card">
+          <img src="https://i.imgur.com/24jUZlT.png">
+          <h3>Shore State Patrol</h3>
+          <p>Maintaining safety on highways and rural areas throughout Shore County.</p>
+        </div>
+
+        <!-- Municipal Police -->
+        <div class="dept-card">
+          <img src="https://i.imgur.com/3Uhtndq.png">
+          <h3>Municipal Police</h3>
+          <p>Protecting and serving local cities, ensuring law and order at the community level.</p>
+        </div>
+
+        <!-- Civilian Operations -->
+        <div class="dept-card">
+          <img src="https://i.imgur.com/DZBwCeX.png">
+          <h3>Civilian Operations</h3>
+          <p>The backbone of every story — shaping ShoreRP with creative scenarios and immersive characters.</p>
+        </div>
+
+        <!-- Fire Department -->
+        <div class="dept-card">
+          <img src="https://i.imgur.com/cgD0S1f.png">
+          <h3>Fire & Rescue</h3>
+          <p>Emergency response, fire suppression, rescue services, and life-saving operations.</p>
+        </div>
+
+        <!-- 911 Dispatch -->
+        <div class="dept-card">
+          <img src="https://i.imgur.com/Saa1GSc.png">
+          <h3>Los Santos Regional 911</h3>
+          <p>Coordinating emergency responses and communications for all Shore County services.</p>
+        </div>
+
+      </div>
+    </article>
+  </section>
+
+  <!-- SIDEBAR -->
+  <aside class="page-sidebar">
+    <div class="sidebar-card">
+      <h3>Ready to Apply?</h3>
+      <p>ShoreRP is always looking for dedicated members to join our departments.</p>
+      <button class="sidebar-btn" onclick="location.href='/apply.html'">Submit Application</button>
+      <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">Join Discord</button>
+    </div>
+  </aside>
+
+</div>
+
+<footer>
+  © 2025 Shore Roleplay — All Rights Reserved
+</footer>
+
+</body>
+</html>
