@@ -197,16 +197,30 @@ let currentTab = 'pending';
 /* ========== USER NAV STATE ========== */
 const user = JSON.parse(localStorage.getItem("shoreUser"));
 const box = document.getElementById("userControls");
+const loginBox = document.getElementById("loginBox");
 
 if(!user){
   box.innerHTML = `
     <button class="user-btn" onclick="location.href='login.html'">Login</button>
     <button class="user-btn logout-btn" onclick="location.href='register.html'">Register</button>
   `;
+
+  // 🔐 BLOCK STAFF ACCESS IF NOT LOGGED IN
+  loginBox.innerHTML = `
+    <h2>Login Required</h2>
+    <p style="opacity:.8;margin-top:8px;">
+      You must be logged into Shore Roleplay before accessing the Staff Console.
+    </p>
+    <button style="margin-top:18px;padding:12px 18px;border-radius:8px;background:#4ea3ff;border:none;color:#fff;font-weight:600;cursor:pointer"
+      onclick="location.href='login.html'">
+      Login Now
+    </button>
+  `;
+
 } else {
   box.innerHTML = `
     Logged in as <strong>${user.username}</strong>
-    <button class="user-btn" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
+    <button class="user-btn" onclick="location.href='profile.html'">Profile</button>
     <button class="user-btn" onclick="location.href='settings.html'">Settings</button>
     <button class="user-btn logout-btn" onclick="logout()">Logout</button>
   `;
@@ -219,6 +233,12 @@ function logout(){
 
 /* STAFF AUTH */
 async function login(){
+  if(!user){
+    alert("You must log in first.");
+    location.href = "login.html";
+    return;
+  }
+
   const password=document.getElementById("staffPass").value;
   const res=await fetch(API+"/staff-auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});
   if(res.ok){
@@ -282,7 +302,6 @@ Discord Requirement: ${app.agreedDiscord ? "YES" : "NO"}
 `;
   document.getElementById("modal").style.display="flex";
 }
-
 function closeModal(){document.getElementById("modal").style.display="none"}
 
 /* DECISION */
@@ -306,6 +325,7 @@ async function removeApp(id){
   }else alert("Delete failed.");
 }
 </script>
+
 
 </body>
 </html>
