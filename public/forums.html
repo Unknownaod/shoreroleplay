@@ -543,7 +543,9 @@ function renderThreads(threads) {
     const html = `
       <div class="thread-row">
         <div class="thread-title-line">
-          <span class="thread-title">${cleanTitle}</span>
+          <span class="thread-title" onclick="location.href='thread.html?id=${t.id}'">
+          ${cleanTitle}
+          </span>
           ${badgeHTML}
           ${staffTag}
         </div>
