@@ -86,14 +86,14 @@ header p{opacity:.75;font-size:1.1rem}
 .tab{
   padding:10px 18px;border-radius:8px;
   background:#111820;border:1px solid rgba(255,255,255,.12);
-  cursor:pointer;transition:.25s;
+  cursor:pointer;transition:.25s;font-size:14px;
 }
 .tab.active,.tab:hover{background:#4ea3ff;border-color:#4ea3ff}
 
-/* TABLE */
+/* TABLE SHARED */
 table{width:100%;border-collapse:collapse;margin-top:25px}
-th,td{padding:16px;text-align:left;border-bottom:1px solid rgba(255,255,255,.09);font-size:15px}
-th{text-transform:uppercase;font-size:13px;letter-spacing:.8px;color:#4ea3ff;opacity:.9}
+th,td{padding:12px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,.09);font-size:14px}
+th{text-transform:uppercase;font-size:12px;letter-spacing:.8px;color:#4ea3ff;opacity:.9}
 
 /* STATUS */
 .status{
@@ -105,7 +105,7 @@ th{text-transform:uppercase;font-size:13px;letter-spacing:.8px;color:#4ea3ff;opa
 
 /* BUTTONS */
 .btn{
-  padding:8px 14px;border-radius:6px;font-size:14px;cursor:pointer;border:none;transition:.2s;font-weight:600;
+  padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;border:none;transition:.2s;font-weight:600;margin:1px 0;
 }
 .accept{background:#2ecc71;border:1px solid #1e9d55}
 .accept:hover{background:#45ed8a}
@@ -115,6 +115,8 @@ th{text-transform:uppercase;font-size:13px;letter-spacing:.8px;color:#4ea3ff;opa
 .view:hover{background:#3498db}
 .delete{background:#6c63ff;border:1px solid #5148cc}
 .delete:hover{background:#857dff}
+.neutral{background:#7f8c8d;border:1px solid #707b7c}
+.neutral:hover{background:#95a5a6}
 
 /* MODAL */
 #modal{
@@ -167,16 +169,44 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
   <div class="tabs">
     <div class="tab active" onclick="switchTab('pending')">Pending Applications</div>
     <div class="tab" onclick="switchTab('all')">Previous Applications</div>
+    <div class="tab" onclick="switchTab('ha')">HA Tab (Head Administration)</div>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>USERNAME</th><th>EMAIL</th><th>DEPARTMENT</th><th>SUBMITTED</th><th>STATUS</th><th>ACTION</th>
-      </tr>
-    </thead>
-    <tbody id="apps"></tbody>
-  </table>
+  <!-- APPLICATIONS SECTION -->
+  <div id="appsSection">
+    <table>
+      <thead>
+        <tr>
+          <th>USERNAME</th><th>EMAIL</th><th>DEPARTMENT</th><th>SUBMITTED</th><th>STATUS</th><th>ACTION</th>
+        </tr>
+      </thead>
+      <tbody id="apps"></tbody>
+    </table>
+  </div>
+
+  <!-- HA / USERS SECTION -->
+  <div id="haSection" style="display:none;margin-top:10px;">
+    <h3 style="margin-bottom:10px;">User Management (HA Only)</h3>
+    <p style="font-size:13px;opacity:.8;margin-bottom:8px;">
+      View all registered accounts. HWID and last login IP can be used for manual bans on other systems.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>USERNAME</th>
+          <th>EMAIL</th>
+          <th>ROLE</th>
+          <th>BANNED</th>
+          <th>HWID</th>
+          <th>LAST IP</th>
+          <th>CREATED</th>
+          <th>LAST LOGIN</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody id="usersBody"></tbody>
+    </table>
+  </div>
 </div>
 
 <!-- MODAL -->
@@ -193,34 +223,21 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
 <script>
 const API = "https://shoreroleplay.onrender.com";
 let currentTab = 'pending';
+let haUnlocked = false;
 
 /* ========== USER NAV STATE ========== */
 const user = JSON.parse(localStorage.getItem("shoreUser"));
 const box = document.getElementById("userControls");
-const loginBox = document.getElementById("loginBox");
 
 if(!user){
   box.innerHTML = `
     <button class="user-btn" onclick="location.href='login.html'">Login</button>
     <button class="user-btn logout-btn" onclick="location.href='register.html'">Register</button>
   `;
-
-  // 🔐 BLOCK STAFF ACCESS IF NOT LOGGED IN
-  loginBox.innerHTML = `
-    <h2>Login Required</h2>
-    <p style="opacity:.8;margin-top:8px;">
-      You must be logged into Shore Roleplay before accessing the Staff Console.
-    </p>
-    <button style="margin-top:18px;padding:12px 18px;border-radius:8px;background:#4ea3ff;border:none;color:#fff;font-weight:600;cursor:pointer"
-      onclick="location.href='login.html'">
-      Login Now
-    </button>
-  `;
-
 } else {
   box.innerHTML = `
     Logged in as <strong>${user.username}</strong>
-    <button class="user-btn" onclick="location.href='profile.html'">Profile</button>
+    <button class="user-btn" onclick="location.href='profile.html?user=${encodeURIComponent(user.username)}'">Profile</button>
     <button class="user-btn" onclick="location.href='settings.html'">Settings</button>
     <button class="user-btn logout-btn" onclick="logout()">Logout</button>
   `;
@@ -231,29 +248,77 @@ function logout(){
   location.reload();
 }
 
+/* Require login just to even hit staff panel credentials */
+if(!user){
+  document.getElementById("loginBox").style.display = "block";
+} else {
+  document.getElementById("loginBox").style.display = "block"; // still require staff password
+}
+
 /* STAFF AUTH */
 async function login(){
-  if(!user){
-    alert("You must log in first.");
-    location.href = "login.html";
-    return;
-  }
-
   const password=document.getElementById("staffPass").value;
-  const res=await fetch(API+"/staff-auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});
+  const res=await fetch(API+"/staff-auth",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({password})
+  });
   if(res.ok){
     document.getElementById("loginBox").style.display="none";
     document.getElementById("panel").style.display="block";
     loadApps();
-  }else document.getElementById("error").textContent="❌ Invalid Credential";
+  }else{
+    document.getElementById("error").textContent="❌ Invalid Credential";
+  }
 }
 
 /* TABS */
 function switchTab(tab){
   currentTab=tab;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelector(`.tab:nth-child(${tab==='pending'?1:2})`).classList.add('active');
-  loadApps();
+  document.querySelector(`.tab:nth-child(${tab==='pending'?1:tab==='all'?2:3})`).classList.add('active');
+
+  const appsSection = document.getElementById("appsSection");
+  const haSection = document.getElementById("haSection");
+
+  if(tab === 'ha'){
+    appsSection.style.display = "none";
+    haSection.style.display = "block";
+
+    if(!haUnlocked){
+      haPrompt();
+    } else {
+      loadUsers();
+    }
+  } else {
+    appsSection.style.display = "block";
+    haSection.style.display = "none";
+    loadApps();
+  }
+}
+
+/* HA PASSWORD PROMPT */
+async function haPrompt(){
+  const pwd = prompt("Enter HA (Head Administration) password:");
+  if(!pwd){
+    // bounce back to pending if cancelled
+    currentTab = 'pending';
+    switchTab('pending');
+    return;
+  }
+  const res = await fetch(API + "/staff-ha-auth",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({password:pwd})
+  });
+  if(res.ok){
+    haUnlocked = true;
+    loadUsers();
+  }else{
+    alert("Invalid HA password.");
+    currentTab = 'pending';
+    switchTab('pending');
+  }
 }
 
 /* LOAD APPLICATIONS */
@@ -268,7 +333,7 @@ async function loadApps(){
       <td>${app.username}</td>
       <td>${app.email}</td>
       <td>${app.department}</td>
-      <td>${app.submittedAt?.split("T")[0]}</td>
+      <td>${app.submittedAt ? app.submittedAt.split("T")[0] : ""}</td>
       <td><span class="status ${app.status}">${app.status}</span></td>
       <td>
         <button class="btn view" onclick="viewApp('${app.id}')">View</button>
@@ -284,10 +349,11 @@ async function loadApps(){
 async function viewApp(id){
   const apps = await (await fetch(API+"/applications")).json();
   const app = apps.find(a=>a.id===id);
+  if(!app) return;
+
   document.getElementById("modalTitle").textContent = `Application — ${app.username}`;
   document.getElementById("modalContent").textContent =
-`
-ID: ${app.id}
+`ID: ${app.id}
 Username: ${app.username}
 Email: ${app.email}
 Department: ${app.department}
@@ -295,20 +361,24 @@ Status: ${app.status}
 Submitted: ${app.submittedAt}
 
 Reason:
-${app.reason}
+${app.reason || "No reason provided"}
 
 Logging Agreement: ${app.agreedLogging ? "YES" : "NO"}
 Discord Requirement: ${app.agreedDiscord ? "YES" : "NO"}
 `;
   document.getElementById("modal").style.display="flex";
 }
-function closeModal(){document.getElementById("modal").style.display="none"}
+
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+}
 
 /* DECISION */
 async function decide(id,status){
   if(!confirm(`Confirm marking this application as ${status.toUpperCase()}?`))return;
   await fetch(`${API}/applications/${id}/decision`,{
-    method:"POST",headers:{"Content-Type":"application/json"},
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
     body:JSON.stringify({status})
   });
   alert("Decision saved and applicant notified.");
@@ -324,8 +394,88 @@ async function removeApp(id){
     loadApps();
   }else alert("Delete failed.");
 }
-</script>
 
+/* ========== HA / USERS SECTION ========== */
+
+async function loadUsers(){
+  const res = await fetch(API + "/users");
+  const users = await res.json();
+  const body = document.getElementById("usersBody");
+
+  if(!Array.isArray(users) || users.length === 0){
+    body.innerHTML = `<tr><td colspan="9" style="opacity:.7;font-size:13px;">No users found.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = users.map(u => `
+    <tr>
+      <td>${u.username}</td>
+      <td>${u.email}</td>
+      <td>${u.role || "user"}</td>
+      <td>${u.banned ? "YES" : "NO"}</td>
+      <td>${u.hwid || "—"}</td>
+      <td>${u.lastIP || "—"}</td>
+      <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}</td>
+      <td>${u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : "—"}</td>
+      <td>
+        <button class="btn deny" onclick="banUser('${u.id}')">Ban</button>
+        <button class="btn accept" onclick="unbanUser('${u.id}')">Unban</button>
+        <button class="btn delete" onclick="deleteUser('${u.id}')">Delete</button>
+        <button class="btn view" onclick="copyHwid('${u.hwid || ""}')">Copy HWID</button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+async function banUser(id){
+  if(!confirm("Ban this user?")) return;
+  const res = await fetch(`${API}/users/${id}/ban`, { method:"POST" });
+  if(res.ok){
+    alert("User banned.");
+    loadUsers();
+  }else{
+    alert("Ban failed.");
+  }
+}
+
+async function unbanUser(id){
+  if(!confirm("Unban this user?")) return;
+  const res = await fetch(`${API}/users/${id}/unban`, { method:"POST" });
+  if(res.ok){
+    alert("User unbanned.");
+    loadUsers();
+  }else{
+    alert("Unban failed.");
+  }
+}
+
+async function deleteUser(id){
+  if(!confirm("Delete this user and all of their applications?")) return;
+  const res = await fetch(`${API}/users/${id}`, { method:"DELETE" });
+  if(res.ok){
+    alert("User deleted.");
+    loadUsers();
+  }else{
+    alert("Delete failed.");
+  }
+}
+
+function copyHwid(hwid){
+  if(!hwid){
+    alert("No HWID for this user.");
+    return;
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(hwid).then(
+      () => alert("HWID copied to clipboard."),
+      () => alert("Failed to copy HWID.")
+    );
+  }else{
+    // fallback
+    alert("Clipboard API not available.");
+  }
+}
+</script>
 
 </body>
 </html>
