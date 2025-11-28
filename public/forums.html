@@ -187,18 +187,37 @@ const staffColors = {
   "Staff In Training": "sit"
 };
 
+// staff roles that bypass dept requirement
+const STAFF_ROLES = Object.keys(staffColors);
+
 /* PERMISSION CHECK */
 async function verifyPermissions() {
+  // If staff → full access, bypass everything
+  if (STAFF_ROLES.includes(user.role)) {
+    document.getElementById("createThreadBtn").style.display = "block";
+    document.getElementById("lockedMsg").style.display = "none";
+    return;
+  }
+
+  // normal user → must have accepted application
   const apps = await fetch(API + "/applications").then(r => r.json());
-  const accepted = apps.some(a => a.email.toLowerCase() === user.email.toLowerCase() && a.status === "accepted");
+  const accepted = apps.some(
+    a => a.email.toLowerCase() === user.email.toLowerCase() && a.status === "accepted"
+  );
 
   if (accepted) document.getElementById("createThreadBtn").style.display = "block";
   else document.getElementById("lockedMsg").style.display = "block";
 }
+
 verifyPermissions();
+
+/* CURRENT CATEGORY MEMORY */
+let currentCategory = "general";
 
 /* LOAD THREADS */
 async function loadThreads(category) {
+  currentCategory = category;
+
   const container = document.getElementById("threads");
   container.innerHTML = "Loading threads...";
 
@@ -213,7 +232,9 @@ async function loadThreads(category) {
     <div class="thread" onclick="viewThread('${t.id}')">
       <strong>${t.title}</strong>
       <div class="meta">by ${t.author.username}
-        ${t.author.staffRole ? `<span class="staff-badge ${staffColors[t.author.staffRole]}">${t.author.staffRole}</span>` : ""}
+        ${t.author.staffTag ? 
+          `<span class="staff-badge ${staffColors[t.author.role]}">${t.author.staffTag}</span>`
+        : ""}
         — ${new Date(t.createdAt).toLocaleDateString()}
       </div>
     </div>
@@ -233,12 +254,16 @@ function closeModal(){ document.getElementById("modal").style.display="none"; }
 async function createThread() {
   const title = threadTitle.value.trim();
   const body = threadBody.value.trim();
-  if (title.length < 4 || body.length < 10) return alert("Thread content too short.");
+
+  if (title.length < 4 || body.length < 10)
+    return alert("Thread content too short.");
 
   const res = await fetch(API + "/threads", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ title, body, category: currentCategory, userId: user.id })
+    body: JSON.stringify({
+      title, body, category: currentCategory, userId: user.id
+    })
   });
 
   if (res.ok) {
@@ -247,6 +272,10 @@ async function createThread() {
     loadThreads(currentCategory);
   } else alert("Failed to post thread.");
 }
+
+// load initial category
+loadThreads("general");
 </script>
+
 </body>
 </html>
