@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Shore Roleplay | System Status</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  background:#161a21 url('https://i.imgur.com/k7ECz7H.png') repeat;
+  color:#fff;font-family:Segoe UI, sans-serif;margin:0;
+}
+header{
+  padding:40px;text-align:center;
+}
+.status-banner{
+  background:#0effff;color:#000;font-size:1.4rem;
+  padding:22px;border-radius:10px;display:inline-block;
+  font-weight:700;box-shadow:0 0 18px #0effff;
+}
+.container{
+  max-width:1280px;margin:30px auto;padding:20px;
+}
+.service-box{
+  background:rgba(255,255,255,0.06);padding:25px;
+  border-radius:10px;margin-top:25px;border:1px solid rgba(255,255,255,.1);
+}
+.service-header{
+  font-size:1.3rem;font-weight:600;margin-bottom:12px;
+}
+.service-row{
+  display:flex;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,.12);
+  padding:10px 0;font-size:15px;
+}
+.good{color:#0effff;font-weight:600}
+.bad{color:#ff3b3b;font-weight:600}
+.bar{
+  height:14px;background:#0effff;border-radius:5px;margin-top:6px;
+  box-shadow:0 0 10px #0effff;animation:grow .8s ease;
+}
+@keyframes grow{from{width:0}to{width:100%}}
+</style>
+</head>
+<body>
+
+<header>
+  <div id="overall" class="status-banner">Checking system status...</div>
+</header>
+
+<div class="container">
+
+  <div class="service-box">
+    <div class="service-header">API Services</div>
+    <div class="service-row"><span>Web API</span><span id="web">Checking...</span></div>
+    <div class="bar"></div>
+  </div>
+
+  <div class="service-box">
+    <div class="service-header">Authentication Services</div>
+    <div class="service-row"><span>Staff Auth</span><span id="staffAuth">Checking...</span></div>
+    <div class="service-row"><span>HA Auth</span><span id="haAuth">Checking...</span></div>
+    <div class="service-row"><span>User Login</span><span id="login">Checking...</span></div>
+    <div class="bar"></div>
+  </div>
+
+  <div class="service-box">
+    <div class="service-header">User Services</div>
+    <div class="service-row"><span>Users Index</span><span id="users">Checking...</span></div>
+    <div class="service-row"><span>User Actions</span><span id="userActions">Checking...</span></div>
+    <div class="bar"></div>
+  </div>
+
+  <div class="service-box">
+    <div class="service-header">Application Services</div>
+    <div class="service-row"><span>Applications</span><span id="apps">Checking...</span></div>
+    <div class="service-row"><span>Application Decisions</span><span id="decisions">Checking...</span></div>
+    <div class="bar"></div>
+  </div>
+
+  <div class="service-box">
+    <div class="service-header">Forum Tools</div>
+    <div class="service-row"><span>Threads</span><span id="threads">Checking...</span></div>
+    <div class="service-row"><span>Posting & Restrictions</span><span id="posting">Checking...</span></div>
+    <div class="bar"></div>
+  </div>
+
+</div>
+
+<script>
+const API = "https://shoreroleplay.onrender.com";
+
+async function check(url, elementId){
+  try{
+    const r = await fetch(url,{method:"GET"});
+    document.getElementById(elementId).innerHTML =
+      r.ok ? `<span class="good">Operational</span>` :
+      `<span class="bad">Issues Detected</span>`;
+    return r.ok;
+  }catch(e){
+    document.getElementById(elementId).innerHTML = `<span class="bad">Offline</span>`;
+    return false;
+  }
+}
+
+async function runStatus(){
+  let ok = [];
+
+  ok.push(await check(API + "/", "web"));
+  ok.push(await check(API + "/staff-auth", "staffAuth"));
+  ok.push(await check(API + "/ha-auth", "haAuth"));
+  ok.push(await check(API + "/users/login", "login"));
+
+  ok.push(await check(API + "/users", "users"));
+  ok.push(await check(API + "/users/1", "userActions"));
+
+  ok.push(await check(API + "/applications", "apps"));
+  ok.push(await check(API + "/applications/1", "decisions"));
+
+  ok.push(await check(API + "/threads", "threads"));
+  ok.push(await check(API + "/users/1/restrict", "posting"));
+
+  document.getElementById("overall").innerText =
+    ok.every(s => s) ? "All Systems Operational" : "Service Disruptions Detected";
+}
+
+runStatus();
+setInterval(runStatus, 60000); // refresh every 1 min
+</script>
+
+</body>
+</html>
