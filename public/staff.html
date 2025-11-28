@@ -681,8 +681,23 @@ async function loadForumUsers(){
 }
 
 /* Toggle posting ability → /users/:id/restrict */
-async function toggleRestrict(id, current){
-  if(!confirm(`Are you sure you want to ${current ? "unrestrict" : "restrict"} this user from posting?`)) return;
+/* Toggle posting ability → /users/:id/restrict */
+async function toggleRestrict(id, current, targetRole){
+  const staffRole = user.role || "User"; // logged-in staff
+  const protectedRanks = [
+    "Junior Administration",
+    "Administration",
+    "Internal Affairs",
+    "Head Administrator"
+  ];
+
+  // If target is protected and staff is NOT HA+
+  if (protectedRanks.includes(targetRole) && staffRole !== "Head Administrator") {
+    alert("❌ You do not have permission to restrict this user. Only Head Administration may restrict junior administration or higher.");
+    return;
+  }
+
+  if(!confirm(`Are you sure you want to ${current ? "UNRESTRICT" : "RESTRICT"} this user from posting?`)) return;
 
   await fetch(`${API}/users/${id}/restrict`, {
     method:"PATCH",
@@ -692,6 +707,7 @@ async function toggleRestrict(id, current){
 
   loadForumUsers();
 }
+
   
 </script>
 
