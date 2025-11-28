@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Shore Roleplay | Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Inter",sans-serif;
+  background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+  color:#fff;overflow-x:hidden;
+}
+
+/* NAV (consistent across site) */
+nav{
+  display:flex;justify-content:flex-start;align-items:center;
+  padding:18px 60px;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  position:fixed;top:0;width:100%;z-index:100;
+}
+nav a,nav span{
+  color:#dfe6ff;text-decoration:none;font-size:15px;
+  margin-right:32px;font-weight:500;transition:.25s;
+}
+nav a:hover{color:#4ea3ff;text-shadow:0 0 10px #4ea3ff}
+nav span{opacity:.45;cursor:default}
+
+/* LOGIN CONTAINER */
+main{
+  max-width:500px;margin:auto;
+  padding:180px 20px 60px;text-align:center;
+}
+form{
+  background:rgba(10,12,18,.78);
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.1);
+  padding:45px;
+  backdrop-filter:blur(25px);
+  box-shadow:0 0 35px rgba(0,0,0,.6);
+  text-align:left;
+  animation:fadeIn .7s ease forwards;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+
+h1{font-size:2.7rem;margin-bottom:14px;text-align:center}
+
+label{display:block;margin-top:22px;font-size:15px;font-weight:600;opacity:.9}
+input{
+  width:100%;padding:15px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.18);
+  background:#0c111a;color:#fff;margin-top:6px;
+  font-size:15px;transition:.3s;
+}
+input:focus{border-color:#4ea3ff;box-shadow:0 0 10px #4ea3ff;outline:none}
+
+button{
+  margin-top:32px;width:100%;padding:16px;
+  border-radius:10px;border:none;
+  background:#4ea3ff;color:#fff;font-size:17px;
+  font-weight:600;cursor:pointer;transition:.3s;
+  box-shadow:0 0 18px rgba(78,163,255,.45);
+}
+button:hover{transform:translateY(-3px);box-shadow:0 0 28px rgba(78,163,255,.85)}
+
+small{text-align:center;display:block;margin-top:18px;font-size:.9rem;opacity:.75}
+small a{color:#4ea3ff;text-decoration:none}
+small a:hover{text-shadow:0 0 10px #4ea3ff}
+
+/* ALERT */
+#msg{margin-top:20px;font-size:1rem;min-height:25px;font-weight:600;text-align:center}
+
+footer{opacity:.55;text-align:center;margin-top:50px;padding:20px;font-size:.85rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="rules.html">Rules</a>
+  <a href="departments.html">Departments</a>
+  <a href="apply.html">Apply</a>
+  <a href="staff.html">Staff Panel</a>
+  <span>Login</span>
+</nav>
+
+<main>
+  <h1>Account Login</h1>
+
+  <form id="loginForm">
+    <label>Email Address</label>
+    <input type="email" id="email" placeholder="you@example.com" required>
+
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter your password" required>
+
+    <button type="submit">Sign In</button>
+    <small>Don't have an account? <a href="register.html">Register</a></small>
+
+    <p id="msg"></p>
+  </form>
+</main>
+
+<footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
+
+<script>
+const API = "https://shoreroleplay.onrender.com";
+
+document.getElementById("loginForm").addEventListener("submit", async(e)=>{
+  e.preventDefault();
+  const email = email.value.trim();
+  const password = password.value.trim();
+
+  const res = await fetch(API + "/login",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({email,password})
+  });
+
+  const msg = document.getElementById("msg");
+  if(res.ok){
+    msg.style.color="#2ecc71";
+    msg.textContent="✔ Logged in!";
+    setTimeout(()=>location.href="index.html",1200);
+  } else {
+    msg.style.color="#e74c3c";
+    msg.textContent="❌ Invalid credentials";
+  }
+});
+</script>
+</body>
+</html>
