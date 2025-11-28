@@ -662,11 +662,7 @@ async function loadForumUsers(){
             <button class="btn deny" onclick="toggleRestrict('${u.id}', ${u.restricted})">
               ${u.restricted ? "Unrestrict" : "Restrict Posting"}
             </button>
-
-            <button class="btn delete" onclick="banUser('${u.id}')">
-              Ban User
-            </button>
-
+            
             <button class="btn view" onclick="location.href='profile.html?user=${u.username}'">
               View Profile
             </button>
