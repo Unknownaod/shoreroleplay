@@ -83,14 +83,19 @@ button.action{
 button.action:hover{filter:brightness(1.1)}
 .delete{background:#e74c3c}
 
-/* BADGES */
+/* BADGES (FULL RANK SYSTEM) */
 .badge{
   padding:5px 10px;border-radius:6px;font-size:.8rem;font-weight:600;
   display:inline-block;margin-top:3px;
 }
-.user{background:#4ea3ff22;border:1px solid #4ea3ff}
-.staff{background:#ffd00033;border:1px solid #ffd000;color:#ffd000}
-.ha{background:#ff3b3b33;border:1px solid #ff3b3b;color:#ff7979}
+.ha{background:#ff3b3b33;border:1px solid #ff3b3b;color:#ff9a9a}
+.ia{background:#b83bff33;border:1px solid #b83bff;color:#e6cbff}
+.admin{background:#00c8ff33;border:1px solid #00c8ff;color:#c9f3ff}
+.jadmin{background:#00ffe533;border:1px solid #00ffe5;color:#c9fff9}
+.sstaff{background:#ffc40033;border:1px solid #ffc400;color:#fff0b6}
+.staff{background:#00ff6033;border:1px solid #00ff60;color:#c6ffc6}
+.sit{background:#4ea3ff33;border:1px solid #4ea3ff;color:#d7e8ff}
+.civ{background:#ffffff22;border:1px solid #fff;color:#fff}
 
 .status-badge{display:inline-block;padding:3px 8px;border-radius:6px;margin-top:6px;font-size:.78rem;font-weight:600}
 .pending{background:#ffb703;color:#000}
@@ -125,7 +130,7 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
   <p class="sub" id="email"></p>
   <p id="roleBadge"></p>
 
-  <!-- ACCOUNT IDENTIFIERS -->
+  <!-- IDENTIFIERS -->
   <div class="section">
     <h2>Your System Identifier</h2>
     <div class="card">
@@ -135,7 +140,7 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
     </div>
   </div>
 
-  <!-- APPLICATIONS -->
+  <!-- APPLICATION LOG -->
   <div class="section">
     <h2>Your Applications</h2>
     <h3 style="margin-top:10px">Pending</h3><div id="pendingList"></div>
@@ -143,7 +148,7 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
     <h3>Denied</h3><div id="deniedList"></div>
   </div>
 
-  <!-- USERNAME CHANGE -->
+  <!-- PROFILE -->
   <div class="section">
     <h2>Profile Settings</h2>
     <div class="card">
@@ -167,14 +172,12 @@ footer{text-align:center;opacity:.55;margin-top:40px;font-size:.9rem}
       <p id="msg"></p>
     </div>
 
-    <!-- SESSION -->
     <div class="card">
       <h3>Session Management</h3>
       <button class="action" onclick="logoutAll()">Logout All Devices</button>
       <p id="sessMsg"></p>
     </div>
 
-    <!-- DELETE -->
     <div class="card" style="border-color:#e74c3c">
       <h3 style="color:#e74c3c">Delete Account</h3>
       <p>This action is irreversible.</p>
@@ -192,19 +195,38 @@ const API="https://shoreroleplay.onrender.com";
 const user=JSON.parse(localStorage.getItem("shoreUser"));
 if(!user) location.href="login.html";
 
-/* USER UI INIT */
+/* INIT */
 document.getElementById("username").textContent=user.username;
 document.getElementById("email").textContent=user.email;
 renderRole();
 loadIdentifiers();
 loadApps();
 
-/* BADGES */
-function renderRole(){
-  let badge="user";
-  if(user.role==="HA") badge="ha";
-  if(user.role==="staff") badge="staff";
-  document.getElementById("roleBadge").innerHTML=`<span class="badge ${badge}">${badge.toUpperCase()}</span>`;
+/* ROLE RENDER (NEW FULL MAP) */
+function renderRole() {
+  const role = user.role || "Civilian";
+  const roleMap = {
+    "Head Administrator":"ha",
+    "Internal Affairs":"ia",
+    "Administration":"admin",
+    "Junior Administration":"jadmin",
+    "Senior Staff":"sstaff",
+    "Staff":"staff",
+    "Staff In Training":"sit",
+    "Civilian":"civ",
+
+    // legacy support
+    "HA":"ha",
+    "IA":"ia",
+    "ADMIN":"admin",
+    "JADMIN":"jadmin",
+    "SSTAFF":"sstaff",
+    "STAFF":"staff",
+    "SIT":"sit",
+    "USER":"civ"
+  };
+  document.getElementById("roleBadge").innerHTML =
+    `<span class="badge ${roleMap[role]||'civ'}">${role}</span>`;
 }
 
 /* IDENTIFIERS */
@@ -213,10 +235,11 @@ async function loadIdentifiers(){
   const u=await res.json();
   document.getElementById("hwid").textContent=u.hwid||"—";
   document.getElementById("lastIP").textContent=u.lastIP||"—";
-  document.getElementById("lastLogin").textContent=u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString():"—";
+  document.getElementById("lastLogin").textContent=u.lastLoginAt?
+    new Date(u.lastLoginAt).toLocaleString():"—";
 }
 
-/* APPLICATIONS */
+/* APPS */
 async function loadApps(){
   const res=await fetch(API+"/applications");
   const mine=(await res.json()).filter(a=>a.email===user.email);
@@ -242,10 +265,9 @@ async function changeUsername(){
   if(r.ok){user.username=n;localStorage.setItem("shoreUser",JSON.stringify(user));p.textContent="Updated!";setTimeout(()=>location.reload(),800)}
 }
 
-/* PASSWORD + STRENGTH */
+/* PASSWORD */
 document.getElementById("newPass").oninput=e=>{
-  const m=document.getElementById("strength");
-  const v=e.target.value.length;
+  const m=document.getElementById("strength"),v=e.target.value.length;
   m.textContent=v<6?"Weak":v<10?"Medium":"Strong";
   m.style.color=v<6?"#e74c3c":v<10?"#f1c40f":"#2ecc71";
 };
