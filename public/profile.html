@@ -149,7 +149,7 @@ footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem
 const API = "https://shoreroleplay.onrender.com";
 const urlParams = new URLSearchParams(window.location.search);
 const profileUsername = urlParams.get("user");
-if(!profileUsername) location.href = "index.html";
+if (!profileUsername) location.href = "index.html";
 
 /* STAFF ROLE COLOR MAP */
 const roleColor = {
@@ -162,7 +162,7 @@ const roleColor = {
   "Staff In Training":"sit"
 };
 
-/* DEPARTMENT ICONS */
+/* DEPARTMENT BADGES */
 const deptIcons = {
   "Police Department":"https://i.imgur.com/3Uhtndq.png",
   "State Police":"https://i.imgur.com/24jUZlT.png",
@@ -173,75 +173,48 @@ const deptIcons = {
   "DevOps":"https://i.imgur.com/DAlxtWE.png"
 };
 
-// full department list for high staff visibility
-const ALL_DEPARTMENTS = Object.keys(deptIcons);
-
-// roles that unlock ALL departments
-const HIGH_STAFF = [
-  "Administration",
-  "Internal Affairs",
-  "Head Administrator"
-];
-
-/* LOAD PROFILE */
-async function loadProfile(){
-  const users = await fetch(API+"/users").then(r=>r.json());
+async function loadProfile() {
+  const users = await fetch(API + "/users").then(r => r.json());
   const user = users.find(u => u.username.toLowerCase() === profileUsername.toLowerCase());
 
   document.getElementById("username").textContent = profileUsername;
   const subtitleEl = document.getElementById("subtitle");
 
-  /* STAFF BADGE */
-  if(user?.role && user.role !== "user"){
+  /* FIXED — use u.role (NOT staffRole) */
+  if (user && user.role && user.role !== "user") {
     subtitleEl.innerHTML = `
       Shore Roleplay Staff —
-      <span class="staff-badge ${roleColor[user.role]}">${user.role}</span>
-      ${user.staffTag ? `· ${user.staffTag}` : ""}
+      <span class="staff-badge ${roleColor[user.role] || ""}">${user.role}</span>
     `;
   } else {
     subtitleEl.textContent = "Shore Roleplay Member";
   }
 
-  /* FETCH APPLICATIONS */
-  const apps = await fetch(API+"/applications").then(r=>r.json());
+  /* LOAD APPLICATIONS */
+  const apps = await fetch(API + "/applications").then(r => r.json());
   const userApps = apps.filter(a => a.username.toLowerCase() === profileUsername.toLowerCase());
   const accepted = userApps.filter(a => a.status === "accepted");
 
   const deptList = document.getElementById("deptList");
   const appsList = document.getElementById("appsList");
 
-  /* ========== DEPARTMENT DISPLAY LOGIC ========== */
-
-  // If user is Administration or above → show ALL departments
-  if(HIGH_STAFF.includes(user.role)){
-    ALL_DEPARTMENTS.forEach(dep => {
-      deptList.innerHTML += `
-        <div class="dept">
-          <img src="${deptIcons[dep]}">
-          <div><strong>${dep}</strong><br>Authorized Department Access</div>
-        </div>
-      `;
-    });
-  } else if(accepted.length > 0) {
-    // normal members → only show accepted departments
-    accepted.forEach(app => {
-      deptList.innerHTML += `
-        <div class="dept">
-          <img src="${deptIcons[app.department]}">
-          <div><strong>${app.department}</strong><br>Active Department Member</div>
-        </div>
-      `;
-    });
-  } else {
+  if (accepted.length === 0) {
     deptList.innerHTML = "<p>No accepted departments yet.</p>";
   }
 
-  /* APPLICATION HISTORY */
-  userApps.forEach(app => {
+  accepted.forEach(app => {
+    deptList.innerHTML += `
+      <div class="dept">
+        <img src="${deptIcons[app.department] || deptIcons['Civilian Operations']}">
+        <div>
+          <strong>${app.department}</strong><br>Active Department Member
+        </div>
+      </div>
+    `;
     appsList.innerHTML += `
       <div class="app-card">
         <strong>${app.department}</strong> — ${new Date(app.submittedAt).toLocaleDateString()}
-        <div class="badge accepted">${app.status.toUpperCase()}</div>
+        <div class="badge accepted">ACCEPTED</div>
       </div>
     `;
   });
@@ -249,6 +222,7 @@ async function loadProfile(){
 
 loadProfile();
 </script>
+
 
 </body>
 </html>
