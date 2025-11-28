@@ -638,15 +638,17 @@ function copyHwid(hwid){
   }
 }
 
-// FORUM RESTRICTION/MODERATION
+// FORUM RESTRICTION / MODERATION
+/* ========== FORUM USER MODERATION ========== */
+
 /* Load forum users into table */
 async function loadForumUsers(){
   try {
     const res = await fetch(`${API}/users`);
     const users = await res.json();
 
-    const staffRole = user.role || "User"; // Logged-in staff rank
-    const isHA = staffRole === "Head Administrator"; // Only HA allowed to ban
+    const staffRole = user.role || "User"; // logged-in staff rank
+    const isHA = staffRole === "Head Administrator"; // Only HA can ban users
 
     forumUsers.innerHTML = "";
 
@@ -662,16 +664,19 @@ async function loadForumUsers(){
             ${u.restricted ? "Restricted" : "Allowed to Post"}
           </td>
           <td>
+            <!-- Restrict Button -->
             <button class="btn deny" onclick="toggleRestrict('${u.id}', ${u.restricted}, '${u.role}')">
               ${u.restricted ? "Unrestrict" : "Restrict Posting"}
             </button>
 
+            <!-- Ban Button: Only Head Administrator and cannot target another HA -->
             ${isHA && !isTargetHA ? `
               <button class="btn delete" onclick="banUser('${u.id}')">
                 Ban User
               </button>
             ` : ""}
 
+            <!-- View Profile -->
             <button class="btn view" onclick="location.href='profile.html?user=${u.username}'">
               View Profile
             </button>
@@ -681,13 +686,15 @@ async function loadForumUsers(){
     });
   } catch (err) {
     console.error("Forum users failed to load:", err);
-    forumUsers.innerHTML = `<tr><td colspan="5">Failed to load forum users.</td></tr>`;
+    forumUsers.innerHTML = `<tr><td colspan="5" style="color:red;">Failed to load forum users.</td></tr>`;
   }
 }
 
 /* Toggle posting ability → /users/:id/restrict */
 async function toggleRestrict(id, current, targetRole){
-  const staffRole = user.role || "User"; // logged-in staff
+  const staffRole = user.role || "User"; // logged-in staff rank
+
+  // Protected ranks — cannot be restricted except by Head Administrator
   const protectedRanks = [
     "Junior Administration",
     "Administration",
@@ -695,9 +702,8 @@ async function toggleRestrict(id, current, targetRole){
     "Head Administrator"
   ];
 
-  // If target is protected and staff is NOT HA+
   if (protectedRanks.includes(targetRole) && staffRole !== "Head Administrator") {
-    alert("❌ You do not have permission to restrict this user. Only Head Administration may restrict junior administration or higher.");
+    alert("❌ Only Head Administration may restrict Junior Administration or higher.");
     return;
   }
 
