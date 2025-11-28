@@ -496,45 +496,98 @@
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
-const user = JSON.parse(localStorage.getItem("shoreUser"));
-const bar = document.getElementById("userBar");
 
-/* Render login state into correct container */
-function render() {
+/* ============================================
+   LOAD SESSION
+============================================ */
+async function loadSession() {
+  const user = JSON.parse(localStorage.getItem("shoreUser") || "null");
+
+  // No session → render logged out state
+  if (!user) return renderState(null);
+
+  try {
+    // Validate user still exists + fetch latest status
+    const res = await fetch(`${API}/users/${user.id}`);
+    if (!res.ok) throw new Error("User not found");
+
+    const fresh = await res.json();
+
+    // Update localStorage with fresh DB values
+    localStorage.setItem("shoreUser", JSON.stringify(fresh));
+
+    // === BANNED CHECK ===
+    if (fresh.banned?.status === true) {
+      // Force redirect to banned page
+      if (!location.pathname.includes("appeal") && !location.pathname.includes("banned")) {
+        location.href = "banned.html";
+        return;
+      }
+    }
+
+    // Render UI
+    renderState(fresh);
+
+  } catch (err) {
+    console.warn("Session expired or invalid → logging out.");
+    logout();
+  }
+}
+
+/* ============================================
+   RENDER STATE INTO USER BAR
+============================================ */
+function renderState(user) {
+  const bar = document.getElementsByClassName("user-bar")[0];
   if (!bar) return;
 
+  // Logged-out UI
   if (!user) {
     bar.innerHTML = `
-      Existing user? <strong>Sign In</strong> to continue.
+      <div class="user-bar-left">
+        Existing user? <strong>Sign In</strong> to continue.
+      </div>
       <div class="user-bar-right">
         <button class="btn-chip" onclick="location.href='login.html'">Sign In</button>
         <button class="btn-chip btn-chip-primary" onclick="location.href='register.html'">Sign Up</button>
       </div>
     `;
-  } else {
-    bar.innerHTML = `
-      Welcome back, <strong>${user.username}</strong>
-      <div class="user-bar-right">
-        <button class="btn-chip" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
-        <button class="btn-chip" onclick="location.href='settings.html'">Settings</button>
-        <button class="btn-chip btn-chip-primary" onclick="logout()">Logout</button>
-      </div>
-    `;
+    return;
   }
+
+  // Logged-in UI
+  bar.innerHTML = `
+    <div class="user-bar-left">
+      Welcome back, <strong>${user.username}</strong>
+      ${user.banned?.status ? `<span style="color:#ff4d4d">[BANNED]</span>` : ""}
+    </div>
+    <div class="user-bar-right">
+      <button class="btn-chip" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
+      <button class="btn-chip" onclick="location.href='settings.html'">Settings</button>
+      ${user.role === "HA" ? `<button class="btn-chip btn-chip-primary" onclick="location.href='ha.html'">HA Panel</button>` : ""}
+      <button class="btn-chip btn-chip-primary" onclick="logout()">Logout</button>
+    </div>
+  `;
 }
 
-/* Logout */
+/* ============================================
+   LOGOUT
+============================================ */
 function logout() {
   localStorage.removeItem("shoreUser");
-  location.reload();
+  location.href = "index.html";
 }
 
-/* Init */
-render();
+/* ============================================
+   INIT
+============================================ */
+loadSession();
 </script>
+
 
 
 </body>
 </html>
+
 
 
