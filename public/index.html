@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- OPTIONAL ICONS (for social buttons) -->
+  <!-- ICONS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
   <style>
@@ -73,41 +73,6 @@
     }
     .btn-chip:hover{background:rgba(255,255,255,.18);}
     .btn-chip-primary:hover{filter:brightness(1.05);}
-
-    .user-dropdown-toggle{
-      display:flex;
-      align-items:center;
-      gap:6px;
-      cursor:pointer;
-    }
-    .user-dropdown{
-      position:absolute;
-      top:32px;
-      right:0;
-      background:#0c101b;
-      border-radius:8px;
-      border:1px solid rgba(255,255,255,.18);
-      padding:6px 0;
-      min-width:170px;
-      box-shadow:0 10px 25px rgba(0,0,0,.6);
-      display:none;
-      z-index:50;
-    }
-    .user-dropdown a,
-    .user-dropdown button{
-      width:100%;
-      padding:8px 14px;
-      background:transparent;
-      border:none;
-      text-align:left;
-      font-size:.88rem;
-      color:#dfe6ff;
-      cursor:pointer;
-    }
-    .user-dropdown a:hover,
-    .user-dropdown button:hover{
-      background:#181f31;
-    }
 
     /* =========================
        MAIN NAV
@@ -346,16 +311,15 @@
 
 <!-- TOP LOGO BAR -->
 <header class="top-header">
-  <!-- SHORE ROLEPLAY LOGO -->
   <img src="https://i.imgur.com/P15LI6g.png" alt="Shore Roleplay">
 </header>
 
-<!-- USER BAR -->
+<!-- USER BAR (content is controlled by JS) -->
 <div class="user-bar">
-  <div class="user-bar-left" id="userBarLeft">
+  <div class="user-bar-left">
     Existing user? <strong>Sign In</strong> to continue.
   </div>
-  <div class="user-bar-right" id="userBarRight">
+  <div class="user-bar-right">
     <button class="btn-chip" onclick="location.href='login.html'">Sign In</button>
     <button class="btn-chip btn-chip-primary" onclick="location.href='register.html'">Sign Up</button>
   </div>
@@ -369,6 +333,7 @@
     <span class="nav-link" onclick="location.href='departments.html'">Departments</span>
     <span class="nav-link" onclick="location.href='rules.html'">Rules</span>
     <span class="nav-link" onclick="location.href='apply.html'">Apply</span>
+    <span class="nav-link" onclick="location.href='forums.html'">Forums</span>
     <span class="nav-link" onclick="location.href='staff.html'">Staff Panel</span>
   </div>
   <div class="nav-right">
@@ -391,7 +356,6 @@
   <section class="page-main">
     <article class="panel">
       <div class="panel-header">
-        <!-- MAIN SHORE LOGO / BADGES -->
         <img src="https://i.imgur.com/P15LI6g.png" alt="Shore Roleplay Logo">
         <h1>Welcome to the Shore Roleplay Community</h1>
         <h2>Serious, story-driven FiveM roleplay built on professionalism and immersion.</h2>
@@ -438,20 +402,18 @@
   <aside class="page-sidebar">
 
     <!-- Interested in joining -->
-<div class="sidebar-card" id="joinCard">
-  <h3>Interested in joining?</h3>
-  <p>Please make an account and submit an application to get started.</p>
+    <div class="sidebar-card" id="joinCard">
+      <h3>Interested in joining?</h3>
+      <p>Please make an account and submit an application to get started.</p>
 
-  <div class="sidebar-actions" id="joinButtons">
-    <!-- JS will inject Sign In / Sign Up / Discord OR Profile / Settings / Logout -->
-    <button class="sidebar-btn" onclick="location.href='login.html'">Sign In</button>
-    <button class="sidebar-btn" onclick="location.href='register.html'">Sign Up</button>
-    <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">
-      <i class="fa-brands fa-discord"></i> Login with Discord
-    </button>
-  </div>
-</div>
-
+      <div class="sidebar-actions" id="joinButtons">
+        <button class="sidebar-btn" onclick="location.href='login.html'">Sign In</button>
+        <button class="sidebar-btn" onclick="location.href='register.html'">Sign Up</button>
+        <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">
+          <i class="fa-brands fa-discord"></i> Join our Discord
+        </button>
+      </div>
+    </div>
 
     <!-- Open Applications -->
     <div class="sidebar-card">
@@ -501,74 +463,83 @@
 const API = "https://shoreroleplay.onrender.com";
 
 /* ============================================
-   LOAD SESSION
+   INIT SESSION
 ============================================ */
 async function loadSession() {
-  const user = JSON.parse(localStorage.getItem("shoreUser") || "null");
-
-  if (!user) {
-    renderState(null);
+  const stored = localStorage.getItem("shoreUser");
+  if (!stored) {
+    renderLoggedOut();
     renderJoinCard(null);
     return;
   }
 
+  let sessionUser;
   try {
-    const res = await fetch(`${API}/users/${user.id}`);
-    if (!res.ok) throw new Error("User not found");
+    sessionUser = JSON.parse(stored);
+  } catch (e) {
+    logout();
+    return;
+  }
+
+  try {
+    // Get fresh user data from backend
+    const res = await fetch(`${API}/users/${encodeURIComponent(sessionUser.id)}`);
+    if (!res.ok) throw new Error("User fetch failed");
 
     const fresh = await res.json();
     localStorage.setItem("shoreUser", JSON.stringify(fresh));
 
-    /* ============================
-       BAN ENFORCEMENT
-    ============================= */
+    // Ban enforcement (redirect if banned)
     if (fresh.banned === true) {
+      const reason = encodeURIComponent(fresh.banReason || "No reason provided");
       const path = location.pathname.toLowerCase();
-      if (!path.includes("banned") && !path.includes("appeal")) {
-        location.href = "banned.html";
+      if (!path.includes("banned")) {
+        location.href = `banned.html?reason=${reason}`;
         return;
       }
     }
 
-    renderState(fresh);
+    renderLoggedIn(fresh);
     renderJoinCard(fresh);
-
   } catch (err) {
-    console.warn("Session invalid → logging out.", err);
+    console.warn("Session invalid, clearing.", err);
     logout();
   }
 }
 
 /* ============================================
-   RENDER TOP USER BAR
+   RENDER USER BAR
 ============================================ */
-function renderState(user) {
+function renderLoggedOut() {
+  const bar = document.querySelector(".user-bar");
+  if (!bar) return;
+  bar.innerHTML = `
+    <div class="user-bar-left">
+      Existing user? <strong>Sign In</strong> to continue.
+    </div>
+    <div class="user-bar-right">
+      <button class="btn-chip" onclick="location.href='login.html'">Sign In</button>
+      <button class="btn-chip btn-chip-primary" onclick="location.href='register.html'">Sign Up</button>
+    </div>
+  `;
+}
+
+function renderLoggedIn(user) {
   const bar = document.querySelector(".user-bar");
   if (!bar) return;
 
-  if (!user) {
-    bar.innerHTML = `
-      <div class="user-bar-left">
-        Existing user? <strong>Sign In</strong> to continue.
-      </div>
-      <div class="user-bar-right">
-        <button class="btn-chip" onclick="location.href='login.html'">Sign In</button>
-        <button class="btn-chip btn-chip-primary" onclick="location.href='register.html'">Sign Up</button>
-      </div>
-    `;
-    return;
-  }
+  const isStaff = user.role && user.role.toLowerCase() !== "user";
 
   bar.innerHTML = `
     <div class="user-bar-left">
       Welcome back, <strong>${user.username}</strong>
-      ${user.banned ? `<span style="color:#ff4d4d">[BANNED]</span>` : ""}
+      ${isStaff ? `<span style="margin-left:6px;font-size:12px;opacity:.8;">(${user.role})</span>` : ""}
+      ${user.banned ? `<span style="color:#ff4d4d;margin-left:8px;">[BANNED]</span>` : ""}
     </div>
-
     <div class="user-bar-right">
-      <button class="btn-chip" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
+      <button class="btn-chip" onclick="location.href='profile.html?user=${encodeURIComponent(user.username)}'">Profile</button>
       <button class="btn-chip" onclick="location.href='settings.html'">Settings</button>
-      ${user.role === "HA" ? `<button class="btn-chip btn-chip-primary" onclick="location.href='ha.html'">HA Panel</button>` : ""}
+      ${isStaff ? `<button class="btn-chip btn-chip-primary" onclick="location.href='staff.html'">Staff Panel</button>` : ""}
       <button class="btn-chip btn-chip-primary" onclick="logout()">Logout</button>
     </div>
   `;
@@ -576,7 +547,6 @@ function renderState(user) {
 
 /* ============================================
    RENDER JOIN CARD BUTTONS
-   (Interested in joining? box)
 ============================================ */
 function renderJoinCard(user) {
   const box = document.getElementById("joinButtons");
@@ -584,20 +554,34 @@ function renderJoinCard(user) {
 
   if (!user) {
     box.innerHTML = `
-      <button class="user-btn" onclick="location.href='login.html'">Sign In</button>
-      <button class="user-btn" onclick="location.href='register.html'">Sign Up</button>
-      <button class="user-btn discord-btn" onclick="location.href='https://discord.com/oauth2/authorize?...'">
-        <i class="fab fa-discord"></i> Login with Discord
+      <button class="sidebar-btn" onclick="location.href='login.html'">Sign In</button>
+      <button class="sidebar-btn" onclick="location.href='register.html'">Sign Up</button>
+      <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">
+        <i class="fa-brands fa-discord"></i> Join our Discord
       </button>
     `;
-  } else {
-    box.innerHTML = `
-      <button class="user-btn" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
-      <button class="user-btn" onclick="location.href='settings.html'">Settings</button>
-      ${user.role === "HA" ? `<button class="user-btn" onclick="location.href='ha.html'">HA Panel</button>` : ""}
-      <button class="user-btn logout-btn" onclick="logout()">Logout</button>
-    `;
+    return;
   }
+
+  const isStaff = user.role && user.role.toLowerCase() !== "user";
+
+  box.innerHTML = `
+    <button class="sidebar-btn" onclick="location.href='profile.html?user=${encodeURIComponent(user.username)}'">
+      View Profile
+    </button>
+    <button class="sidebar-btn" onclick="location.href='settings.html'">
+      Account Settings
+    </button>
+    ${isStaff ? `
+      <button class="sidebar-btn primary" onclick="location.href='staff.html'">
+        Staff Control Panel
+      </button>
+    ` : ""}
+    <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">
+      <i class="fa-brands fa-discord"></i> Join our Discord
+    </button>
+    <button class="sidebar-btn" onclick="logout()">Logout</button>
+  `;
 }
 
 /* ============================================
@@ -614,14 +598,5 @@ function logout() {
 loadSession();
 </script>
 
-
-
-
 </body>
 </html>
-
-
-
-
-
-
