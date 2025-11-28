@@ -194,7 +194,7 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
   <div class="tabs">
     <div class="tab active" onclick="switchTab('pending')">Pending Applications</div>
     <div class="tab" onclick="switchTab('all')">Previous Applications</div>
-    <div class="tab" onclick="switchTab('all')">Forum Tools</div>
+    <div class="tab" onclick="switchTab('forums')">Forum Tools</div>
     <div class="tab" onclick="switchTab('ha')">HA Tab (Head Administration)</div>
   </div>
 
@@ -337,27 +337,38 @@ async function login(){
 /* ========== TABS ========== */
 function switchTab(tab){
   currentTab = tab;
+
+  // Highlight correct tab
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.querySelector(`.tab:nth-child(${tab==='pending'?1:tab==='all'?2:3})`).classList.add("active");
+  document.querySelector(`.tab:nth-child(${
+    tab==='pending' ? 1 :
+    tab==='all' ? 2 :
+    tab==='forums' ? 3 : 4
+  })`).classList.add("active");
 
-  const appsSection = document.getElementById("appsSection");
-  const haSection   = document.getElementById("haSection");
+  // Sections
+  const appsSection   = document.getElementById("appsSection");
+  const forumsSection = document.getElementById("forumsSection");
+  const haSection     = document.getElementById("haSection");
 
+  // Show/hide based on selected tab
+  appsSection.style.display   = (tab === "pending" || tab === "all") ? "block" : "none";
+  forumsSection.style.display = (tab === "forums") ? "block" : "none";
+  haSection.style.display     = (tab === "ha") ? "block" : "none";
+
+  // Load correct data
   if(tab === "ha"){
-    appsSection.style.display = "none";
-    haSection.style.display = "block";
-
-    if(!haUnlocked){
-      haPrompt();
-    } else {
-      loadUsers();
-    }
-  } else {
-    appsSection.style.display = "block";
-    haSection.style.display = "none";
+    if(!haUnlocked) haPrompt();
+    else loadUsers();
+  } 
+  else if(tab === "forums"){
+    loadForumUsers();
+  } 
+  else {
     loadApps();
   }
 }
+
 
 /* ========== HA PASSWORD PROMPT → /ha-auth ========== */
 async function haPrompt(){
