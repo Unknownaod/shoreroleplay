@@ -1,146 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Shore Roleplay | Home</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shore Roleplay | Home</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- FONTS -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<!-- FONTS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: "Inter", sans-serif;
-      background: #05070a;
-      color: #fff;
-      overflow-x: hidden;
-    }
+<style>
+/* ===== RESET ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Inter",sans-serif;
+  background:#000;
+  color:#fff;
+  overflow-x:hidden;
+}
 
-    /* NAVBAR */
-    nav {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 18px 70px;
-      background: rgba(0,0,0,0.35);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      position: fixed; top: 0; width: 100%; z-index: 1000;
-      animation: navFade .7s ease forwards;
-    }
-    @keyframes navFade {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    nav a {
-      color: #fff; text-decoration: none; margin-right: 32px;
-      font-weight: 500; transition: .25s;
-    }
-    nav a:hover { color: #4ea3ff; text-shadow: 0 0 12px #4ea3ff; }
-    .nav-links { display: flex; gap: 32px; }
+/* ===== NAVBAR ===== */
+nav{
+  position:fixed;top:0;width:100%;z-index:1000;
+  display:flex;justify-content:center;align-items:center;
+  padding:20px 0;
+  backdrop-filter:blur(22px);
+  background:rgba(0,0,0,.45);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  animation:navLoad .6s ease-out forwards;
+}
+@keyframes navLoad{
+  from{opacity:0;transform:translateY(-25px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.nav-links{
+  display:flex;gap:45px;
+}
+nav a{
+  color:#dfe6ff;text-decoration:none;
+  font-weight:500;font-size:16px;
+  transition:.25s;
+}
+nav a:hover{
+  color:#75b6ff;
+  text-shadow:0 0 10px #4ea3ff;
+  transform:translateY(-2px);
+}
 
-    /* HERO SECTION */
-    .hero {
-      height: 100vh;
-      background: url('https://i.imgur.com/vbt5BPF.jpeg') center/cover no-repeat fixed;
-      display: flex; justify-content: center; align-items: center;
-      flex-direction: column; text-align: center; padding-top: 60px;
-      animation: fadeIn 1.4s ease forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .hero .logo {
-      width: 290px; margin-bottom: 18px;
-      filter: drop-shadow(0 0 22px rgba(0,0,0,.8));
-      animation: pulse 3s infinite ease-in-out;
-    }
-    @keyframes pulse {
-      0%,100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    .hero h1 { font-size: 4rem; font-weight: 700; }
-    .hero p { font-size: 1.3rem; opacity: .88; margin-top: 10px; }
+/* ===== HERO ===== */
+.hero{
+  height:100vh;
+  background:url('https://i.imgur.com/vbt5BPF.jpeg') center/cover no-repeat fixed;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;padding:80px 20px;
+  position:relative;
+}
+.hero::after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,.5),rgba(0,0,0,.85));
+  pointer-events:none;
+}
+.hero-content{
+  position:relative;z-index:2;
+  animation:heroFade 1.2s ease forwards;
+}
+@keyframes heroFade{
+  from{opacity:0;transform:translateY(25px);}
+  to{opacity:1;transform:translateY(0);}
+}
 
-    /* BUTTONS */
-    .btn {
-      padding: 16px 35px; border-radius: 10px; font-size: 18px; text-decoration: none;
-      font-weight: 600; transition: .25s; display: inline-block; margin: 10px;
-    }
-    .btn-apply {
-      background: linear-gradient(90deg,#2ecc71,#29b765);
-      border: 2px solid #1e8a4d; box-shadow: 0 0 15px rgba(46,204,113,.5);
-      color: white;
-    }
-    .btn-apply:hover { transform: scale(1.05); box-shadow: 0 0 28px rgba(46,204,113,.75); }
+.logo{
+  width:310px;
+  filter:drop-shadow(0 0 32px rgba(255,255,255,.25));
+  animation:softPulse 4s infinite ease-in-out;
+}
+@keyframes softPulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.04)}
+}
 
-    .btn-discord {
-      background: linear-gradient(90deg,#5865F2,#444fdd);
-      border: 2px solid #3c43b9; box-shadow: 0 0 15px rgba(88,101,242,.5);
-      color: white;
-    }
-    .btn-discord:hover { transform: scale(1.05); box-shadow: 0 0 28px rgba(88,101,242,.75); }
+.hero h1{
+  font-size:4.3rem;font-weight:700;
+  margin-top:20px;
+  text-shadow:0 0 20px rgba(0,0,0,.45);
+}
+.hero p{
+  font-size:1.35rem;
+  margin-top:10px;
+  opacity:.9;
+  max-width:850px;
+}
 
-    /* INFO SECTION */
-    .info {
-      padding: 95px 12%; text-align: center; background: #090c12;
-    }
-    .info h2 { font-size: 3rem; margin-bottom: 20px; }
-    .info p { font-size: 1.2rem; opacity: .85; max-width: 850px; margin: auto; }
+/* ===== BUTTONS ===== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:16px 38px;border-radius:12px;
+  font-size:18px;font-weight:600;text-decoration:none;
+  margin:14px;transition:.25s;border:2px solid transparent;
+}
 
-    footer {
-      padding: 25px; text-align: center; opacity: .65; margin-top: 45px; font-size: 14px;
-    }
+.btn-apply{
+  background:linear-gradient(120deg,#2ecc71,#29b765 60%);
+  border-color:#1e8a4d;
+  box-shadow:0 0 20px rgba(46,204,113,.45);
+}
+.btn-apply:hover{
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 0 35px rgba(46,204,113,.8);
+}
 
-    @media only screen and (max-width: 780px) {
-      nav { padding: 16px 25px; }
-      .hero h1 { font-size: 2.7rem; }
-      .hero p { font-size: 1.05rem; }
-    }
-  </style>
+.btn-discord{
+  background:linear-gradient(120deg,#5865F2,#3f49d9 65%);
+  border-color:#3a3fb9;
+  box-shadow:0 0 20px rgba(88,101,242,.45);
+}
+.btn-discord:hover{
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 0 35px rgba(88,101,242,.85);
+}
+
+.btn-discord img{
+  width:26px;margin-right:10px;vertical-align:middle;
+  filter:drop-shadow(0 0 6px rgba(255,255,255,.35));
+}
+
+/* ===== INFO SECTION ===== */
+.info{
+  padding:120px 12%;
+  background:#05070b;
+  text-align:center;
+  position:relative;
+}
+.info::before{
+  content:"";
+  position:absolute;top:-70px;left:50%;
+  transform:translateX(-50%);
+  width:60%;height:2px;
+  background:linear-gradient(90deg,transparent,#4ea3ff,transparent);
+}
+.info h2{
+  font-size:3rem;margin-bottom:18px;
+  text-shadow:0 0 22px rgba(78,163,255,.45);
+}
+.info p{
+  margin:auto;max-width:850px;font-size:1.25rem;opacity:.82;
+}
+
+/* ===== FOOTER ===== */
+footer{
+  padding:28px 12%;text-align:center;font-size:14px;
+  opacity:.65;margin-top:60px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:780px){
+  nav{padding:15px}
+  .nav-links{gap:22px;}
+  .hero h1{font-size:2.8rem}
+  .hero p{font-size:1.1rem}
+}
+</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <div class="nav-links">
-      <a href="/">Home</a>
-      <a href="/rules.html">Rules</a>
-      <a href="/apply.html">Apply</a>
-      <a href="/staff.html">Staff Panel</a>
-    </div>
-  </nav>
+<!-- NAV -->
+<nav>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/rules.html">Rules</a>
+    <a href="/apply.html">Apply</a>
+    <a href="/staff.html">Staff Panel</a>
+  </div>
+</nav>
 
-  <!-- HERO -->
-  <section class="hero">
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
     <img src="https://i.imgur.com/P15LI6g.png" class="logo">
     <h1>Shore Roleplay</h1>
     <p>The next wave of serious, professional FiveM roleplay.</p>
 
     <a href="/apply.html" class="btn btn-apply">Apply Now</a>
-<a href="https://discord.gg/shoreRP" target="_blank" class="btn btn-discord">
-  <img src="https://i.imgur.com/Bb0UbEg.png"
-       style="width:26px;vertical-align:middle;margin-right:10px;filter:drop-shadow(0 0 6px rgba(255,255,255,.25));">
-  Join Discord
-</a>
-  </section>
+    <a href="https://discord.gg/shoreRP" target="_blank" class="btn btn-discord">
+      <img src="https://i.imgur.com/Bb0UbEg.png">Join Discord
+    </a>
+  </div>
+</section>
 
-  <section class="info">
-    <h2>Why Choose ShoreRP?</h2>
-    <p>
-     Join and find out.
-    </p>
-  </section>
+<!-- INFO -->
+<section class="info">
+  <h2>Why Choose ShoreRP?</h2>
+  <p>Join and find out.</p>
+</section>
 
-  <footer>
-    © 2025 Shore Roleplay — All Rights Reserved
-  </footer>
+<footer>
+  © 2025 Shore Roleplay — All Rights Reserved
+</footer>
 
 </body>
 </html>
-
-
-
-
-
