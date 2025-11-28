@@ -56,6 +56,7 @@
     }
     .user-bar-right{
       display:flex;gap:10px;
+      position:relative;
     }
     .btn-chip{
       padding:6px 14px;
@@ -72,6 +73,41 @@
     }
     .btn-chip:hover{background:rgba(255,255,255,.18);}
     .btn-chip-primary:hover{filter:brightness(1.05);}
+
+    .user-dropdown-toggle{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      cursor:pointer;
+    }
+    .user-dropdown{
+      position:absolute;
+      top:32px;
+      right:0;
+      background:#0c101b;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.18);
+      padding:6px 0;
+      min-width:170px;
+      box-shadow:0 10px 25px rgba(0,0,0,.6);
+      display:none;
+      z-index:50;
+    }
+    .user-dropdown a,
+    .user-dropdown button{
+      width:100%;
+      padding:8px 14px;
+      background:transparent;
+      border:none;
+      text-align:left;
+      font-size:.88rem;
+      color:#dfe6ff;
+      cursor:pointer;
+    }
+    .user-dropdown a:hover,
+    .user-dropdown button:hover{
+      background:#181f31;
+    }
 
     /* =========================
        MAIN NAV
@@ -90,6 +126,7 @@
     }
     .nav-brand{
       font-weight:700;font-size:16px;
+      cursor:pointer;
     }
     .nav-link{
       opacity:.85;cursor:pointer;
@@ -315,10 +352,10 @@
 
 <!-- USER BAR -->
 <div class="user-bar">
-  <div class="user-bar-left">
+  <div class="user-bar-left" id="userBarLeft">
     Existing user? <strong>Sign In</strong> to continue.
   </div>
-  <div class="user-bar-right">
+  <div class="user-bar-right" id="userBarRight">
     <button class="btn-chip" onclick="location.href='login.html'">Sign In</button>
     <button class="btn-chip btn-chip-primary" onclick="location.href='register.html'">Sign Up</button>
   </div>
@@ -334,7 +371,6 @@
     <span class="nav-link" onclick="location.href='apply.html'">Apply</span>
     <span class="nav-link" onclick="location.href='staff.html'">Staff Panel</span>
   </div>
-
   <div class="nav-right">
     <div class="nav-search">
       <input type="text" placeholder="Search…">
@@ -355,7 +391,7 @@
   <section class="page-main">
     <article class="panel">
       <div class="panel-header">
-        <!-- MAIN SHORE LOGO / BADGES (you can swap for a collage image like DOJ) -->
+        <!-- MAIN SHORE LOGO / BADGES -->
         <img src="https://i.imgur.com/P15LI6g.png" alt="Shore Roleplay Logo">
         <h1>Welcome to the Shore Roleplay Community</h1>
         <h2>Serious, story-driven FiveM roleplay built on professionalism and immersion.</h2>
@@ -402,12 +438,12 @@
   <aside class="page-sidebar">
 
     <!-- Interested in joining -->
-    <div class="sidebar-card">
+    <div class="sidebar-card" id="joinCard">
       <h3>Interested in joining?</h3>
       <p>Please make an account and submit an application to get started.</p>
       <div class="sidebar-actions">
-        <button class="sidebar-btn" onclick="location.href='/login'">Sign In</button>
-        <button class="sidebar-btn" onclick="location.href='/register'">Sign Up</button>
+        <button class="sidebar-btn" onclick="location.href='login.html'">Sign In</button>
+        <button class="sidebar-btn" onclick="location.href='register.html'">Sign Up</button>
         <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">
           <i class="fa-brands fa-discord"></i> Login with Discord
         </button>
@@ -458,7 +494,102 @@
   © 2025 Shore Roleplay — All Rights Reserved
 </footer>
 
+<script>
+  // Use the same key we used on login/apply pages
+  const currentUser = JSON.parse(localStorage.getItem("shoreUser") || "null");
+
+  function logout() {
+    localStorage.removeItem("shoreUser");
+    location.reload();
+  }
+
+  function renderLoggedOut() {
+    const left = document.getElementById("userBarLeft");
+    const right = document.getElementById("userBarRight");
+    const joinCard = document.getElementById("joinCard");
+
+    if (left) {
+      left.innerHTML = 'Existing user? <strong>Sign In</strong> to continue.';
+    }
+    if (right) {
+      right.innerHTML = `
+        <button class="btn-chip" onclick="location.href='login.html'">Sign In</button>
+        <button class="btn-chip btn-chip-primary" onclick="location.href='register.html'">Sign Up</button>
+      `;
+    }
+    if (joinCard) {
+      joinCard.innerHTML = `
+        <h3>Interested in joining?</h3>
+        <p>Please make an account and submit an application to get started.</p>
+        <div class="sidebar-actions">
+          <button class="sidebar-btn" onclick="location.href='login.html'">Sign In</button>
+          <button class="sidebar-btn" onclick="location.href='register.html'">Sign Up</button>
+          <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">
+            <i class="fa-brands fa-discord"></i> Login with Discord
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  function renderLoggedIn(user) {
+    const left = document.getElementById("userBarLeft");
+    const right = document.getElementById("userBarRight");
+    const joinCard = document.getElementById("joinCard");
+
+    if (left) {
+      left.innerHTML = `Welcome back, <strong>${user.username}</strong>`;
+    }
+    if (right) {
+      right.innerHTML = `
+        <div class="user-dropdown-toggle" onclick="toggleUserDropdown()">
+          <span>${user.username}</span>
+          <i class="fa fa-caret-down"></i>
+        </div>
+        <div class="user-dropdown" id="userDropdownMenu">
+          <button onclick="location.href='settings.html'">Account Settings</button>
+          <button onclick="location.href='profile/${encodeURIComponent(user.username)}'">Public Profile</button>
+          <button onclick="logout()">Logout</button>
+        </div>
+      `;
+    }
+    if (joinCard) {
+      joinCard.innerHTML = `
+        <h3>Your Account</h3>
+        <p>Manage your profile and applications.</p>
+        <div class="sidebar-actions">
+          <button class="sidebar-btn primary" onclick="location.href='settings.html'">Open Settings</button>
+          <button class="sidebar-btn" onclick="location.href='profile/${encodeURIComponent(user.username)}'">
+            View Public Profile
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  function toggleUserDropdown() {
+    const menu = document.getElementById("userDropdownMenu");
+    if (!menu) return;
+    menu.style.display = (menu.style.display === "block" ? "none" : "block");
+  }
+
+  // Initial render
+  if (currentUser) {
+    renderLoggedIn(currentUser);
+  } else {
+    renderLoggedOut();
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    const menu = document.getElementById("userDropdownMenu");
+    const right = document.getElementById("userBarRight");
+    if (!menu || !right) return;
+    if (!right.contains(e.target)) {
+      menu.style.display = "none";
+    }
+  });
+</script>
+
 </body>
 </html>
-
-
