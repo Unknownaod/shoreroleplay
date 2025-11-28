@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Shore Roleplay | Register</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* same styling as login for consistency */
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+  font-family:"Inter",sans-serif;color:#fff;
+}
+
+/* NAV */
+nav{
+  display:flex;align-items:center;
+  padding:18px 60px;background:rgba(0,0,0,.45);
+  backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.1);
+  position:fixed;top:0;width:100%;z-index:10;
+}
+nav a, nav span{
+  color:#dfe6ff;text-decoration:none;margin-right:32px;
+  font-weight:500;font-size:15px;transition:.25s;
+}
+nav a:hover{color:#4ea3ff;text-shadow:0 0 10px #4ea3ff}
+nav span{opacity:.45;cursor:default}
+
+/* FORM CONTAINER */
+main{
+  max-width:500px;margin:auto;padding:180px 20px 60px;text-align:center;
+}
+form{
+  background:rgba(10,12,18,.78);backdrop-filter:blur(25px);
+  padding:48px;border-radius:14px;border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 0 35px rgba(0,0,0,.6);text-align:left;
+}
+h1{text-align:center;font-size:2.7rem;margin-bottom:18px}
+
+label{display:block;margin-top:22px;font-weight:600;font-size:15px;opacity:.9}
+input{
+  width:100%;padding:15px;margin-top:6px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.18);
+  background:#0c111a;color:#fff;font-size:15px;transition:.3s;
+}
+input:focus{border-color:#4ea3ff;box-shadow:0 0 10px #4ea3ff}
+
+button{
+  margin-top:32px;width:100%;padding:16px;border-radius:10px;
+  border:none;background:#4ea3ff;color:#fff;font-size:17px;
+  font-weight:600;cursor:pointer;transition:.3s;
+}
+button:hover{transform:translateY(-3px);box-shadow:0 0 28px rgba(78,163,255,.85)}
+
+small{text-align:center;display:block;margin-top:18px;font-size:.9rem;opacity:.75}
+small a{color:#4ea3ff;text-decoration:none}
+small a:hover{text-shadow:0 0 10px #4ea3ff}
+
+#msg{margin-top:20px;text-align:center;font-weight:600}
+footer{text-align:center;margin-top:50px;opacity:.55;font-size:.85rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="rules.html">Rules</a>
+  <a href="departments.html">Departments</a>
+  <a href="apply.html">Apply</a>
+  <a href="staff.html">Staff Panel</a>
+  <span>Register</span>
+</nav>
+
+<main>
+  <h1>Create an Account</h1>
+
+  <form id="registerForm">
+    <label>Email Address</label>
+    <input type="email" id="email" placeholder="you@example.com" required>
+
+    <label>Username</label>
+    <input type="text" id="username" placeholder="ShoreRP_Gamer" required>
+
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Create a password" required>
+
+    <button type="submit">Register</button>
+    <small>Already have an account? <a href="login.html">Login</a></small>
+
+    <p id="msg"></p>
+  </form>
+</main>
+
+<footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
+
+<script>
+const API = "https://shoreroleplay.onrender.com";
+
+document.getElementById("registerForm").addEventListener("submit", async(e)=>{
+  e.preventDefault();
+
+  const body = {
+    email: email.value.trim(),
+    username: username.value.trim(),
+    password: password.value.trim()
+  };
+
+  const res = await fetch(API + "/register",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify(body)
+  });
+
+  const msg = document.getElementById("msg");
+  if(res.ok){
+    msg.style.color="#2ecc71";
+    msg.textContent="✔ Account created!";
+    setTimeout(()=>location.href="login.html",1200);
+  } else {
+    msg.style.color="#e74c3c";
+    msg.textContent="❌ Email already registered or invalid input";
+  }
+});
+</script>
+</body>
+</html>
