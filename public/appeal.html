@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Shore Roleplay | Ban Appeal</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:"Inter",sans-serif;
+      background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+      color:#fff;overflow-x:hidden;
+    }
+
+    nav{
+      background:rgba(0,0,0,.55);
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      padding:18px 60px;
+      display:flex;justify-content:space-between;align-items:center;
+      position:fixed;top:0;width:100%;z-index:20;
+    }
+    nav a{
+      color:#dfe6ff;text-decoration:none;margin-right:28px;font-size:15px;
+      font-weight:500;transition:.25s;
+    }
+    nav a:hover{color:#4ea3ff;text-shadow:0 0 10px #4ea3ff}
+
+    main{
+      max-width:700px;
+      margin:150px auto 60px;
+      background:rgba(0,0,0,.82);
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 0 45px rgba(0,0,0,.7);
+      padding:40px 32px 42px;
+      text-align:center;
+    }
+
+    .ban-icon{
+      font-size:4rem;
+      color:#e74c3c;
+      margin-bottom:10px;
+      text-shadow:0 0 20px rgba(231,76,60,.7);
+    }
+    h1{
+      font-size:2.4rem;
+      margin-bottom:4px;
+    }
+    .reason-box{
+      background:#120e12;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      padding:16px;
+      margin:18px 0 10px;
+      text-align:left;
+      font-size:.95rem;
+    }
+    .reason-box strong{color:#ff7675}
+    .meta{
+      font-size:.88rem;
+      opacity:.8;
+      margin-bottom:4px;
+    }
+
+    form{
+      margin-top:26px;
+      text-align:left;
+    }
+    label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:600;
+      font-size:.96rem;
+    }
+    textarea{
+      width:100%;
+      min-height:140px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background:#0b0f18;
+      padding:14px;
+      color:#fff;
+      font-size:.95rem;
+      resize:vertical;
+    }
+    textarea:focus{
+      outline:none;
+      border-color:#4ea3ff;
+      box-shadow:0 0 16px rgba(78,163,255,.8);
+    }
+    button{
+      margin-top:18px;
+      width:100%;
+      padding:14px 18px;
+      border-radius:10px;
+      border:none;
+      background:#4ea3ff;
+      color:#fff;
+      font-size:1rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:.25s;
+      box-shadow:0 0 18px rgba(78,163,255,.55);
+    }
+    button:hover{
+      transform:translateY(-2px);
+      box-shadow:0 0 26px rgba(78,163,255,.9);
+    }
+
+    #msg{
+      margin-top:14px;
+      font-size:.95rem;
+      min-height:20px;
+      text-align:center;
+      font-weight:600;
+    }
+
+    .logout{
+      margin-top:14px;
+      font-size:.85rem;
+      opacity:.8;
+      cursor:pointer;
+      text-decoration:underline;
+    }
+
+    footer{
+      text-align:center;
+      margin-top:40px;
+      padding:20px;
+      opacity:.6;
+      font-size:.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div>
+    <a href="index.html">Shore Roleplay</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ban-icon">✖</div>
+  <h1>You Are Banned</h1>
+  <p class="meta" id="userLine"></p>
+
+  <div class="reason-box">
+    <p><strong>Ban Reason:</strong> <span id="banReason"></span></p>
+    <p class="meta"><strong>Ban Date:</strong> <span id="banDate"></span></p>
+  </div>
+
+  <p style="margin-top:10px;font-size:.95rem;opacity:.85;">
+    If you believe this ban was issued in error, you may submit a ban appeal below. Abuse of the appeal
+    system may result in permanent denial.
+  </p>
+
+  <form id="appealForm">
+    <label for="appealText">Appeal Message</label>
+    <textarea id="appealText" placeholder="Explain why you believe this ban is unfair or should be reconsidered..." required></textarea>
+    <button type="submit">Submit Appeal</button>
+  </form>
+
+  <p id="msg"></p>
+
+  <div class="logout" onclick="logout()">Logout</div>
+</main>
+
+<footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
+
+<script>
+const API = "https://shoreroleplay.onrender.com";
+const stored = localStorage.getItem("shoreUser");
+let user = null;
+
+// Require logged-in + banned user
+if (!stored) {
+  // Not logged in → go home
+  window.location.href = "index.html";
+} else {
+  user = JSON.parse(stored);
+  if (!user.banned) {
+    // Logged in but not banned → shouldn't be here
+    window.location.href = "index.html";
+  }
+}
+
+// Fill ban info
+document.getElementById("userLine").textContent = `Logged in as ${user.username}`;
+document.getElementById("banReason").textContent = user.banReason || "No reason provided.";
+document.getElementById("banDate").textContent = user.banDate
+  ? new Date(user.banDate).toLocaleString()
+  : "Unknown";
+
+// Appeal submit
+document.getElementById("appealForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("msg");
+  const appealText = document.getElementById("appealText").value.trim();
+
+  if (appealText.length < 20) {
+    msg.style.color = "#e74c3c";
+    msg.textContent = "Please provide more detail (at least 20 characters).";
+    return;
+  }
+
+  const res = await fetch(API + "/appeals", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      userId: user.id,
+      username: user.username,
+      reason: appealText
+    })
+  });
+
+  const data = await res.json();
+  if (res.ok && data.success) {
+    msg.style.color = "#2ecc71";
+    msg.textContent = "✔ Appeal submitted. Staff will review it shortly.";
+    document.getElementById("appealForm").reset();
+  } else {
+    msg.style.color = "#e74c3c";
+    msg.textContent = data.error || "❌ Failed to submit appeal. Try again later.";
+  }
+});
+
+function logout(){
+  localStorage.removeItem("shoreUser");
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
