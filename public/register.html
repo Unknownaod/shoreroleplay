@@ -100,31 +100,63 @@ footer{text-align:center;margin-top:50px;opacity:.55;font-size:.85rem}
 <script>
 const API = "https://shoreroleplay.onrender.com";
 
-document.getElementById("registerForm").addEventListener("submit", async(e)=>{
+// Generate persistent HWID if not already stored
+function getHWID() {
+  let hwid = localStorage.getItem("shoreHWID");
+  if (!hwid) {
+    hwid = crypto.randomUUID();
+    localStorage.setItem("shoreHWID", hwid);
+  }
+  return hwid;
+}
+
+// Capture public IP
+async function getIP() {
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    const data = await res.json();
+    return data.ip || "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
+document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const body = {
-    email: email.value.trim(),
-    username: username.value.trim(),
-    password: password.value.trim()
-  };
+  const msg = document.getElementById("msg");
 
-  const res = await fetch(API + "/users/register",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify(body)
+  const email = document.getElementById("email").value.trim();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!email || !username || !password) {
+    msg.style.color = "#e74c3c";
+    msg.textContent = "Please complete all fields.";
+    return;
+  }
+
+  const hwid = getHWID();
+  const ip = await getIP();
+
+  const res = await fetch(API + "/users/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, username, password, hwid, ip })
   });
 
-  const msg = document.getElementById("msg");
-  if(res.ok){
-    msg.style.color="#2ecc71";
-    msg.textContent="✔ Account created!";
-    setTimeout(()=>location.href="login.html",1200);
+  const data = await res.json();
+
+  if (data.success) {
+    msg.style.color = "#2ecc71";
+    msg.textContent = "✔ Account created! Redirecting...";
+    setTimeout(() => location.href = "login.html", 1200);
   } else {
-    msg.style.color="#e74c3c";
-    msg.textContent="❌ Email already registered or invalid input";
+    msg.style.color = "#e74c3c";
+    msg.textContent = data.error || "❌ Registration failed";
   }
 });
 </script>
+
 </body>
 </html>
