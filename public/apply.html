@@ -44,7 +44,9 @@ nav a:hover{
   text-shadow:0 0 14px #4ea3ff;
   transform:translateY(-2px);
 }
-nav span{opacity:.45}
+nav span{
+  opacity:.45;cursor:default;
+}
 
 /* ===== MAIN CONTAINER ===== */
 main{
@@ -145,13 +147,12 @@ footer{
 <!-- NAV -->
 <nav>
   <div>
-    <a href="/">Home</a>
-    <a href="/rules.html">Rules</a>
-    <span>Application</span>
+    <a href="index.html">Home</a>
+    <a href="rules.html">Rules</a>
+    <a href="departments.html">Departments</a>
+    <a href="staff.html">Staff Panel</a>
+    <span>Apply</span>
   </div>
-  <a href="/" style="background:#4ea3ff;padding:11px 24px;border-radius:10px;color:#fff;text-decoration:none;box-shadow:0 0 14px rgba(78,163,255,.45);transition:.25s;">
-    ⬅ Back to Home
-  </a>
 </nav>
 
 <!-- MAIN -->
@@ -198,7 +199,7 @@ footer{
   <p id="msg"></p>
 </main>
 
-<footer>© Shore Roleplay — All Rights Reserved</footer>
+<footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
