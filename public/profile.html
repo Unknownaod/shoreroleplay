@@ -31,36 +31,34 @@ nav a:hover{color:#4ea3ff;text-shadow:0 0 12px #4ea3ff}
 
 /* MAIN */
 main{
-  max-width:1100px;
-  margin:150px auto 60px;
+  max-width:1100px;margin:150px auto 60px;
   background:rgba(0,0,0,.75);
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.11);
+  border-radius:14px;border:1px solid rgba(255,255,255,.11);
   box-shadow:0 0 45px rgba(0,0,0,.6);
   padding:40px;
 }
 
 /* PROFILE HEADER */
-.profile-header{text-align:center;margin-bottom:32px}
-.profile-header h1{
-  font-size:2.8rem;margin-bottom:6px;
-  display:flex;justify-content:center;align-items:center;gap:10px
-}
+.profile-header{text-align:center;margin-bottom:30px}
 
-/* PROFILE IMAGE */
-#pfp{
-  width:160px;height:160px;
-  border-radius:100px;
-  border:3px solid #4ea3ff;
-  object-fit:cover;
-  box-shadow:0 0 25px rgba(78,163,255,.6);
-  margin-bottom:14px;
+/* PROFILE PICTURE */
+.pfp-wrapper{
+  width:160px;height:160px;border-radius:50%;
+  overflow:hidden;margin:0 auto 20px;
+  border:4px solid #4ea3ff;box-shadow:0 0 25px #4ea3ff70;
+  display:flex;justify-content:center;align-items:center;
+  background:#0d1117;font-size:3.5rem;font-weight:700;
+  text-transform:uppercase;
+}
+.pfp-wrapper img{
+  width:100%;height:100%;object-fit:cover;
 }
 
 /* STAFF BADGE */
 .staff-badge{
   padding:4px 10px;border-radius:6px;
-  font-size:.78rem;font-weight:700;display:inline-block;margin-left:6px;
+  font-size:.78rem;font-weight:700;
+  display:inline-block;margin-left:6px;
 }
 .ha{background:#f1c40f;color:#000}
 .ia{background:#ff5050}
@@ -69,14 +67,6 @@ main{
 .sstaff{background:#ffaa00;color:#000}
 .staff{background:#27ae60;color:#000}
 .sit{background:#16a085}
-
-/* BIO */
-.bio-box{
-  background:#0b0f16;
-  padding:18px;border-radius:10px;
-  border:1px solid rgba(255,255,255,.14);
-  font-size:1rem;margin-top:10px;line-height:1.55;
-}
 
 /* SECTIONS */
 .section{margin-top:45px}
@@ -87,28 +77,24 @@ main{
 
 /* INFO BOX */
 .info-box{
-  background:#0c111b;
-  border:1px solid rgba(255,255,255,.14);
+  background:#0c111b;border:1px solid rgba(255,255,255,.14);
   padding:18px;margin:10px 0;border-radius:10px;
-  font-size:1rem;line-height:1.5;
 }
 
 /* DEPARTMENTS */
 .dept{
   display:flex;align-items:center;
-  background:#111722;
-  border:1px solid rgba(255,255,255,.14);
+  background:#111722;border:1px solid rgba(255,255,255,.14);
   padding:14px 18px;margin:8px 0;border-radius:10px;
 }
-.dept img{width:52px;height:52px;margin-right:18px}
+.dept img{
+  width:52px;height:52px;margin-right:18px;
+}
 
 /* APPLICATIONS */
 .app-card{
-  background:#0b1019;
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:10px;
-  padding:14px;margin:8px 0;
-  font-size:.95rem;
+  background:#0b1019;border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;padding:14px;margin:8px 0;font-size:.95rem;
 }
 .badge{padding:4px 10px;border-radius:6px;font-size:.78rem;font-weight:600}
 .accepted{background:#2ecc71;color:#000}
@@ -131,12 +117,11 @@ footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem
 </nav>
 
 <main>
-
   <div class="profile-header">
-    <img id="pfp" src="https://i.imgur.com/8eO8KZB.png">
+    <div id="pfp" class="pfp-wrapper"></div>
     <h1 id="username">Loading...</h1>
-    <p id="subtitle">Fetching profile...</p>
-    <div id="bio" class="bio-box" style="display:none"></div>
+    <p id="subtitle"></p>
+    <p id="bio" style="margin-top:10px;max-width:700px;margin:auto;opacity:.9;font-size:.95rem"></p>
   </div>
 
   <div class="section">
@@ -153,7 +138,6 @@ footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem
     <h2>Public Applications</h2>
     <div id="appsList"></div>
   </div>
-
 </main>
 
 <footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
@@ -164,10 +148,7 @@ const params=new URLSearchParams(window.location.search);
 const profileUsername=params.get("user");
 if(!profileUsername) location.href="index.html";
 
-/* ADMIN ROLES */
-const ADMIN_ROLES=["Head Administrator","Internal Affairs","Administration"];
-
-/* ROLE COLORS */
+/* STAFF ROLE COLORS */
 const roleColor={
   "Head Administrator":"ha",
   "Internal Affairs":"ia",
@@ -188,32 +169,40 @@ const deptIcons={
   "Civilian Operations":"https://i.imgur.com/DZBwCeX.png"
 };
 
+const ADMIN_ROLES=["Head Administrator","Internal Affairs","Administration"];
+
 async function loadProfile(){
   const users=await fetch(API+"/users").then(r=>r.json());
   const u=users.find(x=>x.username.toLowerCase()===profileUsername.toLowerCase());
-  if(!u) return document.getElementById("username").textContent="User Not Found";
+  if(!u){document.getElementById("username").textContent="User Not Found";return;}
 
+  /* username */
   document.getElementById("username").textContent=u.username;
-  document.getElementById("pfp").src=u.pfp||"https://i.imgur.com/8eO8KZB.png";
 
-  /* STAFF BADGE */
-  const subtitle=document.getElementById("subtitle");
+  /* STAFF BADGE OR NORMAL */
+  const sub=document.getElementById("subtitle");
   if(u.role!=="user"){
-    subtitle.innerHTML=`Staff Member — <span class="staff-badge ${roleColor[u.role]||""}">${u.role}</span>`;
-  } else subtitle.textContent="Shore Roleplay Member";
+    sub.innerHTML=`Staff Member — <span class="staff-badge ${roleColor[u.role]}">${u.role}</span>`;
+  }else sub.textContent="Shore Roleplay Member";
 
   /* BIO */
-  if(u.bio){
-    const bio=document.getElementById("bio");
-    bio.style.display="block";
-    bio.textContent=u.bio;
+  document.getElementById("bio").textContent=u.bio||"";
+
+  /* PROFILE PICTURE */
+  const pfp=document.getElementById("pfp");
+  if(u.pfp){
+    pfp.innerHTML=`<img src="${u.pfp}">`;
+  } else {
+    /* initial avatar */
+    const letter=u.username[0].toUpperCase();
+    pfp.textContent=letter;
   }
 
-  /* INFO */
+  /* ACCOUNT INFO */
   document.getElementById("infoBox").innerHTML=`
     <strong>Username:</strong> ${u.username}<br>
     <strong>Role:</strong> ${u.role}<br>
-    <strong>Joined:</strong> ${u.createdAt?new Date(u.createdAt).toLocaleDateString():"Unknown"}
+    <strong>Joined:</strong> ${new Date(u.createdAt).toLocaleDateString()}
   `;
 
   /* APPLICATIONS */
@@ -222,20 +211,20 @@ async function loadProfile(){
   const appsList=document.getElementById("appsList");
   myApps.forEach(app=>{
     appsList.innerHTML+=`
-    <div class="app-card">
-      <strong>${app.department}</strong> — ${new Date(app.submittedAt).toLocaleDateString()}
-      <div class="badge ${app.status}">${app.status.toUpperCase()}</div>
-    </div>`;
+      <div class="app-card">
+        <strong>${app.department}</strong> — ${new Date(app.submittedAt).toLocaleDateString()}
+        <div class="badge ${app.status}">${app.status.toUpperCase()}</div>
+      </div>`;
   });
 
   /* DEPARTMENTS */
   const dept=document.getElementById("deptList");
+
   if(ADMIN_ROLES.includes(u.role)){
     Object.keys(deptIcons).forEach(d=>{
       dept.innerHTML+=`
       <div class="dept">
-        <img src="${deptIcons[d]}">
-        <div><strong>${d}</strong><br>Administrative Access</div>
+        <img src="${deptIcons[d]}"><div><strong>${d}</strong><br>Administrative Access</div>
       </div>`;
     });
   } else {
@@ -244,8 +233,7 @@ async function loadProfile(){
     accepted.forEach(app=>{
       dept.innerHTML+=`
       <div class="dept">
-        <img src="${deptIcons[app.department]}">
-        <div><strong>${app.department}</strong><br>Active Department Member</div>
+        <img src="${deptIcons[app.department]}"><div><strong>${app.department}</strong><br>Active Department Member</div>
       </div>`;
     });
   }
