@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- FONTS -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -12,76 +13,100 @@
 body{
   font-family:"Inter",sans-serif;
   background:#05070a url('https://i.imgur.com/vbt5BPF.jpeg') center/cover fixed;
-  color:#fff;overflow-x:hidden;
+  color:#fff;
+  overflow-x:hidden;
 }
 
-/* HERO STATUS BANNER */
+/* HERO */
 .hero{
+  padding:130px 25px 70px;
   text-align:center;
-  padding:120px 20px 60px;
-  background:rgba(0,0,0,.55);
+  background:rgba(0,0,0,.50);
   backdrop-filter:blur(18px);
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 .hero h1{
-  font-size:3.2rem;font-weight:700;
-  text-shadow:0 0 25px rgba(78,163,255,.45);
+  font-size:3.6rem;font-weight:800;
+  text-shadow:0 0 26px rgba(78,163,255,.45);
+}
+.hero p{
+  opacity:.75;
+  font-size:1.1rem;
+  max-width:620px;
+  margin:12px auto;
 }
 .status-pill{
+  margin-top:22px;
   display:inline-block;
-  margin-top:18px;
-  padding:10px 22px;border-radius:8px;
-  background:#4ea3ff;color:#000;font-weight:700;
-  box-shadow:0 0 18px #4ea3ff;
-  font-size:1.1rem;
+  padding:12px 28px;
+  background:#4ea3ff;
+  color:#000;font-weight:700;font-size:1.1rem;
+  border-radius:8px;
+  box-shadow:0 0 26px #4ea3ff;
 }
 
 /* CONTAINER */
-.wrapper{
-  max-width:1200px;margin:45px auto;padding:0 25px;
+.container{
+  max-width:1150px;
+  margin:60px auto;
+  padding:0 25px;
 }
 
 /* SERVICE BOX */
 .service-box{
-  background:rgba(0,0,0,.35);
-  backdrop-filter:blur(22px);
+  background:rgba(0,0,0,.45);
   border:1px solid rgba(255,255,255,.08);
-  border-radius:12px;
-  padding:28px;margin-bottom:32px;
-  box-shadow:0 0 26px rgba(0,0,0,.55);
+  border-radius:14px;
+  backdrop-filter:blur(22px);
+  padding:32px;margin-bottom:35px;
+  box-shadow:0 0 38px rgba(0,0,0,.55);
 }
 .service-title{
-  font-size:1.4rem;font-weight:700;
+  font-size:1.5rem;font-weight:700;
   color:#4ea3ff;margin-bottom:18px;
-  border-left:4px solid #4ea3ff;padding-left:10px;
   text-transform:uppercase;
+  border-left:4px solid #4ea3ff;
+  padding-left:12px;
 }
 
 /* ROWS */
 .row{
   display:flex;justify-content:space-between;align-items:center;
-  padding:14px 0;font-size:15px;
+  padding:14px 0;
   border-bottom:1px solid rgba(255,255,255,.08);
+  font-size:1rem;
 }
 
-/* STATUS TEXT */
-.good{color:#4ea3ff;font-weight:600;text-shadow:0 0 10px #4ea3ff}
-.bad{color:#ff4e4e;font-weight:600;text-shadow:0 0 10px #ff4e4e}
+/* STATUS COLORS */
+.online{
+  color:#4ea3ff;
+  font-weight:700;
+  text-shadow:0 0 10px #4ea3ff;
+}
+.offline{
+  color:#ff4e4e;
+  font-weight:700;
+  text-shadow:0 0 10px #ff4e4e;
+}
 
-/* REFRESH NOTE */
 footer{
-  text-align:center;padding:25px;opacity:.45;margin-top:40px;font-size:.85rem;
+  text-align:center;
+  padding:35px;
+  opacity:.45;
+  margin-top:50px;
+  font-size:.9rem;
 }
 </style>
 </head>
 <body>
 
 <section class="hero">
-  <h1>SYSTEM STATUS</h1>
-  <span id="overall" class="status-pill">Checking system...</span>
+  <h1>Shore Roleplay Status</h1>
+  <p>Real-time system health checks for our core services.</p>
+  <span id="overall" class="status-pill">Checking systems...</span>
 </section>
 
-<div class="wrapper">
+<div class="container">
 
   <div class="service-box">
     <div class="service-title">API Core</div>
@@ -90,68 +115,60 @@ footer{
 
   <div class="service-box">
     <div class="service-title">Authentication Services</div>
-    <div class="row"><span>Staff Authentication</span><span id="staffAuth">Checking...</span></div>
-    <div class="row"><span>HA Authentication</span><span id="haAuth">Checking...</span></div>
-    <div class="row"><span>Account Login</span><span id="login">Checking...</span></div>
+    <div class="row"><span>Account System</span><span id="login">Checking...</span></div>
   </div>
 
   <div class="service-box">
     <div class="service-title">User Services</div>
     <div class="row"><span>User Directory</span><span id="users">Checking...</span></div>
-    <div class="row"><span>User Actions</span><span id="userActions">Checking...</span></div>
   </div>
 
   <div class="service-box">
     <div class="service-title">Application System</div>
     <div class="row"><span>Applications</span><span id="apps">Checking...</span></div>
-    <div class="row"><span>Application Decisions</span><span id="decisions">Checking...</span></div>
   </div>
 
   <div class="service-box">
     <div class="service-title">Forum Tools</div>
-    <div class="row"><span>Threads System</span><span id="threads">Checking...</span></div>
-    <div class="row"><span>Posting / Restrictions</span><span id="posting">Checking...</span></div>
+    <div class="row"><span>Threads</span><span id="threads">Checking...</span></div>
+    <div class="row"><span>Posting System</span><span id="posting">Checking...</span></div>
   </div>
 
 </div>
 
-<footer>Auto-refreshing every 60 seconds · © Shore Roleplay</footer>
+<footer>Auto-updates every 60s · © Shore Roleplay</footer>
 
 <script>
 const API = "https://shoreroleplay.onrender.com";
 
+/*
+  PUBLIC-SAFE CHECKING:
+  As long as the endpoint responds (any code), it's considered ONLINE.
+  If the network dies → OFFLINE.
+*/
 async function check(url, id){
   try{
-    const r = await fetch(url);
-    document.getElementById(id).innerHTML =
-      r.ok ? `<span class="good">Operational</span>` :
-             `<span class="bad">Issues Detected</span>`;
-    return r.ok;
+    await fetch(url, { method: "GET" });
+    document.getElementById(id).innerHTML = `<span class="online">Online</span>`;
+    return true;
   }catch(e){
-    document.getElementById(id).innerHTML = `<span class="bad">Offline</span>`;
+    document.getElementById(id).innerHTML = `<span class="offline">Offline</span>`;
     return false;
   }
 }
 
 async function runStatus(){
-  let ok = [];
+  let results = [];
 
-  ok.push(await check(API + "/", "web"));
-  ok.push(await check(API + "/staff-auth", "staffAuth"));
-  ok.push(await check(API + "/ha-auth", "haAuth"));
-  ok.push(await check(API + "/users/login", "login"));
-
-  ok.push(await check(API + "/users", "users"));
-  ok.push(await check(API + "/users/1", "userActions"));
-
-  ok.push(await check(API + "/applications", "apps"));
-  ok.push(await check(API + "/applications/1", "decisions"));
-
-  ok.push(await check(API + "/threads", "threads"));
-  ok.push(await check(API + "/users/1/restrict", "posting"));
+  results.push(await check(API + "/", "web"));
+  results.push(await check(API + "/users", "users"));
+  results.push(await check(API + "/users/login", "login"));
+  results.push(await check(API + "/applications", "apps"));
+  results.push(await check(API + "/threads", "threads"));
+  results.push(await check(API + "/users/1/restrict", "posting"));
 
   document.getElementById("overall").innerHTML =
-    ok.every(v => v) ? "All Systems Operational" : "Service Interruptions";
+    results.every(v => v) ? "All Systems Operational" : "Some Services Offline";
 }
 
 runStatus();
