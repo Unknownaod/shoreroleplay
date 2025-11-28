@@ -14,7 +14,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{
   font-family:"Inter",sans-serif;
-  background:#000;
+  background:#000 url('https://i.imgur.com/vbt5BPF.jpeg') center/cover fixed;
   color:#fff;
   overflow-x:hidden;
 }
@@ -45,6 +45,18 @@ nav a:hover{
   color:#75b6ff;
   text-shadow:0 0 10px #4ea3ff;
   transform:translateY(-2px);
+}
+
+/* ===== LAYOUT WRAPPER (IPS-STYLE) ===== */
+.layout-wrapper{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  padding-top:105px; /* space for nav */
+}
+.layout-container{
+  width:100%;
+  max-width:1350px;
 }
 
 /* ===== HERO ===== */
@@ -119,31 +131,28 @@ nav a:hover{
   transform:translateY(-3px) scale(1.05);
   box-shadow:0 0 35px rgba(88,101,242,.85);
 }
-
 .btn-discord img{
   width:26px;margin-right:10px;vertical-align:middle;
   filter:drop-shadow(0 0 6px rgba(255,255,255,.35));
 }
 
-/* ===== INFO SECTION ===== */
-.info{
-  padding:120px 12%;
-  background:#05070b;
+/* ===== INFO PANEL (IPS PANEL STYLE) ===== */
+.info-panel{
+  background:rgba(10,12,18,.78);
+  backdrop-filter:blur(26px);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 0 35px rgba(0,0,0,.55);
+  border-radius:16px;
+  padding:85px 12%;
   text-align:center;
+  margin-top:-70px;
   position:relative;
 }
-.info::before{
-  content:"";
-  position:absolute;top:-70px;left:50%;
-  transform:translateX(-50%);
-  width:60%;height:2px;
-  background:linear-gradient(90deg,transparent,#4ea3ff,transparent);
-}
-.info h2{
+.info-panel h2{
   font-size:3rem;margin-bottom:18px;
   text-shadow:0 0 22px rgba(78,163,255,.45);
 }
-.info p{
+.info-panel p{
   margin:auto;max-width:850px;font-size:1.25rem;opacity:.82;
 }
 
@@ -175,25 +184,32 @@ footer{
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-content">
-    <img src="https://i.imgur.com/P15LI6g.png" class="logo">
-    <h1>Shore Roleplay</h1>
-    <p>The next wave of serious, professional FiveM roleplay.</p>
+<!-- LAYOUT WRAPPER -->
+<div class="layout-wrapper">
+  <div class="layout-container">
 
-    <a href="/apply.html" class="btn btn-apply">Apply Now</a>
-    <a href="https://discord.gg/shoreRP" target="_blank" class="btn btn-discord">
-      <img src="https://i.imgur.com/Bb0UbEg.png">Join Discord
-    </a>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <img src="https://i.imgur.com/P15LI6g.png" class="logo">
+        <h1>Shore Roleplay</h1>
+        <p>The next wave of serious, professional FiveM roleplay.</p>
+
+        <a href="/apply.html" class="btn btn-apply">Apply Now</a>
+        <a href="https://discord.gg/shoreRP" target="_blank" class="btn btn-discord">
+          <img src="https://i.imgur.com/Bb0UbEg.png">Join Discord
+        </a>
+      </div>
+    </section>
+
+    <!-- INFO PANEL -->
+    <div class="info-panel">
+      <h2>Why Choose ShoreRP?</h2>
+      <p>Join and find out.</p>
+    </div>
+
   </div>
-</section>
-
-<!-- INFO -->
-<section class="info">
-  <h2>Why Choose ShoreRP?</h2>
-  <p>Join and find out.</p>
-</section>
+</div>
 
 <footer>
   © 2025 Shore Roleplay — All Rights Reserved
