@@ -16,7 +16,7 @@ body{
   color:#fff;overflow-x:hidden;
 }
 
-/* ----- SHARED HEADER + NAV ----- */
+/* ----- TOP LOGO ----- */
 .top-header{
   width:100%;background:rgba(0,0,0,.7);
   backdrop-filter:blur(18px);
@@ -26,6 +26,7 @@ body{
 }
 .top-header img{height:44px;}
 
+/* ----- USER BAR ----- */
 .user-bar{
   width:100%;background:rgba(8,10,16,.85);
   border-bottom:1px solid rgba(255,255,255,.08);
@@ -33,29 +34,27 @@ body{
   font-size:14px;
 }
 .btn-chip{
-  padding:6px 14px;border-radius:4px;border:1px solid rgba(255,255,255,.3);
-  background:rgba(255,255,255,.05);cursor:pointer;font-weight:500;transition:.2s;color:#fff;
+  padding:6px 14px;border-radius:4px;border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.05);cursor:pointer;font-weight:500;
+  transition:.2s;color:#fff;
 }
-.btn-chip-primary{background:#4ea3ff;border-color:#4ea3ff;}
 .btn-chip:hover{background:rgba(255,255,255,.18);}
-.btn-chip-primary:hover{filter:brightness(1.05);}
+.btn-chip-primary{background:#4ea3ff;border-color:#4ea3ff;}
+.btn-chip-primary:hover{filter:brightness(1.05)}
 
-/* MAIN NAV */
+/* ----- NAVIGATION ----- */
 .main-nav{
   width:100%;background:rgba(5,7,12,.9);
   border-bottom:1px solid rgba(255,255,255,.08);
   backdrop-filter:blur(18px);
-  padding:10px 40px;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 48px;display:flex;align-items:center;justify-content:space-between;
 }
-.nav-left{display:flex;align-items:center;gap:18px;font-size:15px;}
-.nav-brand{font-weight:700;font-size:16px;}
-.nav-link{opacity:.85;cursor:pointer;position:relative;transition:.2s;}
-.nav-link::after{
-  content:"";position:absolute;left:0;bottom:-3px;width:0;height:2px;background:#4ea3ff;transition:.2s;
-}
-.nav-link:hover{opacity:1;}
-.nav-link:hover::after{width:100%;}
+.nav-left{display:flex;gap:26px;font-size:15px;}
+.nav-link{opacity:.85;cursor:pointer;position:relative;transition:.22s;}
+.nav-link:hover{opacity:1;color:#4ea3ff;}
+.nav-link-active{opacity:1;color:#4ea3ff;text-shadow:0 0 10px #4ea3ff}
 
+/* ----- PAGE LAYOUT ----- */
 .page-wrap{
   max-width:1500px;margin:40px auto 60px;padding:0 40px;
   display:flex;gap:26px;
@@ -64,13 +63,11 @@ body{
 .page-sidebar{width:340px;flex-shrink:0;display:flex;flex-direction:column;gap:18px;}
 
 .panel{
-  background:rgba(0,0,0,.78);
-  border-radius:14px;border:1px solid rgba(255,255,255,.11);
-  box-shadow:0 0 38px rgba(0,0,0,.7);
-  padding:46px;
+  background:rgba(0,0,0,.78);border-radius:14px;border:1px solid rgba(255,255,255,.11);
+  box-shadow:0 0 38px rgba(0,0,0,.7);padding:46px;
 }
 .panel-header{text-align:center;margin-bottom:32px;}
-.panel-header h1{font-size:1.9rem;font-weight:700;text-shadow:0 0 15px rgba(78,163,255,.45);}
+.panel-header h1{font-size:2rem;font-weight:700;text-shadow:0 0 15px rgba(78,163,255,.45);}
 .panel-header p{opacity:.85;font-size:.95rem;margin-top:6px;}
 
 .dept-grid{
@@ -78,10 +75,8 @@ body{
   gap:26px;
 }
 .dept-card{
-  background:rgba(10,12,20,.85);
-  border-radius:12px;border:1px solid rgba(255,255,255,.12);
-  text-align:center;padding:28px;backdrop-filter:blur(16px);
-  transition:.3s;
+  background:rgba(10,12,20,.85);border-radius:12px;border:1px solid rgba(255,255,255,.12);
+  text-align:center;padding:28px;backdrop-filter:blur(16px);transition:.3s;
 }
 .dept-card:hover{transform:translateY(-3px);box-shadow:0 0 22px rgba(78,163,255,.45);}
 .dept-card img{width:120px;margin-bottom:14px;filter:drop-shadow(0 0 10px rgba(255,255,255,.2));}
@@ -89,107 +84,103 @@ body{
 .dept-card p{font-size:.87rem;opacity:.82;line-height:1.45;}
 
 .sidebar-card{
-  background:rgba(0,0,0,.8);
-  border-radius:10px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(0,0,0,.8);border-radius:10px;border:1px solid rgba(255,255,255,.12);
   padding:16px 18px;font-size:.9rem;box-shadow:0 0 22px rgba(0,0,0,.75);
 }
-.sidebar-card h3{font-size:.95rem;margin-bottom:10px;font-weight:600;}
-.sidebar-card p{opacity:.85;margin-bottom:10px;}
 .sidebar-btn{
-  width:100%;padding:9px 10px;border-radius:6px;border:none;
-  background:#4e6dff;color:#fff;font-size:.85rem;font-weight:600;
-  cursor:pointer;text-align:center;transition:.2s;
+  width:100%;padding:9px 10px;border-radius:6px;border:none;background:#4e6dff;
+  color:#fff;font-size:.85rem;font-weight:600;cursor:pointer;transition:.2s;
 }
 .sidebar-btn:hover{filter:brightness(1.07);}
 .sidebar-btn.discord{background:#5865F2}
 
 footer{
-  text-align:center;padding:26px 20px 34px;font-size:.82rem;
-  background:rgba(0,0,0,.75);border-top:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(14px);margin-top:40px;opacity:.8;
+  text-align:center;padding:32px 20px;margin-top:40px;
+  opacity:.7;background:rgba(0,0,0,.75);
+  border-top:1px solid rgba(255,255,255,.08);
 }
 </style>
 </head>
 <body>
 
-<!-- TOP LOGO -->
-<div class="top-header">
-  <img src="https://i.imgur.com/P15LI6g.png">
-</div>
+<!-- LOGO -->
+<div class="top-header"><img src="https://i.imgur.com/P15LI6g.png"></div>
 
-<!-- USER BAR (DYNAMIC) -->
-<div class="user-bar" id="userBar"></div>
+<!-- USER BAR -->
+<div class="user-bar" id="userBar">Loading...</div>
 
-<!-- NAV -->
+<!-- MAIN NAV -->
 <nav class="main-nav">
   <div class="nav-left">
-    <span class="nav-brand">Shore Roleplay</span>
     <span class="nav-link" onclick="location.href='index.html'">Home</span>
-    <span class="nav-link" style="opacity:1;">Departments</span>
+    <span class="nav-link nav-link-active">Departments</span>
     <span class="nav-link" onclick="location.href='rules.html'">Rules</span>
     <span class="nav-link" onclick="location.href='apply.html'">Apply</span>
+    <span class="nav-link" onclick="location.href='forums.html'">Forums</span>
+    <span class="nav-link" onclick="location.href='staff.html'">Staff Panel</span>
   </div>
 </nav>
 
 <!-- CONTENT -->
 <div class="page-wrap">
-  <section class="page-main">
-    <article class="panel">
-      <div class="panel-header">
-        <h1>Departments of Shore Roleplay</h1>
-        <p>Select a department below to learn more and start your journey.</p>
-      </div>
+<section class="page-main">
+<article class="panel">
+  <div class="panel-header">
+    <h1>Departments of Shore Roleplay</h1>
+    <p>Explore the divisions that keep ShoreRP operational.</p>
+  </div>
 
-      <div class="dept-grid">
+  <div class="dept-grid">
 
-        <div class="dept-card">
-          <img src="https://i.imgur.com/DAlxtWE.png">
-          <h3>DevOps Division</h3>
-          <p>Infrastructure, backend stability, and development.</p>
-        </div>
-
-        <div class="dept-card">
-          <img src="https://i.imgur.com/24jUZlT.png">
-          <h3>Shore State Patrol</h3>
-          <p>Highway and regional state law enforcement.</p>
-        </div>
-
-        <div class="dept-card">
-          <img src="https://i.imgur.com/3Uhtndq.png">
-          <h3>Municipal Police</h3>
-          <p>Community policing and urban response.</p>
-        </div>
-
-        <div class="dept-card">
-          <img src="https://i.imgur.com/DZBwCeX.png">
-          <h3>Civilian Operations</h3>
-          <p>Roleplay characters and scenario creation.</p>
-        </div>
-
-        <div class="dept-card">
-          <img src="https://i.imgur.com/cgD0S1f.png">
-          <h3>Fire & Rescue</h3>
-          <p>Fire suppression, rescue and emergency response.</p>
-        </div>
-
-        <div class="dept-card">
-          <img src="https://i.imgur.com/Saa1GSc.png">
-          <h3>Los Santos Regional 911</h3>
-          <p>Emergency communications and dispatch.</p>
-        </div>
-
-      </div>
-    </article>
-  </section>
-
-  <aside class="page-sidebar">
-    <div class="sidebar-card">
-      <h3>Ready to Apply?</h3>
-      <p>ShoreRP is always looking for dedicated members.</p>
-      <button class="sidebar-btn" onclick="location.href='apply.html'">Submit Application</button>
-      <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">Join Discord</button>
+    <div class="dept-card">
+      <img src="https://i.imgur.com/DAlxtWE.png">
+      <h3>DevOps Division</h3>
+      <p>Infrastructure, backend stability, and development.</p>
     </div>
-  </aside>
+
+    <div class="dept-card">
+      <img src="https://i.imgur.com/24jUZlT.png">
+      <h3>Shore State Patrol</h3>
+      <p>Regional & highway law enforcement.</p>
+    </div>
+
+    <div class="dept-card">
+      <img src="https://i.imgur.com/3Uhtndq.png">
+      <h3>Municipal Police</h3>
+      <p>Urban policing and frontline operations.</p>
+    </div>
+
+    <div class="dept-card">
+      <img src="https://i.imgur.com/DZBwCeX.png">
+      <h3>Civilian Operations</h3>
+      <p>Roleplay characters, storylines & scenarios.</p>
+    </div>
+
+    <div class="dept-card">
+      <img src="https://i.imgur.com/cgD0S1f.png">
+      <h3>Fire & Rescue</h3>
+      <p>Fire suppression and emergency response.</p>
+    </div>
+
+    <div class="dept-card">
+      <img src="https://i.imgur.com/Saa1GSc.png">
+      <h3>Los Santos Regional 911</h3>
+      <p>Dispatch & emergency communications.</p>
+    </div>
+
+  </div>
+</article>
+</section>
+
+<!-- SIDEBAR -->
+<aside class="page-sidebar">
+  <div class="sidebar-card">
+    <h3>Join a Department</h3>
+    <p>Ready to begin? Apply now!</p>
+    <button class="sidebar-btn" onclick="location.href='apply.html'">Submit Application</button>
+    <button class="sidebar-btn discord" onclick="window.open('https://discord.gg/shoreRP','_blank')">Join Discord</button>
+  </div>
+</aside>
 </div>
 
 <footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
@@ -199,52 +190,42 @@ const API = "https://shoreroleplay.onrender.com";
 const user = JSON.parse(localStorage.getItem("shoreUser"));
 const bar = document.getElementById("userBar");
 
-/* Check DB if user is banned */
+/* BAN CHECK - uses correct backend route /users/:id */
 async function checkBan() {
   if (!user) return false;
-
   try {
-    const res = await fetch(`${API}/users/${user.id}/status`);
+    const res = await fetch(`${API}/users/${user.id}`);
     const data = await res.json();
-
     if (data.banned) {
-      // Store reason for banned.html
-      localStorage.setItem("shoreBanReason", data.reason || "No reason provided");
-
-      // Remove session
+      localStorage.setItem("shoreBanReason", data.banReason || "No reason provided");
       localStorage.removeItem("shoreUser");
-
-      // Force redirect
-      window.location.href = "banned.html";
+      location.href = "banned.html";
       return true;
     }
-    return false;
-
-  } catch (err) { return false; }
+  } catch {}
+  return false;
 }
 
-/* Render UI depending on login */
+/* RENDER USER BAR */
 async function renderUserBar() {
-  const isBanned = await checkBan();
-  if (isBanned) return; // stop here
+  const banned = await checkBan();
+  if (banned) return;
 
   if (user) {
     bar.innerHTML = `
       Logged in as <strong>${user.username}</strong>
       <div>
-        <button class="btn-chip" onclick="location.href='profile.html?user=${user.username}'">Profile</button>
+        <button class="btn-chip" onclick="location.href='profile.html?user=${encodeURIComponent(user.username)}'">Profile</button>
         <button class="btn-chip" onclick="location.href='settings.html'">Settings</button>
         <button class="btn-chip btn-chip-primary" onclick="logout()">Logout</button>
-      </div>
-    `;
+      </div>`;
   } else {
     bar.innerHTML = `
-      <span>Explore our departments and join Shore Roleplay.</span>
+      <span>Explore departments and join Shore Roleplay.</span>
       <div>
         <button class="btn-chip" onclick="location.href='login.html'">Sign In</button>
         <button class="btn-chip btn-chip-primary" onclick="location.href='register.html'">Sign Up</button>
-      </div>
-    `;
+      </div>`;
   }
 }
 
@@ -255,7 +236,5 @@ function logout() {
 
 renderUserBar();
 </script>
-
-
 </body>
 </html>
