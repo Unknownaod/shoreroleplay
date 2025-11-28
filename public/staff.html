@@ -118,6 +118,19 @@ th{text-transform:uppercase;font-size:12px;letter-spacing:.8px;color:#4ea3ff;opa
 .neutral{background:#7f8c8d;border:1px solid #707b7c}
 .neutral:hover{background:#95a5a6}
 
+/* ROLE BADGES IN TABLE */
+.role-badge{
+  padding:4px 8px;border-radius:999px;font-size:11px;font-weight:600;display:inline-block;
+}
+.role-user{background:#4ea3ff22;border:1px solid #4ea3ff}
+.role-ha{background:#ff3b3b33;border:1px solid #ff7979;color:#ffb3b3}
+.role-ia{background:#ffd00033;border:1px solid #ffd000;color:#ffd000}
+.role-admin{background:#4ea3ff33;border:1px solid #4ea3ff;color:#dbe9ff}
+.role-junior-admin{background:#8e44ad33;border:1px solid #9b59b6;color:#e8d9ff}
+.role-senior-staff{background:#16a08533;border:1px solid #1abc9c;color:#a9fff2}
+.role-staff{background:#2980b933;border:1px solid #3498db;color:#d6ecff}
+.role-sit{background:#f39c1233;border:1px solid #f39c12;color:#ffe8c0}
+
 /* MODAL */
 #modal{
   position:fixed;top:0;left:0;width:100%;height:100%;
@@ -177,7 +190,12 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
     <table>
       <thead>
         <tr>
-          <th>USERNAME</th><th>EMAIL</th><th>DEPARTMENT</th><th>SUBMITTED</th><th>STATUS</th><th>ACTION</th>
+          <th>USERNAME</th>
+          <th>EMAIL</th>
+          <th>DEPARTMENT</th>
+          <th>SUBMITTED</th>
+          <th>STATUS</th>
+          <th>ACTION</th>
         </tr>
       </thead>
       <tbody id="apps"></tbody>
@@ -248,40 +266,37 @@ function logout(){
   location.reload();
 }
 
-/* Require login just to even hit staff panel credentials */
-if(!user){
-  document.getElementById("loginBox").style.display = "block";
-} else {
-  document.getElementById("loginBox").style.display = "block"; // still require staff password
-}
+/* Always show login box, but real access gated by staff password */
+document.getElementById("loginBox").style.display = "block";
 
-/* STAFF AUTH */
+/* STAFF AUTH → /staff-auth */
 async function login(){
-  const password=document.getElementById("staffPass").value;
-  const res=await fetch(API+"/staff-auth",{
+  const password = document.getElementById("staffPass").value.trim();
+  const res = await fetch(API + "/staff-auth", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({password})
+    body:JSON.stringify({ password })
   });
+
   if(res.ok){
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("panel").style.display="block";
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("panel").style.display = "block";
     loadApps();
   }else{
-    document.getElementById("error").textContent="❌ Invalid Credential";
+    document.getElementById("error").textContent = "❌ Invalid Credential";
   }
 }
 
-/* TABS */
+/* ========== TABS ========== */
 function switchTab(tab){
-  currentTab=tab;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelector(`.tab:nth-child(${tab==='pending'?1:tab==='all'?2:3})`).classList.add('active');
+  currentTab = tab;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelector(`.tab:nth-child(${tab==='pending'?1:tab==='all'?2:3})`).classList.add("active");
 
   const appsSection = document.getElementById("appsSection");
-  const haSection = document.getElementById("haSection");
+  const haSection   = document.getElementById("haSection");
 
-  if(tab === 'ha'){
+  if(tab === "ha"){
     appsSection.style.display = "none";
     haSection.style.display = "block";
 
@@ -297,36 +312,43 @@ function switchTab(tab){
   }
 }
 
-/* HA PASSWORD PROMPT */
+/* ========== HA PASSWORD PROMPT → /ha-auth ========== */
 async function haPrompt(){
   const pwd = prompt("Enter HA (Head Administration) password:");
   if(!pwd){
-    // bounce back to pending if cancelled
-    currentTab = 'pending';
-    switchTab('pending');
+    currentTab = "pending";
+    switchTab("pending");
     return;
   }
-const res = await fetch(API + "/ha-auth", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password: pwd })
-});
+
+  const res = await fetch(API + "/ha-auth", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ password: pwd })
+  });
+
   if(res.ok){
     haUnlocked = true;
     loadUsers();
-  }else{
+  } else {
     alert("Invalid HA password.");
-    currentTab = 'pending';
-    switchTab('pending');
+    currentTab = "pending";
+    switchTab("pending");
   }
 }
 
-/* LOAD APPLICATIONS */
+/* ========== APPLICATIONS ========== */
 async function loadApps(){
-  const res = await fetch(API+"/applications");
+  const res = await fetch(API + "/applications");
+  if(!res.ok){
+    document.getElementById("apps").innerHTML =
+      `<tr><td colspan="6">Failed to load applications.</td></tr>`;
+    return;
+  }
+
   const data = await res.json();
-  const pending = data.filter(a => a.status==="pending");
-  const set = currentTab==='pending' ? pending : data;
+  const pending = data.filter(a => a.status === "pending");
+  const set = currentTab === "pending" ? pending : data;
 
   document.getElementById("apps").innerHTML = set.map(app => `
     <tr>
@@ -336,19 +358,19 @@ async function loadApps(){
       <td>${app.submittedAt ? app.submittedAt.split("T")[0] : ""}</td>
       <td><span class="status ${app.status}">${app.status}</span></td>
       <td>
-        <button class="btn view" onclick="viewApp('${app.id}')">View</button>
+        <button class="btn view"   onclick="viewApp('${app.id}')">View</button>
         <button class="btn accept" onclick="decide('${app.id}','accepted')">Accept</button>
-        <button class="btn deny" onclick="decide('${app.id}','denied')">Deny</button>
+        <button class="btn deny"   onclick="decide('${app.id}','denied')">Deny</button>
         <button class="btn delete" onclick="removeApp('${app.id}')">Delete</button>
       </td>
     </tr>
-  `).join("");
+  `).join("") || `<tr><td colspan="6" style="opacity:.7;">No applications in this view.</td></tr>`;
 }
 
-/* VIEW FULL APPLICATION */
+/* VIEW FULL APPLICATION (client-side filter on /applications) */
 async function viewApp(id){
-  const apps = await (await fetch(API+"/applications")).json();
-  const app = apps.find(a=>a.id===id);
+  const apps = await (await fetch(API + "/applications")).json();
+  const app = apps.find(a => a.id === id);
   if(!app) return;
 
   document.getElementById("modalTitle").textContent = `Application — ${app.username}`;
@@ -366,42 +388,76 @@ ${app.reason || "No reason provided"}
 Logging Agreement: ${app.agreedLogging ? "YES" : "NO"}
 Discord Requirement: ${app.agreedDiscord ? "YES" : "NO"}
 `;
-  document.getElementById("modal").style.display="flex";
+  document.getElementById("modal").style.display = "flex";
 }
 
 function closeModal(){
-  document.getElementById("modal").style.display="none";
+  document.getElementById("modal").style.display = "none";
 }
 
-/* DECISION */
+/* DECISION → /applications/:id/decision */
 async function decide(id,status){
-  if(!confirm(`Confirm marking this application as ${status.toUpperCase()}?`))return;
-  await fetch(`${API}/applications/${id}/decision`,{
+  if(!confirm(`Confirm marking this application as ${status.toUpperCase()}?`)) return;
+
+  const res = await fetch(`${API}/applications/${id}/decision`, {
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({status})
+    body:JSON.stringify({ status })
   });
-  alert("Decision saved and applicant notified.");
-  loadApps();
+
+  if(res.ok){
+    alert("Decision saved and applicant notified.");
+    loadApps();
+  } else {
+    alert("Failed to update decision.");
+  }
 }
 
-/* DELETE APPLICATION */
+/* DELETE APPLICATION → /applications/:id */
 async function removeApp(id){
-  if(!confirm("Are you sure you want to permanently delete this application?"))return;
-  const res = await fetch(`${API}/applications/${id}`,{method:"DELETE"});
+  if(!confirm("Are you sure you want to permanently delete this application?")) return;
+
+  const res = await fetch(`${API}/applications/${id}`, { method:"DELETE" });
   if(res.ok){
     alert("Application deleted.");
     loadApps();
-  }else alert("Delete failed.");
+  } else {
+    alert("Delete failed.");
+  }
 }
 
 /* ========== HA / USERS SECTION ========== */
 
+/* Map backend role strings (Option A) to nice colored badges */
+function renderRoleBadge(roleRaw){
+  const role = (roleRaw || "user").trim();
+
+  let cls = "role-user";
+  let label = role;
+
+  if(role === "Head Administrator"){ cls = "role-ha"; }
+  else if(role === "Internal Affairs"){ cls = "role-ia"; }
+  else if(role === "Administration"){ cls = "role-admin"; }
+  else if(role === "Junior Administration"){ cls = "role-junior-admin"; }
+  else if(role === "Senior Staff"){ cls = "role-senior-staff"; }
+  else if(role === "Staff"){ cls = "role-staff"; }
+  else if(role === "Staff In Training"){ cls = "role-sit"; }
+  else if(!role || role === "user"){ label = "User"; }
+
+  return `<span class="role-badge ${cls}">${label}</span>`;
+}
+
+/* GET ALL USERS → /users */
 async function loadUsers(){
   const res = await fetch(API + "/users");
-  const users = await res.json();
   const body = document.getElementById("usersBody");
 
+  if(!res.ok){
+    body.innerHTML = `<tr><td colspan="9" style="opacity:.7;">Failed to load users.</td></tr>`;
+    return;
+  }
+
+  const users = await res.json();
   if(!Array.isArray(users) || users.length === 0){
     body.innerHTML = `<tr><td colspan="9" style="opacity:.7;font-size:13px;">No users found.</td></tr>`;
     return;
@@ -411,22 +467,23 @@ async function loadUsers(){
     <tr>
       <td>${u.username}</td>
       <td>${u.email}</td>
-      <td>${u.role || "user"}</td>
+      <td>${renderRoleBadge(u.role)}</td>
       <td>${u.banned ? "YES" : "NO"}</td>
       <td>${u.hwid || "—"}</td>
       <td>${u.lastIP || "—"}</td>
       <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}</td>
       <td>${u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : "—"}</td>
       <td>
-        <button class="btn deny" onclick="banUser('${u.id}')">Ban</button>
+        <button class="btn deny"   onclick="banUser('${u.id}')">Ban</button>
         <button class="btn accept" onclick="unbanUser('${u.id}')">Unban</button>
         <button class="btn delete" onclick="deleteUser('${u.id}')">Delete</button>
-        <button class="btn view" onclick="copyHwid('${u.hwid || ""}')">Copy HWID</button>
+        <button class="btn view"   onclick="copyHwid('${u.hwid || ""}')">Copy HWID</button>
       </td>
     </tr>
   `).join("");
 }
 
+/* BAN / UNBAN / DELETE → /users/:id/ban, /users/:id/unban, DELETE /users/:id */
 async function banUser(id){
   if(!confirm("Ban this user?")) return;
   const res = await fetch(`${API}/users/${id}/ban`, { method:"POST" });
@@ -460,6 +517,7 @@ async function deleteUser(id){
   }
 }
 
+/* COPY HWID */
 function copyHwid(hwid){
   if(!hwid){
     alert("No HWID for this user.");
@@ -471,7 +529,6 @@ function copyHwid(hwid){
       () => alert("Failed to copy HWID.")
     );
   }else{
-    // fallback
     alert("Clipboard API not available.");
   }
 }
