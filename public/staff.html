@@ -639,17 +639,20 @@ function copyHwid(hwid){
 }
 
 // FORUM RESTRICTION/MODERATION
-/* ========== FORUM USER MODERATION ========== */
-
 /* Load forum users into table */
 async function loadForumUsers(){
   try {
     const res = await fetch(`${API}/users`);
     const users = await res.json();
 
+    const staffRole = user.role || "User"; // Logged-in staff rank
+    const isHA = staffRole === "Head Administrator"; // Only HA allowed to ban
+
     forumUsers.innerHTML = "";
 
     users.forEach(u => {
+      const isTargetHA = u.role === "Head Administrator"; // Prevent banning HAs
+
       forumUsers.innerHTML += `
         <tr>
           <td>${u.username}</td>
@@ -659,10 +662,16 @@ async function loadForumUsers(){
             ${u.restricted ? "Restricted" : "Allowed to Post"}
           </td>
           <td>
-            <button class="btn deny" onclick="toggleRestrict('${u.id}', ${u.restricted})">
+            <button class="btn deny" onclick="toggleRestrict('${u.id}', ${u.restricted}, '${u.role}')">
               ${u.restricted ? "Unrestrict" : "Restrict Posting"}
             </button>
-            
+
+            ${isHA && !isTargetHA ? `
+              <button class="btn delete" onclick="banUser('${u.id}')">
+                Ban User
+              </button>
+            ` : ""}
+
             <button class="btn view" onclick="location.href='profile.html?user=${u.username}'">
               View Profile
             </button>
@@ -676,7 +685,6 @@ async function loadForumUsers(){
   }
 }
 
-/* Toggle posting ability → /users/:id/restrict */
 /* Toggle posting ability → /users/:id/restrict */
 async function toggleRestrict(id, current, targetRole){
   const staffRole = user.role || "User"; // logged-in staff
