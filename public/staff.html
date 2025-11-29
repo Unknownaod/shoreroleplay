@@ -196,6 +196,9 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
     <div class="tab" onclick="switchTab('all')">Previous Applications</div>
     <div class="tab" onclick="switchTab('forums')">Forum Tools</div>
     <div class="tab" onclick="switchTab('ha')">HA Tab (Head Administration)</div>
+    <div class="tab" id="appealsTab" onclick="switchTab('appeals')" style="display:none;">
+  Ban Appeals
+    </div>
   </div>
 
   <!-- APPLICATIONS SECTION -->
@@ -262,6 +265,29 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
   </div>
 </div>
 
+<div id="appealsSection" style="display:none;margin-top:10px;">
+  <h3>Ban Appeals</h3>
+  <p style="opacity:.7;margin-bottom:16px;font-size:14px;">
+    Review user ban appeals. Only Head Administration may approve or deny appeals.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>USERNAME</th>
+        <th>EMAIL</th>
+        <th>APPEAL REASON</th>
+        <th>SUBMITTED</th>
+        <th>STATUS</th>
+        <th>ACTIONS</th>
+      </tr>
+    </thead>
+    <tbody id="appealsBody"></tbody>
+  </table>
+</div>
+
+  
+  
 <!-- MODAL -->
 <div id="modal">
   <div class="modal-box">
@@ -339,12 +365,13 @@ function switchTab(tab){
   currentTab = tab;
 
   // Highlight correct tab
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.querySelector(`.tab:nth-child(${
-    tab==='pending' ? 1 :
-    tab==='all' ? 2 :
-    tab==='forums' ? 3 : 4
-  })`).classList.add("active");
+document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+document.querySelector(`.tab:nth-child(${
+  tab==='pending' ? 1 :
+  tab==='all' ? 2 :
+  tab==='forums' ? 3 :
+  tab==='ha' ? 4 : 5
+})`).classList.add("active");
 
   // Sections
   const appsSection   = document.getElementById("appsSection");
@@ -364,11 +391,23 @@ function switchTab(tab){
   else if(tab === "forums"){
     loadForumUsers();
   } 
+  else if(tab === "appeals"){
+  if(user.role !== "Head Administrator"){
+    alert("🚫 Only Head Administration may review appeals.");
+    switchTab("pending");
+    return;
+  }
+  loadAppeals();
+}  
   else {
     loadApps();
   }
 }
 
+
+if (user.role === "Head Administrator") {
+  document.getElementById("appealsTab").style.display = "inline-block";
+}  
 
 /* ========== HA PASSWORD PROMPT → /ha-auth ========== */
 async function haPrompt(){
@@ -395,6 +434,46 @@ async function haPrompt(){
   }
 }
 
+  /// APPEALS FUNCTION
+
+  async function loadAppeals(){
+  const res = await fetch(API + "/appeals");
+  const appeals = await res.json();
+  appealsBody.innerHTML = appeals.length ? appeals.map(a => `
+    <tr>
+      <td>${a.username}</td>
+      <td>${a.email}</td>
+      <td>${a.reason}</td>
+      <td>${new Date(a.submittedAt).toLocaleDateString()}</td>
+      <td><span class="status ${a.status}">${a.status}</span></td>
+      <td>
+        <button class="btn view" onclick="viewAppeal('${a.id}')">View</button>
+        <button class="btn accept" onclick="decideAppeal('${a.id}','accepted')">Accept</button>
+        <button class="btn deny" onclick="decideAppeal('${a.id}','denied')">Deny</button>
+      </td>
+    </tr>
+  `).join("") : `<tr><td colspan="6" style="opacity:.6;">No appeals submitted.</td></tr>`;
+}
+
+// APPEALS DECISION HANDLER
+
+  async function decideAppeal(id, status){
+  if(!confirm(`Mark this appeal as ${status.toUpperCase()}?`)) return;
+
+  const res = await fetch(`${API}/appeals/${id}/decision`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ status })
+  });
+
+  if(res.ok){
+    if(status === "accepted") await fetch(`${API}/appeals/${id}/unban`, { method:"POST" });
+    alert("Decision saved.");
+    loadAppeals();
+  }
+}
+
+  
 /* ========== APPLICATIONS ========== */
 async function loadApps(){
   const res = await fetch(API + "/applications");
