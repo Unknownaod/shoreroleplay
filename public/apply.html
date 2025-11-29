@@ -172,6 +172,7 @@ footer{
 <script>
 const API = "https://shoreroleplay.onrender.com";
 const btn = document.getElementById("submitBtn");
+const msg = document.getElementById("msg");
 const user = JSON.parse(localStorage.getItem("shoreUser"));
 
 if (!user) {
@@ -198,8 +199,68 @@ checkBan();
 username.value = user.username;
 email.value = user.email;
 
+/* ===========================
+   APPLICATION STATUS CHECK
+   =========================== */
+async function checkExistingApplication() {
+  try {
+    const res = await fetch(`${API}/applications`);
+    const apps = await res.json();
+
+    const mine = apps.filter(a => a.email === user.email);
+
+    if (mine.length === 0) {
+      enableApply();
+      return;
+    }
+
+    // get the latest application
+    mine.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    const latest = mine[0];
+
+    switch (latest.status) {
+      case "pending":
+        lockApply("⏳ You already have an application pending. Please wait for a response before applying again.");
+        break;
+
+      case "accepted":
+        enableApply("✔ Your previous application was accepted. You may submit another one if needed.");
+        break;
+
+      case "denied":
+        enableApply("❌ Your last application was denied. You may submit a new one.");
+        break;
+
+      default:
+        enableApply();
+    }
+  } catch (err) {
+    console.error("Application check failed:", err);
+    enableApply();
+  }
+}
+
+/* Helpers */
+function lockApply(text) {
+  btn.disabled = true;
+  btn.dataset.locked = "true"; // prevents enabling from checkboxes
+  msg.style.color = "#f1c40f";
+  msg.textContent = text;
+}
+
+function enableApply(note = "") {
+  btn.disabled = !(agreeLogging.checked && agreeDiscord.checked);
+  btn.dataset.locked = "false";
+
+  if (note) {
+    msg.style.color = "#2ecc71";
+    msg.textContent = note;
+  }
+}
+
 /* Agreement checker */
 function validate() {
+  if (btn.dataset.locked === "true") return; // ignore if locked
   btn.disabled = !(agreeLogging.checked && agreeDiscord.checked);
 }
 agreeLogging.addEventListener("change", validate);
@@ -227,23 +288,26 @@ document.getElementById("applyForm").addEventListener("submit", async (e) => {
     body: JSON.stringify(payload)
   });
 
-  const msg = document.getElementById("msg");
-
   if (res.ok) {
     msg.style.color = "#2ecc71";
     msg.textContent = "✔ Application submitted successfully!";
     reason.value = "";
     btn.disabled = true;
+    btn.textContent = "Submit Application";
   } else {
     const data = await res.json();
     msg.style.color = "#e74c3c";
     msg.textContent = "❌ " + (data.error || "Submission failed.");
+    btn.textContent = "Submit Application";
+    validate(); // re-evaluate checkboxes
   }
-
-  btn.textContent = "Submit Application";
 });
+
+/* Run initial app state check */
+checkExistingApplication();
 </script>
 
 </body>
 </html>
+
 
