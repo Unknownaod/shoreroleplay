@@ -366,17 +366,20 @@ if (!shoreUser) {
 } else {
   navBox.innerHTML = `
     Logged in as <strong>${shoreUser.username}</strong>
-    <button class="nav-btn" onclick="location.href='profile.html?user=${encodeURIComponent(shoreUser.username)}'">Profile</button>
+    <button class="nav-btn" onclick="location.href='profile.html?user=${encodeURIComponent(
+      shoreUser.username
+    )}'">Profile</button>
     <button class="nav-btn" onclick="location.href='settings.html'">Settings</button>
     <button class="nav-btn primary" onclick="logout()">Logout</button>
   `;
 }
+
 function logout() {
   localStorage.removeItem("shoreUser");
   location.href = "index.html";
 }
 
-/* INIT */
+/* INIT DOM HOOKS */
 const accessSub = document.getElementById("accessSub");
 const accessSummary = document.getElementById("accessSummary");
 const accessBadges = document.getElementById("accessBadges");
@@ -400,7 +403,9 @@ async function loadUsers() {
     const res = await fetch(API + "/users");
     const users = await res.json();
     authorMap = {};
-    users.forEach(u => { authorMap[u.id] = u; });
+    users.forEach((u) => {
+      authorMap[u.id] = u;
+    });
   } catch (err) {
     console.warn("User list failed:", err);
   }
@@ -410,33 +415,50 @@ async function loadUsers() {
 async function loadAccess() {
   if (!shoreUser) {
     canPost = false;
-    accessSub.textContent = "You’re not logged in. You can read threads but not post.";
-    accessSummary.textContent = "Log in and get accepted to a department to post threads.";
-    accessBadges.innerHTML = `<span class="badge-access no">No posting access</span>`;
+    accessSub.textContent =
+      "You’re not logged in. You can read threads but not post.";
+    accessSummary.textContent =
+      "Log in and get accepted to a department to post threads.";
+    accessBadges.innerHTML =
+      `<span class="badge-access no">No posting access</span>`;
     deptList.innerHTML = "";
     newThreadBox.style.display = "none";
     noAccessBox.style.display = "block";
+    noAccessBox.innerHTML = `
+      <strong>Read-only access</strong>
+      <p style="font-size:.88rem;opacity:.82;margin-top:4px;">
+        Log in and get accepted into a department (or become staff) to create threads.
+      </p>
+    `;
     return;
   }
 
   try {
-    // Fetch only THIS USER's applications
-    const res = await fetch(`${API}/applications/user/${encodeURIComponent(shoreUser.email)}`);
-    const apps = await res.json();
+    // 🔍 fetch ONLY this user's applications
+    const res = await fetch(
+      `${API}/applications/user/${encodeURIComponent(shoreUser.email)}`
+    );
+
+    let apps = [];
+    if (res.ok) {
+      apps = await res.json();
+    }
 
     acceptedDepartments = apps
-      .filter(a => a.status === "accepted")
-      .map(a => a.department);
+      .filter((a) => a.status === "accepted")
+      .map((a) => a.department);
 
     const isStaff = STAFF_ROLES.includes(shoreUser.role);
     canPost = isStaff || acceptedDepartments.length > 0;
 
-    /* RESTRICTION CHECK */
+    /* 🔒 RESTRICTION CHECK */
     if (shoreUser.restricted === true) {
       canPost = false;
       accessSub.textContent = "Your posting privileges are restricted.";
-      accessSummary.textContent = "You are currently not allowed to create threads or replies.";
-      accessBadges.innerHTML = `<span class="badge-access no">Posting Disabled</span>`;
+      accessSummary.textContent =
+        "You are currently not allowed to create threads or replies.";
+      accessBadges.innerHTML =
+        `<span class="badge-access no">Posting Disabled</span>`;
       newThreadBox.style.display = "none";
       noAccessBox.style.display = "block";
       noAccessBox.innerHTML = `
@@ -444,40 +466,97 @@ async function loadAccess() {
         <p style="font-size:.88rem;opacity:.82;margin-top:4px;">
           Your account has been restricted from posting by ShoreRP Staff.<br>
           You may still read public threads, but thread creation and replies are disabled.
-        </p>`;
+        </p>
+      `;
       return;
     }
 
     /* ROLE + DEPARTMENT ACCESS TEXT */
     if (isStaff && acceptedDepartments.length > 0) {
-      accessSub.textContent = "You are staff and a member of at least one department.";
+      accessSub.textContent =
+        "You are staff and a member of at least one department.";
     } else if (isStaff) {
-      accessSub.textContent = "You are staff. You may post in any forum category.";
+      accessSub.textContent =
+        "You are staff. You may post in any forum category.";
     } else if (acceptedDepartments.length > 0) {
-      accessSub.textContent = "You are accepted into a department. You may post in forums.";
+      accessSub.textContent =
+        "You are accepted into a department. You may post in forums.";
     } else {
       accessSub.textContent = "You can currently view but not post in forums.";
     }
 
-    /* SIDEBAR SUMMARY */
+    /* SIDEBAR SUMMARY + BADGES */
     if (canPost) {
-      accessSummary.textContent = "You are allowed to create threads and replies.";
-      accessBadges.innerHTML = `<span class="badge-access ok">Posting enabled</span>`;
+      accessSummary.textContent =
+        "You are allowed to create threads and replies.";
+      accessBadges.innerHTML =
+        `<span class="badge-access ok">Posting enabled</span>`;
     } else {
-      accessSummary.textContent = "You must be staff or accepted into a department to post.";
-      accessBadges.innerHTML = `<span class="badge-
+      accessSummary.textContent =
+        "You must be staff or accepted into a department to post.";
+      accessBadges.innerHTML =
+        `<span class="badge-access no">Read-only access</span>`;
+    }
 
+    /* DEPARTMENT CHIPS */
+    if (acceptedDepartments.length) {
+      deptList.innerHTML = acceptedDepartments
+        .map((d) => `<span class="dept-chip">${d}</span>`)
+        .join("");
+    } else {
+      deptList.innerHTML =
+        `<span style="opacity:.75;font-size:.85rem;">No accepted departments yet.</span>`;
+    }
+
+    /* TOGGLE FORMS */
+    if (canPost) {
+      newThreadBox.style.display = "block";
+      noAccessBox.style.display = "none";
+    } else {
+      newThreadBox.style.display = "none";
+      noAccessBox.style.display = "block";
+      noAccessBox.innerHTML = `
+        <strong>Read-only access</strong>
+        <p style="font-size:.88rem;opacity:.82;margin-top:4px;">
+          You must be ShoreRP Staff or accepted into a department to create threads.
+        </p>
+      `;
+    }
+  } catch (err) {
+    console.error("Access check error:", err);
+    accessSub.textContent = "Failed to load your access (server error).";
+  }
+}
+
+/* ---------- PARSE [TAGS] FROM TITLE ---------- */
+function extractBadges(rawTitle) {
+  let title = rawTitle || "";
+  const badges = [];
+
+  // Only parse tags from the beginning like [TAG]
+  while (title.startsWith("[")) {
+    const close = title.indexOf("]");
+    if (close === -1) break;
+    const token = title.slice(1, close).trim();
+    if (!token) break;
+    badges.push(token.toUpperCase());
+    title = title.slice(close + 1).trim();
+  }
+
+  return { cleanTitle: title || rawTitle, badges };
+}
 
 /* ---------- RENDER THREADS ---------- */
 function renderThreads(threads) {
   if (!threads || !threads.length) {
-    threadList.innerHTML = `<div class="empty-state">No threads in this category yet.</div>`;
+    threadList.innerHTML =
+      `<div class="empty-state">No threads in this category yet.</div>`;
     return;
   }
 
   threadList.innerHTML = "";
 
-  threads.forEach(t => {
+  threads.forEach((t) => {
     const { cleanTitle, badges } = extractBadges(t.title || "Untitled");
     const author = authorMap[t.authorId];
     const created = t.createdAt
@@ -490,7 +569,7 @@ function renderThreads(threads) {
     let badgeHTML = "";
 
     // from title tags
-    badges.forEach(b => {
+    badges.forEach((b) => {
       if (b === "STAFF") {
         badgeHTML += `<span class="tag staff">Staff</span>`;
       } else if (b === "ANNOUNCEMENT") {
@@ -510,9 +589,10 @@ function renderThreads(threads) {
     // category tag
     badgeHTML += `<span class="tag dept">${t.category || "general"}</span>`;
 
-    const staffTag = author && author.staffTag
-      ? `<span class="tag staff">${author.staffTag}</span>`
-      : "";
+    const staffTag =
+      author && author.staffTag
+        ? `<span class="tag staff">${author.staffTag}</span>`
+        : "";
 
     const authorPart = author
       ? `${author.username}${author.role ? " • " + author.role : ""}`
@@ -522,7 +602,7 @@ function renderThreads(threads) {
       <div class="thread-row">
         <div class="thread-title-line">
           <span class="thread-title" onclick="location.href='thread.html?id=${t.id}'">
-          ${cleanTitle}
+            ${cleanTitle}
           </span>
           ${badgeHTML}
           ${staffTag}
@@ -542,7 +622,8 @@ function renderThreads(threads) {
 async function loadThreads(category, silent = false) {
   currentCategory = category;
   if (!silent) {
-    threadList.innerHTML = `<div class="empty-state">Loading threads...</div>`;
+    threadList.innerHTML =
+      `<div class="empty-state">Loading threads...</div>`;
   }
   try {
     const res = await fetch(API + "/threads/" + encodeURIComponent(category));
@@ -551,7 +632,8 @@ async function loadThreads(category, silent = false) {
     renderThreads(data);
   } catch (err) {
     console.error("Load threads error:", err);
-    threadList.innerHTML = `<div class="empty-state">Failed to load threads.</div>`;
+    threadList.innerHTML =
+      `<div class="empty-state">Failed to load threads.</div>`;
   }
 }
 
@@ -586,7 +668,7 @@ async function createThread() {
     return;
   }
 
-  // Add tags to title (this stays 100% backend-compatible)
+  // Add tags to title (backend compatible)
   const tags = [];
 
   if (staffOnly && STAFF_ROLES.includes(shoreUser.role)) {
@@ -597,7 +679,7 @@ async function createThread() {
   if (type === "bug") tags.push("BUG");
 
   if (tags.length) {
-    const tagPrefix = tags.map(t => `[${t}]`).join(" ");
+    const tagPrefix = tags.map((t) => `[${t}]`).join(" ");
     title = `${tagPrefix} ${title}`;
   }
 
@@ -610,9 +692,9 @@ async function createThread() {
 
   try {
     const res = await fetch(API + "/threads", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(payload)
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
 
     if (!res.ok) {
@@ -629,7 +711,6 @@ async function createThread() {
 
     // reload threads for current category
     loadThreads(currentCategory, false);
-
   } catch (err) {
     console.error("Create thread error:", err);
     postMsg.textContent = "Server error while posting.";
@@ -651,25 +732,23 @@ function startAutoRefresh() {
   }, 10000); // 10s poll
 }
 
+/* ---------- REFRESH USER (FOR RESTRICTION + ROLE CHANGES) ---------- */
 async function refreshUser() {
   if (!shoreUser) return;
-
   try {
     const res = await fetch(`${API}/users/${shoreUser.id}`);
     if (!res.ok) return;
-
     const fresh = await res.json();
     localStorage.setItem("shoreUser", JSON.stringify(fresh));
-    shoreUser = fresh; // overwrite local copy so restriction is live
+    shoreUser = fresh;
   } catch (err) {
     console.warn("Failed to refresh user:", err);
   }
 }
 
-  
 /* ---------- BOOTSTRAP ---------- */
 (async function init() {
-  if (shoreUser) await refreshUser(); // 🔁 Instant restriction sync
+  if (shoreUser) await refreshUser(); // keep restrictions/role fresh
   await loadUsers();
   await loadAccess();
   await loadThreads(currentCategory, false);
