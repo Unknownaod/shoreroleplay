@@ -592,7 +592,7 @@
     const departments = [
       { id:"pd",   name:"Police Department",  badge:"PD"   },
       { id:"sd",   name:"Sheriff's Office",   badge:"SO"   },
-      { id:"sp",   name:"State Patrol",     badge:"SP"   },
+      { id:"sp",   name:"State Patrol",       badge:"SP"   },
       { id:"fire", name:"Fire & Rescue",      badge:"FIRE" },
       { id:"ems",  name:"EMS",                badge:"EMS"  },
       { id:"civ",  name:"Civilian Media",     badge:"CIV"  },
@@ -612,7 +612,45 @@
     const uploadMetaEl = document.getElementById("uploadMeta");
     const uploadBtn = document.getElementById("uploadBtn");
 
+    // front-end copy of staff roles for compatibility if user.isStaff is missing
+    const STAFF_ROLES = [
+      "Head Administrator",
+      "Internal Affairs",
+      "Administration",
+      "Junior Administration",
+      "Senior Staff",
+      "Staff",
+      "Staff In Training"
+    ];
+
+    function isUserStaff() {
+      if (!user) return false;
+      if (user.isStaff === true) return true;
+      return STAFF_ROLES.includes(user.role);
+    }
+
+    function getUserDepartmentIdFromApi() {
+      if (!user || !user.hasDepartment || !user.department) return null;
+      const n = user.department.toLowerCase();
+
+      if (n.includes("police"))   return "pd";
+      if (n.includes("sheriff"))  return "sd";
+      if (n.includes("state"))    return "sp";   // covers "State Police" / "State Patrol"
+      if (n.includes("fire"))     return "fire";
+      if (n.includes("ems") || n.includes("medical")) return "ems";
+      if (n.includes("civilian") || n.includes("media")) return "civ";
+
+      return null;
+    }
+
     let activeDeptId = departments[0].id;
+
+    // if non-staff with accepted application → default to their department tab
+    if (user && !isUserStaff() && user.hasDepartment) {
+      const apiDeptId = getUserDepartmentIdFromApi();
+      if (apiDeptId) activeDeptId = apiDeptId;
+    }
+
     let galleryData = []; // full set from API
 
     // Build tabs
@@ -637,49 +675,29 @@
         btn.classList.toggle("active", btn.dataset.deptId === id);
       });
       const dept = departments.find(d => d.id === id);
-      deptSummaryEl.textContent = `${dept.name} • Public photo feed`;
-      renderGallery();   // <-- was erroring before, now defined below
-      setupUploadSection(); // also refresh upload state per tab
+      if (dept) {
+        deptSummaryEl.textContent = `${dept.name} • Public photo feed`;
+      }
+      renderGallery();
+      setupUploadSection(); // re-evaluate permissions when tab changes
     }
 
-    // Upload permissions: must be staff OR belong to a department
-function userCanUpload() {
-  if (!user) return false;
+    // Upload permissions: must be staff OR belong to a department (from API)
+    function userCanUpload() {
+      if (!user) return false;
 
-  const staffRoles = [
-    "Head Administrator",
-    "Internal Affairs",
-    "Administration",
-    "Junior Administration",
-    "Senior Staff",
-    "Staff",
-    "Staff In Training"
-  ];
+      // staff members can post anywhere
+      if (isUserStaff()) return true;
 
-  // staff = unrestricted
-  if (staffRoles.includes(user.role)) return true;
+      // requires accepted application
+      if (!user.hasDepartment || !user.department) return false;
 
-  // department membership from array
-  if (Array.isArray(user.departments) && user.departments.length > 0) {
-    const normalized = user.departments.map(d => d.toLowerCase());
+      // department members can only upload in their own tab
+      const userDeptId = getUserDepartmentIdFromApi();
+      if (!userDeptId) return false;
 
-    // match department to tab
-    const deptMap = {
-      "state police": "sp",
-      "police department": "pd",
-      "sheriff's office": "sd",
-      "fire & rescue": "fire",
-      "ems": "ems",
-      "civilian media": "civ"
-    };
-
-    // does the user belong to the active dept?
-    return normalized.some(d => deptMap[d] === activeDeptId);
-  }
-
-  return false; // no staff, no departments
-}
-
+      return userDeptId === activeDeptId;
+    }
 
     function setupUploadSection() {
       if (!user) {
@@ -690,30 +708,11 @@ function userCanUpload() {
         return;
       }
 
-      const staffRoles = [
-        "Head Administrator",
-        "Internal Affairs",
-        "Administration",
-        "Junior Administration",
-        "Senior Staff",
-        "Staff",
-        "Staff In Training"
-      ];
+      const isStaff = isUserStaff();
+      const userDeptId = getUserDepartmentIdFromApi();
 
-      const roleToDept = {
-        "Police Department": "pd",
-        "Sheriff's Office": "sd",
-        "State Patrol": "sp",   // <-- FIXED HERE (was "SP")
-        "Fire & Rescue": "fire",
-        "EMS": "ems",
-        "Civilian Media": "civ"
-      };
-
-      const userDept = roleToDept[user.role] || null;
-      const isStaff = staffRoles.includes(user.role);
-
-      // CIVILIANS (no dept, not staff)
-      if (!isStaff && !userDept) {
+      // CIVILIANS (no accepted application, not staff)
+      if (!isStaff && !userDeptId) {
         uploadNoticeEl.style.display = "flex";
         uploadFormEl.style.display = "none";
         uploadNoticeTextEl.textContent =
@@ -722,8 +721,9 @@ function userCanUpload() {
       }
 
       // DEPARTMENT MEMBER ON WRONG TAB
-      if (!isStaff && userDept !== activeDeptId) {
-        const deptName = Object.keys(roleToDept).find(k => roleToDept[k] === userDept);
+      if (!isStaff && userDeptId !== activeDeptId) {
+        const deptObj = departments.find(d => d.id === userDeptId);
+        const deptName = deptObj ? deptObj.name : "your department";
 
         uploadNoticeEl.style.display = "flex";
         uploadFormEl.style.display = "none";
@@ -745,9 +745,9 @@ function userCanUpload() {
         uploadDeptSelect.appendChild(opt);
       });
 
-      if (!isStaff) {
+      if (!isStaff && userDeptId) {
         // lock to user's assigned department
-        uploadDeptSelect.value = userDept;
+        uploadDeptSelect.value = userDeptId;
         uploadDeptSelect.disabled = true;
       } else {
         // staff can choose any dept
@@ -757,7 +757,6 @@ function userCanUpload() {
       uploadMetaEl.textContent = `Posting as ${user.username}`;
     }
 
-    // ===== NEW: renderGallery implementation (was missing) =====
     function renderGallery(){
       const deptId = activeDeptId;
       const items = galleryData.filter(item => item.department === deptId);
@@ -815,7 +814,6 @@ function userCanUpload() {
 
     async function fetchGallery(){
       try{
-        // GET /gallery  -> returns array of { imageUrl, caption, department, author, createdAt }
         const res = await fetch(API + "/gallery");
         if(!res.ok) throw new Error("Failed to load gallery");
         const data = await res.json();
@@ -854,7 +852,6 @@ function userCanUpload() {
       uploadMetaEl.textContent = "Uploading…";
 
       try{
-        // POST /gallery  body: { department, imageUrl, caption, author }
         const payload = {
           department,
           imageUrl,
@@ -889,8 +886,8 @@ function userCanUpload() {
 
     // INIT
     renderTabs();
-    setupUploadSection();
     setActiveDept(activeDeptId);
+    setupUploadSection();
     fetchGallery();
 
   </script>
