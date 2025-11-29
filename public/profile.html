@@ -64,90 +64,99 @@ main{
   margin-left:6px;
 }
 
-/* ================================================
-   HEAD ADMIN BADGE — FINAL BUILD
-   • Small black badge
-   • Thick purple text
-   • Sharp cyan outline (NOT glow)
-   • Italic + bold
-   • MULTIPLE forked white lightning strikes
-   • All bolts contained INSIDE badge
-================================================ */
+/* -------------------------------------------
+   HEAD ADMINISTRATOR — FINAL VERSION
+   SMALL BOX • PURPLE TEXT • CYAN EDGE
+   ITALIC • MULTI VERTICAL LIGHTNING STRIKES
+------------------------------------------- */
 .ha {
   position: relative;
-  display: inline-block;
-
-  /* SIZE + LOOK */
-  padding: 2px 10px 3px;
-  background: #000;
-  border-radius: 4px;
-  transform: skewX(-6deg);
+  display: inline-flex;        /* SHRINK to text size */
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;            /* SMALL TIGHT BOX */
+  background: #000;            /* pure black */
+  border-radius: 3px;
+  overflow: hidden;
+  transform: skewX(-6deg);     /* angled badge */
   text-transform: uppercase;
+}
 
-  /* TEXT STYLE */
+/* TEXT INSIDE */
+.ha-text {
   font-style: italic;
-  font-weight: 1000;
-  font-size: .90rem;
-  letter-spacing: .9px;
-  color: #b14dff; /* deep purple */
+  font-weight: 1000;           /* ULTRA bold */
+  font-size: .90rem;           /* larger without box growing */
+  letter-spacing: .8px;
+  color: #b14dff;              /* deep purple */
+  transform: skewX(6deg);      /* counter skew for readable text */
 
-  /* CYAN EDGE — NOT A GLOW */
+  /* CYAN MICRO EDGE - NOT A GLOW */
   text-shadow:
+    1px 0 #00eaff,
     -1px 0 #00eaff,
-     1px 0 #00eaff,
-     0 -1px #00eaff,
-     0  1px #00eaff; /* razor outline */
-  
-  overflow: hidden; /* keeps lightning inside */
+    0 1px #00eaff,
+    0 -1px #00eaff;
 }
 
-/* ================================================
-   MULTI-BOLT SYSTEM
-================================================ */
-.ha svg {
+/* -------------------------------------------
+   MULTI STRIKE LIGHTNING
+------------------------------------------- */
+.ha .bolt {
   position: absolute;
-  top: 0;
-  height: 100%;
+  top: -240%;                  /* start above box */
+  left: 50%;                   /* center */
   width: 10px;
-
-  stroke: #ffffff;               /* WHITE lightning */
-  stroke-width: 2.3;
-  filter: drop-shadow(0 0 5px #ffffff);
-  opacity: .9;
+  height: 400%;                /* long travel */
+  transform: translateX(-50%);
   pointer-events: none;
-  mix-blend-mode: screen;        /* blends like real electricity */
+  mix-blend-mode: screen;
+  animation: boltDrop 1.8s ease-in-out infinite;
 }
 
-/* LEFT BOLT */
-.ha .bolt-1 { left: 25%; animation: strike1 .75s ease-in infinite; }
-/* CENTER */
-.ha .bolt-2 { left: 50%; animation: strike2 .95s ease-out infinite; }
-/* RIGHT */
-.ha .bolt-3 { left: 75%; animation: strike3 .85s ease-in-out infinite; }
-
-/* Bolt Animations */
-@keyframes strike1 {
-  0%   { transform: translateY(-120%); opacity: 0; }
-  25%  { opacity: 1; }
-  60%  { transform: translateY(0); }
-  100% { transform: translateY(120%); opacity: 0; }
-}
-@keyframes strike2 {
-  0%   { transform: translateY(-140%); opacity: 0; }
-  30%  { opacity: 1; }
-  65%  { transform: translateY(0); }
-  100% { transform: translateY(140%); opacity: 0; }
-}
-@keyframes strike3 {
-  0%   { transform: translateY(-100%); opacity: 0; }
-  20%  { opacity: 1; }
-  55%  { transform: translateY(0); }
-  100% { transform: translateY(100%); opacity: 0; }
+/* Each polyline is a separate lightning path */
+.ha .bolt polyline {
+  fill: none;
+  stroke: #ffffff;             /* PURE WHITE LIGHTNING */
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px #00eaff); /* cyan energy aura */
+  opacity: .9;
 }
 
+/* FALLING STRIKE MOTION */
+@keyframes boltDrop {
+  0%   { transform: translate(-50%, -200%); opacity: 0; }
+  15%  { opacity: 1; }
+  45%  { transform: translate(-50%, 0%); }
+  70%  { opacity: .6; }
+  100% { transform: translate(-50%, 200%); opacity: 0; }
+}
+
+/* -------------------------------------------
+   SMALL ELECTRIC FLASH POP
+------------------------------------------- */
+.ha::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,255,255,.15);
+  opacity: 0;
+  pointer-events: none;
+  animation: flashPop 2.4s infinite;
+}
+
+@keyframes flashPop {
+  0%, 87%, 100% { opacity: 0; }
+  88% { opacity: .25; }
+  89% { opacity: 0; }
+}
 
 
-/* OTHER ROLES (leave as-is) */
+/* -------------------------------------------
+   OTHER ROLES (UNCHANGED)
+------------------------------------------- */
 .ia{background:#ff5050}
 .adm{background:#3498db}
 .jadm{background:#6741ff}
