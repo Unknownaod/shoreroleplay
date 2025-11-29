@@ -54,19 +54,79 @@ main{
   width:100%;height:100%;object-fit:cover;
 }
 
-/* STAFF BADGE */
+/* STAFF BADGE BASE */
 .staff-badge{
-  padding:4px 10px;border-radius:6px;
-  font-size:.78rem;font-weight:700;
-  display:inline-block;margin-left:6px;
+  padding:4px 10px;
+  border-radius:6px;
+  font-size:.78rem;
+  font-weight:700;
+  display:inline-block;
+  margin-left:6px;
 }
-.ha{background:#f1c40f;color:#000}
+
+/* ------------------------------
+   HEAD ADMINISTRATOR TAG
+   ------------------------------ */
+.ha {
+  background: #0b1c2e;
+  color: #7ee8ff;
+  border: 1px solid #00eaff;
+  box-shadow:
+    0 0 6px rgba(0,234,255,.6),
+    0 0 12px rgba(0,234,255,.45),
+    inset 0 0 8px rgba(0,190,255,.35);
+  position: relative;
+  text-shadow: 0 0 6px rgba(0,234,255,.8);
+  animation: haPulse 2.8s ease-in-out infinite;
+}
+
+/* Moving cyan highlight sweep */
+.ha::before {
+  content: "";
+  position: absolute;
+  top: 0;left: 0;width: 100%;height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(0,255,255,.15) 45%,
+    transparent 100%
+  );
+  filter: blur(4px);
+  animation: haSweep 3.8s infinite linear;
+  pointer-events: none;
+}
+
+/* Cyan neon pulsation */
+@keyframes haPulse {
+  0% {
+    box-shadow:
+      0 0 6px rgba(0,234,255,.6),
+      0 0 14px rgba(0,234,255,.45),
+      inset 0 0 6px rgba(0,190,255,.35);
+  }
+  100% {
+    box-shadow:
+      0 0 18px rgba(0,234,255,1),
+      0 0 42px rgba(0,234,255,.95),
+      inset 0 0 12px rgba(0,255,255,.6);
+  }
+}
+
+/* Forward flicker streak */
+@keyframes haSweep {
+  from { transform: translateX(-120%); }
+  to   { transform: translateX(120%); }
+}
+
+/* OTHER ROLES (leave as-is) */
 .ia{background:#ff5050}
 .adm{background:#3498db}
 .jadm{background:#6741ff}
 .sstaff{background:#ffaa00;color:#000}
 .staff{background:#27ae60;color:#000}
 .sit{background:#16a085}
+
 
 /* SECTIONS */
 .section{margin-top:45px}
