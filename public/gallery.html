@@ -645,7 +645,6 @@
 function userCanUpload() {
   if (!user) return false;
 
-  // STAFF ROLES
   const staffRoles = [
     "Head Administrator",
     "Internal Affairs",
@@ -658,11 +657,23 @@ function userCanUpload() {
 
   const isStaff = staffRoles.includes(user.role);
 
-  // DEPARTMENT MEMBER = has a department assigned AND is not staff
-  const isDepartmentMember =
-    typeof user.department === "string" &&
-    user.department.trim() !== "" &&
-    !isStaff;
+  // Map department roles -> department IDs used by gallery tabs
+  const roleToDept = {
+    "Police Department": "pd",
+    "Sheriff's Office": "sd",
+    "State Patrol": "SP",
+    "Fire & Rescue": "fire",
+    "EMS": "ems",
+    "Civilian Media": "civ",
+  };
+
+  const userDept = roleToDept[user.role] || null; // convert role to internal dept code
+
+  // user belongs to a department if we mapped one & is not staff
+  const isDepartmentMember = userDept !== null && !isStaff;
+
+  // persist mapped department for UI lock
+  if (isDepartmentMember) user.department = userDept;
 
   return isStaff || isDepartmentMember;
 }
