@@ -133,16 +133,14 @@ function getHWID() {
   return hwid;
 }
 
-/* ==========================
-   PASSWORD TOGGLE
-========================== */
+/* PASSWORD TOGGLE */
 document.getElementById("togglePass").onclick = () => {
   const field = document.getElementById("password");
   field.type = field.type === "password" ? "text" : "password";
 };
 
 /* ==========================
-   LOGIN HANDLER
+   LOGIN HANDLER (FIXED)
 ========================== */
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -178,7 +176,11 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     return;
   }
 
-  localStorage.setItem("shoreUser", JSON.stringify(data.user));
+  /* ==========================
+     THE FIX — STORE ONLY ID
+  ========================== */
+  localStorage.setItem("shoreUser", JSON.stringify({ id: data.user.id }));
+
   msg.style.color="#2ecc71";
   msg.textContent="✔ Login successful! Redirecting...";
 
