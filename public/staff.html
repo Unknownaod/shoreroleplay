@@ -265,26 +265,49 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
 </div>
 
 <!-- BAN APPEALS SECTION -->
-<div id="appealsSection" style="display:none;margin-top:10px;">
-  <h3>Ban Appeals</h3>
-  <p style="opacity:.7;margin-bottom:16px;font-size:14px;">
-    Review user ban appeals. Only Head Administration may approve or deny appeals.
-  </p>
+<div id="appealsSection" style="display:none;margin-top:35px;">
 
-  <table>
-    <thead>
-      <tr>
-        <th>USERNAME</th>
-        <th>EMAIL</th>
-        <th>APPEAL REASON</th>
-        <th>SUBMITTED</th>
-        <th>STATUS</th>
-        <th>ACTIONS</th>
-      </tr>
-    </thead>
-    <tbody id="appealsBody"></tbody>
-  </table>
+  <div style="
+    background:rgba(5,8,14,.78);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:35px 38px;
+    backdrop-filter:blur(22px);
+    box-shadow:0 0 45px rgba(0,0,0,.55);
+    animation:fadeIn .45s ease forwards;
+  ">
+
+    <h2 style="
+      margin-bottom:8px;
+      font-weight:600;
+      font-size:1.6rem;
+      color:#4ea3ff;
+      text-shadow:0 0 18px rgba(78,163,255,.45);
+    ">
+      Ban Appeals
+    </h2>
+
+    <p style="opacity:.65;margin-bottom:18px;font-size:14px;">
+      Review user ban appeals. Only Head Administration may approve, deny, or delete appeals.
+    </p>
+
+    <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+      <thead>
+        <tr>
+          <th>USERNAME</th>
+          <th>EMAIL</th>
+          <th>APPEAL REASON</th>
+          <th>SUBMITTED</th>
+          <th>STATUS</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody id="appealsBody"></tbody>
+    </table>
+
+  </div>
 </div>
+
 
 <!-- MODAL -->
 <div id="modal">
