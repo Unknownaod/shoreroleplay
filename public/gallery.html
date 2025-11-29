@@ -641,11 +641,11 @@
       renderGallery();
     }
 
-// Upload permissions: must be staff OR have a non-user role
+// Upload permissions: must be staff OR belong to a department
 function userCanUpload() {
   if (!user) return false;
 
-  // Your backend uses "role" for both staff & departments
+  // STAFF ROLES
   const staffRoles = [
     "Head Administrator",
     "Internal Affairs",
@@ -656,15 +656,17 @@ function userCanUpload() {
     "Staff In Training"
   ];
 
-  // staff?
   const isStaff = staffRoles.includes(user.role);
 
-  // department member?
-  // If role is NOT "user" and NOT staff, then this user belongs to a department
-  const isDepartmentMember = user.role && user.role !== "user" && !isStaff;
+  // DEPARTMENT MEMBER = has a department assigned AND is not staff
+  const isDepartmentMember =
+    typeof user.department === "string" &&
+    user.department.trim() !== "" &&
+    !isStaff;
 
   return isStaff || isDepartmentMember;
 }
+
 
 
     function setupUploadSection(){
