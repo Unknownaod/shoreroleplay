@@ -86,18 +86,37 @@ main{
   line-height: 1.05;           /* fixes vertical alignment */
 }
 
-/* LIGHTNING STRIKE AREA */
+/* LIGHTNING STRIKE AREA (spread horizontally) */
 .ha svg.bolt {
   position: absolute;
-  top: -100%;                  /* start above box */
-  left: 50%;
-  width: 12px;
-  height: 260%;                /* drops fully inside badge */
-  transform: translateX(-50%);
+  top: -100%;
+  width: 10px;
+  height: 260%;
   pointer-events: none;
-  z-index: 1;                  /* behind text */
   opacity: .9;
+  z-index: 1;
 }
+
+/* left bolt */
+.ha svg.bolt:nth-of-type(1) {
+  left: 15%;        /* LEFT SIDE */
+  transform: translateX(-50%);
+}
+
+/* center bolt */
+.ha svg.bolt:nth-of-type(2) {
+  left: 50%;        /* CENTER */
+  transform: translateX(-50%);
+  animation-delay: .25s;
+}
+
+/* right bolt */
+.ha svg.bolt:nth-of-type(3) {
+  left: 85%;        /* RIGHT SIDE */
+  transform: translateX(-50%);
+  animation-delay: .55s;
+}
+
 
 /* LIGHTNING LINES */
 .ha svg.bolt polyline {
