@@ -64,66 +64,79 @@ main{
   margin-left:6px;
 }
 
-/* ==========================================
-   HEAD ADMIN — BLACK BOX + PURPLE TEXT + CYAN OUTLINE + LIGHTNING WAVE
-========================================== */
+/* -------------------------------------------
+   HEAD ADMIN — BLACK BOX + PURPLE LETTERS + CYAN OUTLINE
+   ANGLED TEXT + REAL LIGHTNING
+------------------------------------------- */
 .ha {
   position: relative;
   display: inline-block;
-  padding: 2px 10px;
-  font-size: .72rem;
-  font-weight: 800;
-  background: #000;           /* PURE BLACK BOX */
+  padding: 3px 12px 5px;
+  background: #000;                 /* PURE BLACK */
   border-radius: 4px;
   overflow: hidden;
+  transform: skewX(-6deg);          /* slight tilt */
   text-transform: uppercase;
 
-  /* HEAVY PURPLE TEXT + CYAN STROKE */
-  color: #b94dff;             /* main purple */
+  /* PURPLE TEXT WITH CYAN EDGE */
+  font-weight: 900;                 /* BOLDER TEXT */
+  font-size: .78rem;
+  letter-spacing: .6px;
+  color: #a843ff;                   /* heavy purple */
   text-shadow:
-      0 0 2px #00eaff,
-      0 0 4px #00eaff;        /* thin cyan wrap around letters */
+    0 0 1px #00eaff,
+    0 0 3px #00eaff,
+    0 0 6px #00eaff;                /* micro cyan halo */
 }
 
-/* ==========================================
-   THUNDER / LIGHTNING WAVE INSIDE BADGE
-========================================== */
-.ha::before {
+/* *********************************
+   REAL ELECTRIC LIGHTNING LAYER
+********************************* */
+.ha .bolt {
+  position: absolute;
+  bottom: -2px;
+  left: -200%;
+  height: 200%;
+  width: 300%;
+  opacity: .75;
+  filter: drop-shadow(0 0 6px #00eaff) brightness(1.6);
+  animation: boltMove 1.8s linear infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* Lightning Motion */
+@keyframes boltMove {
+  0%   { transform: translateX(-50%) skewX(-8deg); opacity: .4; }
+  30%  { opacity: 1; }
+  55%  { transform: translateX(20%) skewX(6deg); opacity: .55; }
+  100% { transform: translateX(150%) skewX(-12deg); opacity: .4; }
+}
+
+/* OCCASIONAL FLASH POP EFFECT */
+.ha::after {
   content: "";
   position: absolute;
-  top: 50%; left: -150%;
-  width: 300%;
-  height: 60%;
-  transform: translateY(-50%);
-
-  /* JAGGED ELECTRIC LIGHTNING */
-  background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(0,255,255,.0) 0px,
-      rgba(0,255,255,.8) 6px,
-      rgba(0,255,255,0) 12px,
-      rgba(255,255,255,.9) 16px,
-      rgba(0,255,255,0) 22px
-    );
-
-  filter: blur(2.5px) brightness(1.8); /* glowing lightning look */
-  mix-blend-mode: screen;              /* blends into purple text */
-  opacity: .45;
-  animation: haLightning 2.4s linear infinite;
+  inset: 0;
+  background: rgba(0,255,255,.12);
+  opacity: 0;
   pointer-events: none;
+  animation: flashPop 2.8s infinite;
 }
 
-/* ==========================================
-   LIGHTNING WAVE MOTION
-========================================== */
-@keyframes haLightning {
-  0%   { transform: translate(-150%, -50%) skewX(-18deg); }
-  50%  { transform: translate(0%, -50%) skewX(8deg); }
-  100% { transform: translate(150%, -50%) skewX(-12deg); }
+@keyframes flashPop {
+  0%, 88%, 100% { opacity: 0; }
+  89% { opacity: .25; }
+  90% { opacity: 0; } /* micro flash like real electricity */
 }
 
-
+/* Remove inherited staff badge padding from HA */
+.ha.staff-badge {
+  padding: 3px 12px 5px !important;
+  border-radius: 4px !important;
+  background: #000 !important;
+  border: none !important;
+}
 
 
 
@@ -260,13 +273,31 @@ async function loadProfile() {
   /* USERNAME */
   document.getElementById("username").textContent = u.username;
 
-  /* STAFF BADGE OR NORMAL */
-  const sub = document.getElementById("subtitle");
-  if (u.role !== "user") {
-    sub.innerHTML = `Staff Member — <span class="staff-badge ${roleColor[u.role]}">${u.role}</span>`;
-  } else {
-    sub.textContent = "Shore Roleplay Member";
-  }
+/* STAFF BADGE OR NORMAL */
+const sub = document.getElementById("subtitle");
+
+if (u.role === "Head Administrator") {
+  sub.innerHTML = `
+    Staff Member —
+    <span class="staff-badge ha">
+      ${u.role}
+      <svg class="bolt" width="180" height="35" viewBox="0 0 180 35" preserveAspectRatio="none">
+        <polyline points="0,20 20,12 35,25 55,5 75,18 95,8 115,28 135,12 155,22 180,10"
+          fill="none" stroke="#00eaff" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </span>
+  `;
+} else if (u.role !== "user") {
+  // All OTHER staff roles use the normal badge
+  sub.innerHTML = `
+    Staff Member — <span class="staff-badge ${roleColor[u.role]}">${u.role}</span>
+  `;
+} else {
+  sub.textContent = "Shore Roleplay Member";
+}
+
+
 
   /* BIO */
   document.getElementById("bio").textContent = u.bio || "";
