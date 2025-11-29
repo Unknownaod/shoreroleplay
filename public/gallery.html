@@ -634,28 +634,44 @@ function isUserStaff() {
   return STAFF_ROLES.includes(user.role);
 }
 
-/* Department resolution */
-function getUserDepartmentIdFromApi() {
-  if (!user || !user.department) return null;
+/* Department resolution (supports multi-department users) */
+function getUserDepartmentIdsFromApi() {
+  if (!user || !user.department) return [];
 
-  const dept = String(user.department).toLowerCase();
-  if (dept.includes("police"))   return "pd";
-  if (dept.includes("sheriff"))  return "sd";
-  if (dept.includes("state"))    return "sp";
-  if (dept.includes("fire"))     return "fire";
-  if (dept.includes("ems") || dept.includes("medical")) return "ems";
-  if (dept.includes("civilian") || dept.includes("media")) return "civ";
+  // Convert to array if stored as CSV string
+  let depts = user.department;
+  if (typeof depts === "string") {
+    depts = depts.split(",").map(s => s.trim());
+  }
 
-  return null;
+  if (!Array.isArray(depts)) return [];
+
+  const deptIds = [];
+
+  depts.forEach(d => {
+    const n = d.toLowerCase();
+    if (n.includes("police")) deptIds.push("pd");
+    else if (n.includes("sheriff")) deptIds.push("sd");
+    else if (n.includes("state")) deptIds.push("sp");
+    else if (n.includes("fire")) deptIds.push("fire");
+    else if (n.includes("ems") || n.includes("medical")) deptIds.push("ems");
+    else if (n.includes("civilian") || n.includes("media")) deptIds.push("civ");
+  });
+
+  return [...new Set(deptIds)]; // remove duplicates
 }
 
+/* DEFAULT TAB SELECTION */
 let activeDeptId = departments[0].id;
 
-// Non-staff start on their own department tab
 if (user && !isUserStaff() && user.department) {
-  const dept = getUserDepartmentIdFromApi();
-  if (dept) activeDeptId = dept;
+  const owned = getUserDepartmentIdsFromApi();
+  if (owned.length > 0) {
+    // Use FIRST department as default tab instead of locking
+    activeDeptId = owned[0];
+  }
 }
+
 
 /* ========== GALLERY DATA STORAGE ========== */
 let galleryData = [];
@@ -687,18 +703,20 @@ function setActiveDept(id) {
 
 /* Upload permissions:
    Must be staff OR belong to the department */
+/* Multi-department aware upload permission */
 function userCanUpload() {
   if (!user) return false;
 
   if (isUserStaff()) return true;
 
-  const dept = getUserDepartmentIdFromApi();
-  if (!dept) return false;
+  const userDepts = getUserDepartmentIdsFromApi();
+  if (!userDepts.length) return false;
 
-  return dept === activeDeptId;
+  // User can upload if current tab matches ANY of their departments
+  return userDepts.includes(activeDeptId);
 }
 
-/* Upload UI control */
+/* Upload UI control (multi-department version) */
 function setupUploadSection() {
   if (!user) {
     uploadNoticeEl.style.display = "flex";
@@ -709,9 +727,10 @@ function setupUploadSection() {
   }
 
   const staff = isUserStaff();
-  const userDept = getUserDepartmentIdFromApi();
+  const userDepts = getUserDepartmentIdsFromApi();
 
-  if (!staff && !userDept) {
+  // No dept assigned & not staff
+  if (!staff && userDepts.length === 0) {
     uploadNoticeEl.style.display = "flex";
     uploadFormEl.style.display = "none";
     uploadNoticeTextEl.textContent =
@@ -719,31 +738,58 @@ function setupUploadSection() {
     return;
   }
 
-  if (!staff && userDept !== activeDeptId) {
-    const deptObj = departments.find(d => d.id === userDept);
+  // Civilians trying to upload in a department they don't belong to
+  if (!staff && !userDepts.includes(activeDeptId)) {
     uploadNoticeEl.style.display = "flex";
     uploadFormEl.style.display = "none";
+
+    const deptNames = userDepts
+      .map(id => departments.find(d => d.id === id)?.name || id)
+      .join(", ");
+
     uploadNoticeTextEl.innerHTML =
-      `You belong to <strong>${deptObj.name}</strong>. Switch to your department tab to upload photos.`;
+      `You belong to <strong>${deptNames}</strong>.<br>Switch to one of your departments to upload photos.`;
     return;
   }
 
+  /* Allowed */
   uploadNoticeEl.style.display = "none";
   uploadFormEl.style.display = "block";
 
   uploadDeptSelect.innerHTML = "";
-  departments.forEach(d => {
+
+  // STAFF → show all departments
+  if (staff) {
+    departments.forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d.id;
+      opt.textContent = d.name;
+      uploadDeptSelect.appendChild(opt);
+    });
+    uploadDeptSelect.disabled = false;
+  }
+  // MULTI-DEPT USER → show only their departments
+  else if (userDepts.length > 1) {
+    userDepts.forEach(id => {
+      const d = departments.find(dep => dep.id === id);
+      if (!d) return;
+      const opt = document.createElement("option");
+      opt.value = d.id;
+      opt.textContent = d.name;
+      uploadDeptSelect.appendChild(opt);
+    });
+    uploadDeptSelect.disabled = false;
+  }
+  // SINGLE-DEPT USER → lock to one dept
+  else {
+    const id = userDepts[0];
+    const d = departments.find(dep => dep.id === id);
     const opt = document.createElement("option");
     opt.value = d.id;
     opt.textContent = d.name;
     uploadDeptSelect.appendChild(opt);
-  });
-
-  if (!staff && userDept) {
-    uploadDeptSelect.value = userDept;
+    uploadDeptSelect.value = id;
     uploadDeptSelect.disabled = true;
-  } else {
-    uploadDeptSelect.disabled = false;
   }
 
   uploadMetaEl.textContent = `Posting as ${user.username}`;
