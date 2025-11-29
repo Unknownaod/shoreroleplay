@@ -559,6 +559,7 @@
   </main>
 
   <script>
+<script>
 const API = "https://shoreroleplay.onrender.com";
 
 /* ========== LOGIN STATE HANDLER ========== */
@@ -611,7 +612,7 @@ const uploadCaptionInput = document.getElementById("uploadCaption");
 const uploadMetaEl = document.getElementById("uploadMeta");
 const uploadBtn = document.getElementById("uploadBtn");
 
-/* ========== STAFF ROLE DEFINITIONS ========== */
+/* STAFF ROLE DEFINITIONS */
 const STAFF_ROLES = [
   "Head Administrator",
   "Internal Affairs",
@@ -622,10 +623,10 @@ const STAFF_ROLES = [
   "Staff In Training"
 ];
 
-/* Proper staff detection */
+/* Detect staff member */
 function isUserStaff() {
   if (!user) return false;
-  if (user.isStaff === true) return true; // legacy flag
+  if (user.isStaff === true) return true;
 
   if (Array.isArray(user.roles)) {
     return user.roles.some(r => STAFF_ROLES.includes(r));
@@ -634,31 +635,28 @@ function isUserStaff() {
   return STAFF_ROLES.includes(user.role);
 }
 
-/* Department resolution (supports multi-department users) */
+/* Multi-department resolution */
 function getUserDepartmentIdsFromApi() {
   if (!user || !user.department) return [];
 
-  // Convert to array if stored as CSV string
   let depts = user.department;
   if (typeof depts === "string") {
     depts = depts.split(",").map(s => s.trim());
   }
-
   if (!Array.isArray(depts)) return [];
 
-  const deptIds = [];
-
+  const ids = [];
   depts.forEach(d => {
     const n = d.toLowerCase();
-    if (n.includes("police")) deptIds.push("pd");
-    else if (n.includes("sheriff")) deptIds.push("sd");
-    else if (n.includes("state")) deptIds.push("sp");
-    else if (n.includes("fire")) deptIds.push("fire");
-    else if (n.includes("ems") || n.includes("medical")) deptIds.push("ems");
-    else if (n.includes("civilian") || n.includes("media")) deptIds.push("civ");
+    if (n.includes("police")) ids.push("pd");
+    else if (n.includes("sheriff")) ids.push("sd");
+    else if (n.includes("state")) ids.push("sp");
+    else if (n.includes("fire")) ids.push("fire");
+    else if (n.includes("ems") || n.includes("medical")) ids.push("ems");
+    else if (n.includes("civilian") || n.includes("media")) ids.push("civ");
   });
 
-  return [...new Set(deptIds)]; // remove duplicates
+  return [...new Set(ids)];
 }
 
 /* DEFAULT TAB SELECTION */
@@ -666,14 +664,10 @@ let activeDeptId = departments[0].id;
 
 if (user && !isUserStaff() && user.department) {
   const owned = getUserDepartmentIdsFromApi();
-  if (owned.length > 0) {
-    // Use FIRST department as default tab instead of locking
-    activeDeptId = owned[0];
-  }
+  if (owned.length > 0) activeDeptId = owned[0];
 }
 
-
-/* ========== GALLERY DATA STORAGE ========== */
+/* ========== GALLERY DATA ========== */
 let galleryData = [];
 
 /* Render department tabs */
@@ -689,105 +683,74 @@ function renderTabs() {
   });
 }
 
-/* Activate selected department tab */
+/* Switch department */
 function setActiveDept(id) {
   activeDeptId = id;
+
   [...deptTabsEl.querySelectorAll(".tab-btn")].forEach(btn =>
     btn.classList.toggle("active", btn.dataset.deptId === id)
   );
+
   const dept = departments.find(d => d.id === id);
   deptSummaryEl.textContent = `${dept.name} • Public photo feed`;
+
   renderGallery();
   setupUploadSection();
 }
 
-/* Upload permissions:
-   Must be staff OR belong to the department */
-/* Multi-department aware upload permission */
+/* PERMISSION CHECK */
 function userCanUpload() {
   if (!user) return false;
-
   if (isUserStaff()) return true;
 
-  const userDepts = getUserDepartmentIdsFromApi();
-  if (!userDepts.length) return false;
-
-  // User can upload if current tab matches ANY of their departments
-  return userDepts.includes(activeDeptId);
+  const owned = getUserDepartmentIdsFromApi();
+  return owned.includes(activeDeptId);
 }
 
-/* Upload UI control (multi-department version) */
+/* Upload section logic */
 function setupUploadSection() {
   if (!user) {
     uploadNoticeEl.style.display = "flex";
     uploadFormEl.style.display = "none";
-    uploadNoticeTextEl.textContent =
-      "You must be logged in with a department or staff account to upload photos.";
+    uploadNoticeTextEl.textContent = "You must be logged in to upload.";
     return;
   }
 
   const staff = isUserStaff();
-  const userDepts = getUserDepartmentIdsFromApi();
+  const owned = getUserDepartmentIdsFromApi();
 
-  // No dept assigned & not staff
-  if (!staff && userDepts.length === 0) {
+  if (!staff && owned.length === 0) {
     uploadNoticeEl.style.display = "flex";
     uploadFormEl.style.display = "none";
-    uploadNoticeTextEl.textContent =
-      "Your account is not linked to any department or staff role.";
+    uploadNoticeTextEl.textContent = "Your account is not assigned to a department.";
     return;
   }
 
-  // Civilians trying to upload in a department they don't belong to
-  if (!staff && !userDepts.includes(activeDeptId)) {
+  if (!staff && !owned.includes(activeDeptId)) {
     uploadNoticeEl.style.display = "flex";
     uploadFormEl.style.display = "none";
-
-    const deptNames = userDepts
-      .map(id => departments.find(d => d.id === id)?.name || id)
-      .join(", ");
-
     uploadNoticeTextEl.innerHTML =
-      `You belong to <strong>${deptNames}</strong>.<br>Switch to one of your departments to upload photos.`;
+      `You belong to <strong>${owned.join(", ")}</strong>. Switch to your department tab.`;
     return;
   }
 
-  /* Allowed */
   uploadNoticeEl.style.display = "none";
   uploadFormEl.style.display = "block";
-
   uploadDeptSelect.innerHTML = "";
 
-  // STAFF → show all departments
   if (staff) {
-    departments.forEach(d => {
-      const opt = document.createElement("option");
-      opt.value = d.id;
-      opt.textContent = d.name;
-      uploadDeptSelect.appendChild(opt);
-    });
+    departments.forEach(d => uploadDeptSelect.add(new Option(d.name, d.id)));
     uploadDeptSelect.disabled = false;
-  }
-  // MULTI-DEPT USER → show only their departments
-  else if (userDepts.length > 1) {
-    userDepts.forEach(id => {
+  } else if (owned.length > 1) {
+    owned.forEach(id => {
       const d = departments.find(dep => dep.id === id);
-      if (!d) return;
-      const opt = document.createElement("option");
-      opt.value = d.id;
-      opt.textContent = d.name;
-      uploadDeptSelect.appendChild(opt);
+      uploadDeptSelect.add(new Option(d.name, d.id));
     });
     uploadDeptSelect.disabled = false;
-  }
-  // SINGLE-DEPT USER → lock to one dept
-  else {
-    const id = userDepts[0];
+  } else {
+    const id = owned[0];
     const d = departments.find(dep => dep.id === id);
-    const opt = document.createElement("option");
-    opt.value = d.id;
-    opt.textContent = d.name;
-    uploadDeptSelect.appendChild(opt);
+    uploadDeptSelect.add(new Option(d.name, d.id));
     uploadDeptSelect.value = id;
     uploadDeptSelect.disabled = true;
   }
@@ -795,35 +758,28 @@ function setupUploadSection() {
   uploadMetaEl.textContent = `Posting as ${user.username}`;
 }
 
-/* Render gallery for an active department */
+/* Render gallery */
 function renderGallery() {
-  const deptId = activeDeptId;
-
   const items = galleryData.filter(i =>
-    i.department === deptId || i.dept === deptId || i.deptId === deptId
+    i.department === activeDeptId || i.dept === activeDeptId || i.deptId === activeDeptId
   );
 
   galleryGridEl.innerHTML = "";
 
   if (!items.length) {
     galleryGridEl.innerHTML = `
-      <div class="empty-state">
-        No photos have been shared for this department yet.<br>
-        If you're a member of this department or staff, be the first to post!
-      </div>`;
+      <div class="empty-state">No photos for this department yet.</div>`;
   } else {
     items.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     items.forEach(item => {
-      const dept = departments.find(d => d.id === item.department) || { badge:"" };
       galleryGridEl.innerHTML += `
         <article class="gallery-item">
           <div class="gallery-img-wrap">
-            <img src="${item.imageUrl}" alt="Photo"
-                 onerror="this.src='https://i.imgur.com/u7H5RkP.png';">
-            <span class="gallery-chip">${dept.badge}</span>
+            <img src="${item.imageUrl}" onerror="this.src='https://i.imgur.com/u7H5RkP.png';">
+            <span class="gallery-chip">${(departments.find(d => d.id === item.department) || {}).badge || ""}</span>
           </div>
           <div class="gallery-body">
-            <div class="gallery-caption">${item.caption || "Untitled shot"}</div>
+            <div class="gallery-caption">${item.caption || "Untitled"}</div>
             <div class="gallery-meta-line">
               <span>${item.author || "Unknown"}</span>
               <span>${formatShortDate(item.createdAt)}</span>
@@ -836,18 +792,17 @@ function renderGallery() {
   galleryCountEl.textContent = `${items.length} photo${items.length === 1 ? "" : "s"} in this department.`;
 }
 
-/* Date formatting */
+/* Date formatter */
 function formatShortDate(iso) {
   if (!iso) return "";
   const d = new Date(iso);
   return isNaN(d) ? "" : d.toLocaleDateString(undefined, { month:"short", day:"numeric" });
 }
 
-/* Fetch gallery entries */
+/* Fetch gallery */
 async function fetchGallery() {
   try {
     const res = await fetch(`${API}/gallery`);
-    if (!res.ok) throw new Error();
     const data = await res.json();
     galleryData = Array.isArray(data) ? data : (data.items || []);
   } catch {
@@ -859,7 +814,7 @@ async function fetchGallery() {
 /* Upload handler */
 uploadFormEl.addEventListener("submit", async e => {
   e.preventDefault();
-  if (!userCanUpload()) return alert("You are not allowed to upload photos.");
+  if (!userCanUpload()) return alert("You cannot upload here.");
 
   const payload = {
     department: uploadDeptSelect.value,
@@ -868,10 +823,11 @@ uploadFormEl.addEventListener("submit", async e => {
     author: user.username
   };
 
-  if (!payload.imageUrl) return alert("Enter an image URL.");
+  if (!payload.imageUrl.startsWith("http"))
+    return alert("Invalid image URL.");
 
   uploadBtn.disabled = true;
-  uploadMetaEl.textContent = "Uploading…";
+  uploadMetaEl.textContent = "Uploading...";
 
   try {
     const res = await fetch(`${API}/gallery`, {
@@ -898,6 +854,8 @@ renderTabs();
 setActiveDept(activeDeptId);
 setupUploadSection();
 fetchGallery();
+</script>
+
   </script>
 </body>
 </html>
