@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Shore Roleplay | Photo Gallery</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+
+    body{
+      font-family:"Inter",sans-serif;
+      background:#05070a url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+      color:#f5f7ff;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    a{color:#4ea3ff;text-decoration:none}
+
+    /* NAVBAR */
+    nav{
+      padding:18px 55px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:rgba(0,0,0,.55);
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:1000;
+    }
+
+    .nav-left{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .nav-logo{
+      width:38px;
+      height:38px;
+      border-radius:12px;
+      background:url("https://i.imgur.com/5LQ8M5u.png") center/cover no-repeat;
+      box-shadow:0 0 0 1px rgba(255,255,255,.15);
+    }
+
+    .nav-title{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .nav-title span:first-child{
+      font-weight:700;
+      letter-spacing:.12em;
+      font-size:13px;
+      text-transform:uppercase;
+    }
+    .nav-title span:last-child{
+      font-size:11px;
+      opacity:.7;
+    }
+
+    .nav-links a{
+      margin-left:26px;
+      font-size:14px;
+      opacity:.8;
+      transition:.25s;
+    }
+    .nav-links a:hover{
+      opacity:1;
+      transform:translateY(-1px);
+    }
+
+    .user-box{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:13px;
+    }
+    .user-btn{
+      padding:6px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.25);
+      background:transparent;
+      color:#f5f7ff;
+      font-size:12px;
+      cursor:pointer;
+      transition:.25s;
+    }
+    .user-btn:hover{
+      background:rgba(255,255,255,.09);
+    }
+    .logout-btn{
+      border-color:rgba(255,99,132,.65);
+    }
+    .logout-btn:hover{
+      background:rgba(255,99,132,.12);
+    }
+
+    /* PAGE LAYOUT */
+    main{
+      padding:120px 18px 40px;
+      max-width:1200px;
+      margin:0 auto;
+    }
+
+    .page-header{
+      margin-bottom:18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .page-header h1{
+      font-size:28px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .page-header p{
+      font-size:13px;
+      opacity:.8;
+      max-width:420px;
+    }
+
+    .pill{
+      font-size:11px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.15);
+      background:rgba(0,0,0,.4);
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .pill span.dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#4ea3ff;
+      box-shadow:0 0 0 4px rgba(78,163,255,.25);
+    }
+
+    /* TABS + CONTENT LAYOUT */
+    .glass-shell{
+      background:rgba(5,7,12,.85);
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 24px 60px rgba(0,0,0,.75);
+      overflow:hidden;
+      display:grid;
+      grid-template-rows:auto auto 1fr;
+      min-height:520px;
+    }
+
+    .tab-bar{
+      display:flex;
+      overflow-x:auto;
+      scrollbar-width:none;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      background:linear-gradient(90deg,rgba(12,15,25,.96),rgba(6,8,13,.96));
+    }
+    .tab-bar::-webkit-scrollbar{display:none;}
+
+    .tab-btn{
+      padding:12px 22px;
+      border:none;
+      background:transparent;
+      color:#cfd4ff;
+      font-size:13px;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      cursor:pointer;
+      position:relative;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      opacity:.8;
+      transition:.25s;
+      white-space:nowrap;
+    }
+    .tab-badge{
+      font-size:10px;
+      padding:2px 7px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.3);
+      opacity:.9;
+    }
+    .tab-btn.active{
+      opacity:1;
+      color:#fff;
+      background:radial-gradient(circle at top,rgba(78,163,255,.32),transparent);
+    }
+    .tab-btn.active::after{
+      content:"";
+      position:absolute;
+      left:20px;
+      right:20px;
+      bottom:0;
+      height:2px;
+      background:linear-gradient(90deg,#4ea3ff,#68f2ff);
+      border-radius:999px;
+    }
+
+    .sub-header{
+      padding:12px 20px;
+      font-size:12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.35));
+      border-bottom:1px solid rgba(255,255,255,.04);
+      flex-wrap:wrap;
+    }
+    .sub-header span{
+      opacity:.9;
+    }
+
+    /* LAYOUT: UPLOAD + GALLERY */
+    .content{
+      display:grid;
+      grid-template-columns:minmax(0,1.6fr) minmax(0,2.4fr);
+      gap:0;
+      min-height:0;
+    }
+    @media (max-width:900px){
+      .content{
+        grid-template-columns:1fr;
+      }
+    }
+
+    .upload-pane{
+      border-right:1px solid rgba(255,255,255,.05);
+      padding:18px 20px 20px;
+      background:radial-gradient(circle at top left,rgba(78,163,255,.09),transparent);
+      min-height:0;
+    }
+    @media (max-width:900px){
+      .upload-pane{
+        border-right:none;
+        border-bottom:1px solid rgba(255,255,255,.05);
+      }
+    }
+
+    .upload-card{
+      border-radius:14px;
+      padding:16px 16px 14px;
+      background:rgba(3,6,12,.82);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 18px 40px rgba(0,0,0,.8);
+    }
+    .upload-card h2{
+      font-size:16px;
+      margin-bottom:4px;
+    }
+    .upload-card p{
+      font-size:12px;
+      opacity:.85;
+      margin-bottom:14px;
+    }
+
+    .alert{
+      font-size:12px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,193,7,.55);
+      background:rgba(255,193,7,.08);
+      margin-bottom:8px;
+      display:flex;
+      gap:8px;
+    }
+
+    form label{
+      font-size:12px;
+      margin-top:10px;
+      margin-bottom:4px;
+      display:block;
+      opacity:.9;
+    }
+
+    select,input[type="text"],textarea{
+      width:100%;
+      padding:8px 9px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(4,7,15,.95);
+      color:#f5f7ff;
+      font-size:13px;
+      outline:none;
+      transition:.2s;
+    }
+    select:focus,input[type="text"]:focus,textarea:focus{
+      border-color:#4ea3ff;
+      box-shadow:0 0 0 1px rgba(78,163,255,.6);
+    }
+    textarea{
+      resize:vertical;
+      min-height:70px;
+      max-height:160px;
+    }
+    .hint{
+      font-size:11px;
+      opacity:.65;
+      margin-top:3px;
+    }
+
+    .upload-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:12px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .upload-actions small{
+      font-size:10px;
+      opacity:.7;
+    }
+
+    .primary-btn{
+      padding:8px 16px;
+      border-radius:999px;
+      border:none;
+      background:linear-gradient(120deg,#4ea3ff,#68f2ff);
+      color:#020308;
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      cursor:pointer;
+      transition:.22s;
+    }
+    .primary-btn:hover{
+      filter:brightness(1.08);
+      transform:translateY(-1px);
+      box-shadow:0 10px 26px rgba(0,0,0,.65);
+    }
+    .primary-btn:disabled{
+      opacity:.4;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none;
+    }
+
+    /* GALLERY PANE */
+    .gallery-pane{
+      padding:18px 20px 20px;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .gallery-meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      font-size:11px;
+      opacity:.8;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .gallery-grid{
+      flex:1;
+      min-height:0;
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+      gap:14px;
+      padding-top:4px;
+    }
+
+    .gallery-item{
+      border-radius:14px;
+      background:rgba(2,4,9,.96);
+      border:1px solid rgba(255,255,255,.08);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+      box-shadow:0 16px 32px rgba(0,0,0,.7);
+    }
+
+    .gallery-img-wrap{
+      position:relative;
+      padding-top:66%;
+      overflow:hidden;
+    }
+    .gallery-img-wrap img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      transition:transform .4s ease-out;
+    }
+    .gallery-item:hover .gallery-img-wrap img{
+      transform:scale(1.06);
+    }
+
+    .gallery-chip{
+      position:absolute;
+      left:8px;
+      top:8px;
+      font-size:10px;
+      padding:3px 7px;
+      border-radius:999px;
+      background:rgba(0,0,0,.6);
+      border:1px solid rgba(255,255,255,.38);
+    }
+
+    .gallery-body{
+      padding:9px 10px 10px;
+      font-size:12px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .gallery-caption{
+      font-weight:500;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .gallery-meta-line{
+      display:flex;
+      justify-content:space-between;
+      font-size:11px;
+      opacity:.7;
+    }
+
+    .empty-state{
+      grid-column:1/-1;
+      padding:26px 18px;
+      text-align:center;
+      border-radius:14px;
+      border:1px dashed rgba(255,255,255,.25);
+      background:rgba(0,0,0,.45);
+      font-size:13px;
+      opacity:.85;
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-left">
+      <div class="nav-logo"></div>
+      <div class="nav-title">
+        <span>SHORE ROLEPLAY</span>
+        <span>Operations &amp; Community Network</span>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="forums.html">Forums</a>
+      <a href="apply.html">Applications</a>
+      <a href="status.html">Status</a>
+      <a href="gallery.html"><strong>Gallery</strong></a>
+    </div>
+    <div id="userControls" class="user-box"></div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div>
+        <div class="pill"><span class="dot"></span> Public Department Gallery</div>
+        <h1>Department Media Wall</h1>
+        <p>
+          Browse public photos from each department. Uploads are restricted to active
+          department members &amp; staff, but everything here is visible to the community.
+        </p>
+      </div>
+      <div>
+        <span class="pill">Read-only for civilians</span>
+      </div>
+    </div>
+
+    <section class="glass-shell">
+      <!-- DEPARTMENT TABS -->
+      <div class="tab-bar" id="deptTabs"></div>
+
+      <div class="sub-header">
+        <span id="deptSummary">Loading departments…</span>
+        <span id="deptRules">
+          Only verified department members &amp; staff may post. All uploads are logged.
+        </span>
+      </div>
+
+      <div class="content">
+        <!-- UPLOAD SIDE -->
+        <aside class="upload-pane">
+          <div class="upload-card" id="uploadCard">
+            <h2>Post a Photo</h2>
+            <p>
+              You must be in a department or be a staff member to upload. All posts
+              are publicly visible once approved by staff.
+            </p>
+
+            <!-- Shown if not allowed -->
+            <div id="uploadNotice" class="alert" style="display:none;">
+              <span>⚠️</span>
+              <span id="uploadNoticeText"></span>
+            </div>
+
+            <form id="uploadForm" style="display:none;">
+              <label for="uploadDept">Department</label>
+              <select id="uploadDept" name="department"></select>
+              <div class="hint">
+                Staff can post to any department. Regular members are locked to their own.
+              </div>
+
+              <label for="uploadUrl">Image URL</label>
+              <input
+                type="text"
+                id="uploadUrl"
+                name="imageUrl"
+                placeholder="https://example.com/screenshot.png"
+                required
+              />
+              <div class="hint">
+                Use Imgur or another CDN link for now. (Backend file uploads can be wired later.)
+              </div>
+
+              <label for="uploadCaption">Caption</label>
+              <textarea
+                id="uploadCaption"
+                name="caption"
+                placeholder="Brief description of the scene or call-out…"
+              ></textarea>
+
+              <div class="upload-actions">
+                <small id="uploadMeta">Ready to post.</small>
+                <button type="submit" class="primary-btn" id="uploadBtn">Publish Photo</button>
+              </div>
+            </form>
+          </div>
+        </aside>
+
+        <!-- GALLERY SIDE -->
+        <section class="gallery-pane">
+          <div class="gallery-meta">
+            <span id="galleryCount">0 photos in this department.</span>
+            <span id="galleryFilterLabel">Sorted by newest first • Public view</span>
+          </div>
+          <div class="gallery-grid" id="galleryGrid">
+            <!-- Photos injected via JS -->
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const API = "https://shoreroleplay.onrender.com";
+
+    // ===== LOGIN STATE HANDLER (same pattern as other pages) =====
+    const user = JSON.parse(localStorage.getItem("shoreUser"));
+    const box = document.getElementById("userControls");
+
+    if(!box){
+      console.warn("userControls element missing");
+    } else if(!user){
+      box.innerHTML = `
+        <button class="user-btn" onclick="location.href='login.html'">Login</button>
+        <button class="user-btn logout-btn" onclick="location.href='register.html'">Register</button>
+      `;
+    } else {
+      box.innerHTML = `
+        Logged in as <strong>${user.username}</strong>
+        <button class="user-btn" onclick="location.href='profile.html?user=${encodeURIComponent(user.username)}'">Profile</button>
+        <button class="user-btn" onclick="location.href='settings.html'">Settings</button>
+        <button class="user-btn logout-btn" onclick="logout()">Logout</button>
+      `;
+    }
+
+    function logout(){
+      localStorage.removeItem("shoreUser");
+      location.reload();
+    }
+
+    // ===== GALLERY LOGIC =====
+
+    // 👇 Define departments here (edit names/colors as needed)
+    const departments = [
+      { id:"pd",   name:"Police Department",  badge:"PD"   },
+      { id:"sd",   name:"Sheriff's Office",   badge:"SO"   },
+      { id:"hp",   name:"Highway Patrol",     badge:"HP"   },
+      { id:"fire", name:"Fire & Rescue",      badge:"FIRE" },
+      { id:"ems",  name:"EMS",                badge:"EMS"  },
+      { id:"civ",  name:"Civilian Media",     badge:"CIV"  },
+      { id:"staff",name:"Staff & Media Team", badge:"STAFF"}
+    ];
+
+    const deptTabsEl = document.getElementById("deptTabs");
+    const deptSummaryEl = document.getElementById("deptSummary");
+    const galleryGridEl = document.getElementById("galleryGrid");
+    const galleryCountEl = document.getElementById("galleryCount");
+    const uploadNoticeEl = document.getElementById("uploadNotice");
+    const uploadNoticeTextEl = document.getElementById("uploadNoticeText");
+    const uploadFormEl = document.getElementById("uploadForm");
+    const uploadDeptSelect = document.getElementById("uploadDept");
+    const uploadUrlInput = document.getElementById("uploadUrl");
+    const uploadCaptionInput = document.getElementById("uploadCaption");
+    const uploadMetaEl = document.getElementById("uploadMeta");
+    const uploadBtn = document.getElementById("uploadBtn");
+
+    let activeDeptId = departments[0].id;
+    let galleryData = []; // full set from API
+
+    // Build tabs
+    function renderTabs(){
+      deptTabsEl.innerHTML = "";
+      departments.forEach(dept => {
+        const btn = document.createElement("button");
+        btn.className = "tab-btn" + (dept.id === activeDeptId ? " active" : "");
+        btn.dataset.deptId = dept.id;
+        btn.innerHTML = `
+          ${dept.name}
+          <span class="tab-badge">${dept.badge}</span>
+        `;
+        btn.addEventListener("click", () => setActiveDept(dept.id));
+        deptTabsEl.appendChild(btn);
+      });
+    }
+
+    function setActiveDept(id){
+      activeDeptId = id;
+      Array.from(deptTabsEl.querySelectorAll(".tab-btn")).forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.deptId === id);
+      });
+      const dept = departments.find(d => d.id === id);
+      deptSummaryEl.textContent = `${dept.name} • Public photo feed`;
+      renderGallery();
+    }
+
+    // Upload permissions: must be in a department OR staff
+    function userCanUpload(){
+      if(!user) return false;
+      // Adjust keys depending on how you store them in Mongo
+      // Examples:
+      //  - user.department: "pd", "fire", etc.
+      //  - user.isStaff: true/false
+      const hasDept = !!user.department;
+      const isStaff = !!user.isStaff || (Array.isArray(user.roles) && user.roles.includes("staff"));
+      return hasDept || isStaff;
+    }
+
+    function setupUploadSection(){
+      if(!user){
+        uploadNoticeEl.style.display = "flex";
+        uploadNoticeTextEl.textContent =
+          "You need to be logged in with a department or staff account to upload photos.";
+        uploadFormEl.style.display = "none";
+        return;
+      }
+
+      if(!userCanUpload()){
+        uploadNoticeEl.style.display = "flex";
+        uploadNoticeTextEl.textContent =
+          "Your account is not linked to any department or staff role. Please speak to Staff to get your roles updated.";
+        uploadFormEl.style.display = "none";
+        return;
+      }
+
+      uploadNoticeEl.style.display = "none";
+      uploadFormEl.style.display = "block";
+
+      // Build department select
+      uploadDeptSelect.innerHTML = "";
+      departments.forEach(dept => {
+        const opt = document.createElement("option");
+        opt.value = dept.id;
+        opt.textContent = dept.name;
+        uploadDeptSelect.appendChild(opt);
+      });
+
+      const isStaff = user.isStaff || (Array.isArray(user.roles) && user.roles.includes("staff"));
+
+      if(!isStaff && user.department){
+        // Lock to their own department
+        uploadDeptSelect.value = user.department;
+        uploadDeptSelect.disabled = true;
+      } else {
+        // Staff can pick any
+        uploadDeptSelect.disabled = false;
+      }
+
+      uploadMetaEl.textContent = `Posting as ${user.username}`;
+    }
+
+    function renderGallery(){
+      const deptId = activeDeptId;
+      const items = galleryData.filter(item => item.department === deptId);
+
+      galleryGridEl.innerHTML = "";
+
+      if(items.length === 0){
+        const div = document.createElement("div");
+        div.className = "empty-state";
+        div.innerHTML = `
+          No photos have been shared for this department yet.<br/>
+          If you're a member of this department or staff, be the first to post!
+        `;
+        galleryGridEl.appendChild(div);
+      } else {
+        // Sort newest first if createdAt exists
+        items.sort((a,b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+        items.forEach(item => {
+          const card = document.createElement("article");
+          card.className = "gallery-item";
+
+          const dept = departments.find(d => d.id === item.department) || { badge:"" };
+
+          card.innerHTML = `
+            <div class="gallery-img-wrap">
+              <img src="${item.imageUrl}" alt="${item.caption || "Department photo"}"
+                   onerror="this.src='https://i.imgur.com/u7H5RkP.png';" />
+              <span class="gallery-chip">${dept.badge}</span>
+            </div>
+            <div class="gallery-body">
+              <div class="gallery-caption" title="${item.caption || ""}">
+                ${item.caption ? item.caption : "Untitled shot"}
+              </div>
+              <div class="gallery-meta-line">
+                <span>${item.author || "Unknown"}</span>
+                <span>${formatShortDate(item.createdAt)}</span>
+              </div>
+            </div>
+          `;
+
+          galleryGridEl.appendChild(card);
+        });
+      }
+
+      galleryCountEl.textContent = `${items.length} photo${items.length === 1 ? "" : "s"} in this department.`;
+    }
+
+    function formatShortDate(iso){
+      if(!iso) return "";
+      const d = new Date(iso);
+      if(isNaN(d.getTime())) return "";
+      return d.toLocaleDateString(undefined,{month:"short",day:"numeric"});
+    }
+
+    async function fetchGallery(){
+      try{
+        // NOTE:
+        //  You will need to implement this API route in your backend:
+        //  GET /gallery  -> returns array of { imageUrl, caption, department, author, createdAt }
+        const res = await fetch(API + "/gallery");
+        if(!res.ok) throw new Error("Failed to load gallery");
+        const data = await res.json();
+        if(Array.isArray(data)){
+          galleryData = data;
+        } else if(Array.isArray(data.items)){
+          galleryData = data.items;
+        } else {
+          galleryData = [];
+        }
+      }catch(err){
+        console.error(err);
+        galleryData = [];
+      }
+      renderGallery();
+    }
+
+    // Handle upload submit
+    uploadFormEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if(!userCanUpload()){
+        alert("You are not allowed to upload photos.");
+        return;
+      }
+
+      const department = uploadDeptSelect.value;
+      const imageUrl = uploadUrlInput.value.trim();
+      const caption = uploadCaptionInput.value.trim();
+
+      if(!imageUrl){
+        alert("Please enter an image URL.");
+        return;
+      }
+
+      uploadBtn.disabled = true;
+      uploadMetaEl.textContent = "Uploading…";
+
+      try{
+        // NOTE:
+        //  Implement this in your backend:
+        //    POST /gallery
+        //    body: { department, imageUrl, caption, author }
+        //  Optionally secure it with your auth middleware.
+        const payload = {
+          department,
+          imageUrl,
+          caption,
+          author: user.username
+        };
+
+        const res = await fetch(API + "/gallery", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(payload)
+        });
+
+        if(!res.ok){
+          throw new Error("Upload failed");
+        }
+
+        uploadMetaEl.textContent = "Photo posted successfully.";
+        uploadUrlInput.value = "";
+        uploadCaptionInput.value = "";
+
+        // Reload gallery
+        await fetchGallery();
+      }catch(err){
+        console.error(err);
+        uploadMetaEl.textContent = "Failed to upload. Try again.";
+        alert("Failed to upload photo. Check the console / backend logs.");
+      }finally{
+        uploadBtn.disabled = false;
+      }
+    });
+
+    // INIT
+    renderTabs();
+    setupUploadSection();
+    setActiveDept(activeDeptId);
+    fetchGallery();
+
+  </script>
+</body>
+</html>
