@@ -643,38 +643,43 @@
     }
 
     // Upload permissions: must be staff OR belong to a department
-    function userCanUpload() {
-      if (!user) return false;
+function userCanUpload() {
+  if (!user) return false;
 
-      const staffRoles = [
-        "Head Administrator",
-        "Internal Affairs",
-        "Administration",
-        "Junior Administration",
-        "Senior Staff",
-        "Staff",
-        "Staff In Training"
-      ];
+  const staffRoles = [
+    "Head Administrator",
+    "Internal Affairs",
+    "Administration",
+    "Junior Administration",
+    "Senior Staff",
+    "Staff",
+    "Staff In Training"
+  ];
 
-      // staff members can post anywhere
-      if (staffRoles.includes(user.role)) return true;
+  // staff = unrestricted
+  if (staffRoles.includes(user.role)) return true;
 
-      // Map user.role → department gallery ID
-      const roleToDept = {
-        "Police Department": "pd",
-        "Sheriff's Office": "sd",
-        "State Patrol": "sp",   // <-- uses "sp" to match departments array
-        "Fire & Rescue": "fire",
-        "EMS": "ems",
-        "Civilian Media": "civ"
-      };
+  // department membership from array
+  if (Array.isArray(user.departments) && user.departments.length > 0) {
+    const normalized = user.departments.map(d => d.toLowerCase());
 
-      const userDept = roleToDept[user.role] || null;
-      if (!userDept) return false; // civilian / no dept
+    // match department to tab
+    const deptMap = {
+      "state police": "sp",
+      "police department": "pd",
+      "sheriff's office": "sd",
+      "fire & rescue": "fire",
+      "ems": "ems",
+      "civilian media": "civ"
+    };
 
-      // department members can only upload in their own tab
-      return userDept === activeDeptId;
-    }
+    // does the user belong to the active dept?
+    return normalized.some(d => deptMap[d] === activeDeptId);
+  }
+
+  return false; // no staff, no departments
+}
+
 
     function setupUploadSection() {
       if (!user) {
