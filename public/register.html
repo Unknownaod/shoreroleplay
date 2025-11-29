@@ -14,6 +14,7 @@ body{
   background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
   font-family:"Inter",sans-serif;color:#fff;
 }
+
 /* NAV */
 nav{
   display:flex;align-items:center;
@@ -58,7 +59,11 @@ small{text-align:center;display:block;margin-top:18px;font-size:.9rem;opacity:.7
 small a{color:#4ea3ff;text-decoration:none}
 small a:hover{text-shadow:0 0 10px #4ea3ff}
 
-#msg{margin-top:20px;text-align:center;font-weight:600}
+#msg{
+  margin-top:20px;text-align:center;font-weight:600;
+  font-size:1rem;
+}
+
 footer{text-align:center;margin-top:50px;opacity:.55;font-size:.85rem}
 </style>
 </head>
@@ -87,6 +92,7 @@ footer{text-align:center;margin-top:50px;opacity:.55;font-size:.85rem}
     <input type="password" id="password" placeholder="Create a password" required>
 
     <button type="submit">Register</button>
+
     <small>Already have an account? <a href="login.html">Login</a></small>
 
     <p id="msg"></p>
@@ -123,24 +129,15 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   e.preventDefault();
 
   const msg = document.getElementById("msg");
-
   const email = document.getElementById("email").value.trim();
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  // stronger front-end validation
-  if (username.length < 3) {
-    msg.style.color = "#e74c3c";
-    msg.textContent = "Username must be 3+ characters.";
-    return;
-  }
-  if (password.length < 6) {
-    msg.style.color = "#e74c3c";
-    msg.textContent = "Password must be 6+ characters.";
-    return;
-  }
+  // basic front-end validation
+  if (username.length < 3) return show("Username must be 3+ characters.", false);
+  if (password.length < 6) return show("Password must be 6+ characters.", false);
 
-  const hwid = getHWID(); // stored locally – backend generates its own anyway
+  const hwid = getHWID();
 
   const res = await fetch(API + "/users/register", {
     method: "POST",
@@ -151,12 +148,22 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   const data = await res.json();
 
   if (data.success) {
-    msg.style.color = "#2ecc71";
-    msg.textContent = "✔ Account created! Redirecting...";
-    setTimeout(() => location.href = "login.html", 1200);
+    show("✔ Verification email sent! Check your inbox to finish registering. Your account is NOT active until you click the email link.", true);
+
+    // Disable form controls
+    document.querySelectorAll("input, button").forEach(el => {
+      el.disabled = true;
+      el.style.opacity = .5;
+      el.style.cursor = "not-allowed";
+    });
+
   } else {
-    msg.style.color = "#e74c3c";
-    msg.textContent = data.error || "❌ Registration failed";
+    show(data.error || "❌ Registration failed", false);
+  }
+
+  function show(text, ok) {
+    msg.style.color = ok ? "#2ecc71" : "#e74c3c";
+    msg.textContent = text;
   }
 });
 </script>
