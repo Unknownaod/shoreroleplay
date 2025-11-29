@@ -420,38 +420,35 @@ async function loadAccess() {
   }
 
   try {
-    const res = await fetch(API + "/applications");
+    // Fetch only THIS USER's applications
+    const res = await fetch(`${API}/applications/user/${encodeURIComponent(shoreUser.email)}`);
     const apps = await res.json();
+
     acceptedDepartments = apps
-      .filter(a => a.email === shoreUser.email && a.status === "accepted")
+      .filter(a => a.status === "accepted")
       .map(a => a.department);
 
     const isStaff = STAFF_ROLES.includes(shoreUser.role);
     canPost = isStaff || acceptedDepartments.length > 0;
 
-// 🔒 Check if this user is restricted from forums
-if (shoreUser.restricted === true) {
-  canPost = false;
+    /* RESTRICTION CHECK */
+    if (shoreUser.restricted === true) {
+      canPost = false;
+      accessSub.textContent = "Your posting privileges are restricted.";
+      accessSummary.textContent = "You are currently not allowed to create threads or replies.";
+      accessBadges.innerHTML = `<span class="badge-access no">Posting Disabled</span>`;
+      newThreadBox.style.display = "none";
+      noAccessBox.style.display = "block";
+      noAccessBox.innerHTML = `
+        <strong>Posting Disabled</strong>
+        <p style="font-size:.88rem;opacity:.82;margin-top:4px;">
+          Your account has been restricted from posting by ShoreRP Staff.<br>
+          You may still read public threads, but thread creation and replies are disabled.
+        </p>`;
+      return;
+    }
 
-  accessSub.textContent = "Your posting privileges are restricted.";
-  accessSummary.textContent = "You are currently not allowed to create threads or replies.";
-  accessBadges.innerHTML = `<span class="badge-access no">Posting Disabled</span>`;
-
-  newThreadBox.style.display = "none";
-  noAccessBox.innerHTML = `
-    <strong>Posting Disabled</strong>
-    <p style="font-size:.88rem;opacity:.82;margin-top:4px;">
-      Your account has been restricted from posting by ShoreRP Staff.
-      You may still read public threads, but thread creation and replies are disabled.
-    </p>
-  `;
-  noAccessBox.style.display = "block";
-
-  return; // ⛔ stop further access processing
-}
-
-    
-    // Sub header
+    /* ROLE + DEPARTMENT ACCESS TEXT */
     if (isStaff && acceptedDepartments.length > 0) {
       accessSub.textContent = "You are staff and a member of at least one department.";
     } else if (isStaff) {
@@ -462,57 +459,14 @@ if (shoreUser.restricted === true) {
       accessSub.textContent = "You can currently view but not post in forums.";
     }
 
-    // Sidebar summary
+    /* SIDEBAR SUMMARY */
     if (canPost) {
       accessSummary.textContent = "You are allowed to create threads and replies.";
       accessBadges.innerHTML = `<span class="badge-access ok">Posting enabled</span>`;
     } else {
-      accessSummary.textContent =
-        "You must be staff or in at least one accepted department to post.";
-      accessBadges.innerHTML = `<span class="badge-access no">Read-only access</span>`;
-    }
+      accessSummary.textContent = "You must be staff or accepted into a department to post.";
+      accessBadges.innerHTML = `<span class="badge-
 
-    // Dept chips
-    if (acceptedDepartments.length) {
-      deptList.innerHTML = acceptedDepartments
-        .map(d => `<span class="dept-chip">${d}</span>`)
-        .join("");
-    } else {
-      deptList.innerHTML = `<span style="opacity:.75;font-size:.85rem;">No accepted departments yet.</span>`;
-    }
-
-    // Toggle forms
-    if (canPost) {
-      newThreadBox.style.display = "block";
-      noAccessBox.style.display = "none";
-    } else {
-      newThreadBox.style.display = "none";
-      noAccessBox.style.display = "block";
-    }
-
-  } catch (err) {
-    console.error("Access check error:", err);
-    accessSub.textContent = "Failed to load your access (server error).";
-  }
-}
-
-/* ---------- PARSE BADGES FROM TITLE ---------- */
-function extractBadges(rawTitle) {
-  let title = rawTitle || "";
-  const badges = [];
-
-  // Only parse tags from the beginning like [TAG]
-  while (title.startsWith("[")) {
-    const close = title.indexOf("]");
-    if (close === -1) break;
-    const token = title.slice(1, close).trim();
-    if (!token) break;
-    badges.push(token.toUpperCase());
-    title = title.slice(close + 1).trim();
-  }
-
-  return { cleanTitle: title || rawTitle, badges };
-}
 
 /* ---------- RENDER THREADS ---------- */
 function renderThreads(threads) {
