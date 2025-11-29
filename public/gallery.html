@@ -655,121 +655,102 @@ function userCanUpload() {
     "Staff In Training"
   ];
 
-  const isStaff = staffRoles.includes(user.role);
+  // staff members can post anywhere
+  if (staffRoles.includes(user.role)) return true;
 
-  // Map department roles -> department IDs used by gallery tabs
+  // Map user.role → department gallery ID
   const roleToDept = {
     "Police Department": "pd",
     "Sheriff's Office": "sd",
     "State Patrol": "SP",
     "Fire & Rescue": "fire",
     "EMS": "ems",
-    "Civilian Media": "civ",
+    "Civilian Media": "civ"
   };
 
-  const userDept = roleToDept[user.role] || null; // convert role to internal dept code
+  const userDept = roleToDept[user.role] || null;
+  if (!userDept) return false; // civilian / no dept
 
-  // user belongs to a department if we mapped one & is not staff
-  const isDepartmentMember = userDept !== null && !isStaff;
-
-  // persist mapped department for UI lock
-  if (isDepartmentMember) user.department = userDept;
-
-  return isStaff || isDepartmentMember;
+  // department members can only upload in their own tab
+  return userDept === activeDeptId;
 }
 
+    
+function setupUploadSection() {
+  if (!user) {
+    uploadNoticeEl.style.display = "flex";
+    uploadFormEl.style.display = "none";
+    uploadNoticeTextEl.textContent =
+      "You must be logged in with a department or staff account to upload photos.";
+    return;
+  }
 
+  const staffRoles = [
+    "Head Administrator",
+    "Internal Affairs",
+    "Administration",
+    "Junior Administration",
+    "Senior Staff",
+    "Staff",
+    "Staff In Training"
+  ];
 
-    function setupUploadSection(){
-      if(!user){
-        uploadNoticeEl.style.display = "flex";
-        uploadNoticeTextEl.textContent =
-          "You need to be logged in with a department or staff account to upload photos.";
-        uploadFormEl.style.display = "none";
-        return;
-      }
+  const roleToDept = {
+    "Police Department": "pd",
+    "Sheriff's Office": "sd",
+    "State Patrol": "SP",
+    "Fire & Rescue": "fire",
+    "EMS": "ems",
+    "Civilian Media": "civ"
+  };
 
-      if(!userCanUpload()){
-        uploadNoticeEl.style.display = "flex";
-        uploadNoticeTextEl.textContent =
-          "Your account is not linked to any department or staff role. Please speak to Staff to get your roles updated.";
-        uploadFormEl.style.display = "none";
-        return;
-      }
+  const userDept = roleToDept[user.role] || null;
+  const isStaff = staffRoles.includes(user.role);
 
-      uploadNoticeEl.style.display = "none";
-      uploadFormEl.style.display = "block";
+  // CIVILIANS (no dept, not staff)
+  if (!isStaff && !userDept) {
+    uploadNoticeEl.style.display = "flex";
+    uploadFormEl.style.display = "none";
+    uploadNoticeTextEl.textContent =
+      "Your account is not linked to any department or staff role. Please speak to Staff to get your roles updated.";
+    return;
+  }
 
-      // Build department select
-      uploadDeptSelect.innerHTML = "";
-      departments.forEach(dept => {
-        const opt = document.createElement("option");
-        opt.value = dept.id;
-        opt.textContent = dept.name;
-        uploadDeptSelect.appendChild(opt);
-      });
+  // DEPARTMENT MEMBER ON WRONG TAB
+  if (!isStaff && userDept !== activeDeptId) {
+    const deptName = Object.keys(roleToDept).find(k => roleToDept[k] === userDept);
 
-      const isStaff = user.isStaff || (Array.isArray(user.roles) && user.roles.includes("staff"));
+    uploadNoticeEl.style.display = "flex";
+    uploadFormEl.style.display = "none";
+    uploadNoticeTextEl.innerHTML =
+      `You belong to the <strong>${deptName}</strong>. Switch to that department tab to upload photos.`;
+    return;
+  }
 
-      if(!isStaff && user.department){
-        // Lock to their own department
-        uploadDeptSelect.value = user.department;
-        uploadDeptSelect.disabled = true;
-      } else {
-        // Staff can pick any
-        uploadDeptSelect.disabled = false;
-      }
+  // STAFF OR CORRECT DEPARTMENT → ALLOW UPLOAD
+  uploadNoticeEl.style.display = "none";
+  uploadFormEl.style.display = "block";
 
-      uploadMetaEl.textContent = `Posting as ${user.username}`;
-    }
+  // Build department dropdown
+  uploadDeptSelect.innerHTML = "";
+  departments.forEach(dept => {
+    const opt = document.createElement("option");
+    opt.value = dept.id;
+    opt.textContent = dept.name;
+    uploadDeptSelect.appendChild(opt);
+  });
 
-    function renderGallery(){
-      const deptId = activeDeptId;
-      const items = galleryData.filter(item => item.department === deptId);
+  if (!isStaff) {
+    // lock to user's assigned department
+    uploadDeptSelect.value = userDept;
+    uploadDeptSelect.disabled = true;
+  } else {
+    // staff can choose any dept
+    uploadDeptSelect.disabled = false;
+  }
 
-      galleryGridEl.innerHTML = "";
-
-      if(items.length === 0){
-        const div = document.createElement("div");
-        div.className = "empty-state";
-        div.innerHTML = `
-          No photos have been shared for this department yet.<br/>
-          If you're a member of this department or staff, be the first to post!
-        `;
-        galleryGridEl.appendChild(div);
-      } else {
-        // Sort newest first if createdAt exists
-        items.sort((a,b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-
-        items.forEach(item => {
-          const card = document.createElement("article");
-          card.className = "gallery-item";
-
-          const dept = departments.find(d => d.id === item.department) || { badge:"" };
-
-          card.innerHTML = `
-            <div class="gallery-img-wrap">
-              <img src="${item.imageUrl}" alt="${item.caption || "Department photo"}"
-                   onerror="this.src='https://i.imgur.com/u7H5RkP.png';" />
-              <span class="gallery-chip">${dept.badge}</span>
-            </div>
-            <div class="gallery-body">
-              <div class="gallery-caption" title="${item.caption || ""}">
-                ${item.caption ? item.caption : "Untitled shot"}
-              </div>
-              <div class="gallery-meta-line">
-                <span>${item.author || "Unknown"}</span>
-                <span>${formatShortDate(item.createdAt)}</span>
-              </div>
-            </div>
-          `;
-
-          galleryGridEl.appendChild(card);
-        });
-      }
-
-      galleryCountEl.textContent = `${items.length} photo${items.length === 1 ? "" : "s"} in this department.`;
-    }
+  uploadMetaEl.textContent = `Posting as ${user.username}`;
+}
 
     function formatShortDate(iso){
       if(!iso) return "";
