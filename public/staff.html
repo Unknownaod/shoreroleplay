@@ -197,7 +197,7 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
     <div class="tab" onclick="switchTab('forums')">Forum Tools</div>
     <div class="tab" onclick="switchTab('ha')">HA Tab (Head Administration)</div>
     <div class="tab" id="appealsTab" onclick="switchTab('appeals')" style="display:none;">
-  Ban Appeals
+      Ban Appeals
     </div>
   </div>
 
@@ -218,28 +218,27 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
     </table>
   </div>
 
-<!-- FORUM MODERATION -->
-<div id="forumsSection" style="display:none;">
-  <h2 class="section-title">Forum Moderation Panel</h2>
-  <p style="opacity:.7;margin-bottom:18px;font-size:14px;">
-    View users and perform forum-related moderation actions.
-  </p>
+  <!-- FORUM MODERATION -->
+  <div id="forumsSection" style="display:none;">
+    <h2 class="section-title">Forum Moderation Panel</h2>
+    <p style="opacity:.7;margin-bottom:18px;font-size:14px;">
+      View users and perform forum-related moderation actions.
+    </p>
 
-  <table>
-    <thead>
-      <tr>
-        <th>USERNAME</th>
-        <th>EMAIL</th>
-        <th>ROLE</th>
-        <th>POSTING STATUS</th>
-        <th>ACTIONS</th>
-      </tr>
-    </thead>
-    <tbody id="forumUsers"></tbody>
-  </table>
-</div>
+    <table>
+      <thead>
+        <tr>
+          <th>USERNAME</th>
+          <th>EMAIL</th>
+          <th>ROLE</th>
+          <th>POSTING STATUS</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody id="forumUsers"></tbody>
+    </table>
+  </div>
 
-  
   <!-- HA / USERS SECTION -->
   <div id="haSection" style="display:none;margin-top:10px;">
     <h3 style="margin-bottom:10px;">User Management (HA Only)</h3>
@@ -265,6 +264,7 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
   </div>
 </div>
 
+<!-- BAN APPEALS SECTION -->
 <div id="appealsSection" style="display:none;margin-top:10px;">
   <h3>Ban Appeals</h3>
   <p style="opacity:.7;margin-bottom:16px;font-size:14px;">
@@ -286,8 +286,6 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
   </table>
 </div>
 
-  
-  
 <!-- MODAL -->
 <div id="modal">
   <div class="modal-box">
@@ -339,10 +337,10 @@ function logout(){
   location.reload();
 }
 
-/* Always show login box, but real access gated by staff password */
+/* Always show login box, but real access is gated by staff password */
 document.getElementById("loginBox").style.display = "block";
 
- /// STAFF AUTH 
+/* STAFF AUTH → /staff-auth */
 async function login(){
   const password = document.getElementById("staffPass").value.trim();
   const res = await fetch(API + "/staff-auth", {
@@ -355,8 +353,8 @@ async function login(){
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("panel").style.display = "block";
 
-    // ⭐ ONLY SHOW BAN APPEALS TAB AFTER STAFF PANEL IS UNLOCKED
-    if (user.role === "Head Administrator") {
+    // Only HA sees the Ban Appeals tab
+    if (user && user.role === "Head Administrator") {
       document.getElementById("appealsTab").style.display = "inline-block";
     }
 
@@ -365,7 +363,6 @@ async function login(){
     document.getElementById("error").textContent = "❌ Invalid Credential";
   }
 }
-
 
 /* ========== TABS ========== */
 function switchTab(tab){
@@ -377,23 +374,19 @@ function switchTab(tab){
     tab==='pending' ? 1 :
     tab==='all' ? 2 :
     tab==='forums' ? 3 :
-    tab==='ha' ? 4 :
-    5
+    tab==='ha' ? 4 : 5
   })`).classList.add("active");
 
-  // Get sections
-  const appsSection     = document.getElementById("appsSection");
-  const forumsSection   = document.getElementById("forumsSection");
-  const haSection       = document.getElementById("haSection");
-  const appealsSection  = document.getElementById("appealsSection"); // 👈 REQUIRED
+  const appsSection    = document.getElementById("appsSection");
+  const forumsSection  = document.getElementById("forumsSection");
+  const haSection      = document.getElementById("haSection");
+  const appealsSection = document.getElementById("appealsSection");
 
-  // Toggle visibility
   appsSection.style.display    = (tab === "pending" || tab === "all") ? "block" : "none";
   forumsSection.style.display  = (tab === "forums") ? "block" : "none";
   haSection.style.display      = (tab === "ha") ? "block" : "none";
-  appealsSection.style.display = (tab === "appeals") ? "block" : "none"; // 👈 REQUIRED
+  appealsSection.style.display = (tab === "appeals") ? "block" : "none";
 
-  // Load correct data
   if(tab === "ha"){
     if(!haUnlocked) haPrompt();
     else loadUsers();
@@ -402,18 +395,17 @@ function switchTab(tab){
     loadForumUsers();
   }
   else if(tab === "appeals"){
-    if(user.role !== "Head Administrator"){
+    if(!user || user.role !== "Head Administrator"){
       alert("🚫 Only Head Administration may review appeals.");
       switchTab("pending");
       return;
     }
-    loadAppeals(); // 👈 FINALLY VISIBLE
+    loadAppeals();
   }
   else {
     loadApps();
   }
 }
-
 
 /* ========== HA PASSWORD PROMPT → /ha-auth ========== */
 async function haPrompt(){
@@ -440,12 +432,20 @@ async function haPrompt(){
   }
 }
 
-  /// APPEALS FUNCTION
+/* ========== APPEALS ========== */
 
- async function loadAppeals(){
+async function loadAppeals(){
   const res = await fetch(API + "/appeals");
+  if(!res.ok){
+    document.getElementById("appealsBody").innerHTML =
+      `<tr><td colspan="6" style="opacity:.6;">Failed to load appeals.</td></tr>`;
+    return;
+  }
+
   const appeals = await res.json();
-  appealsBody.innerHTML = appeals.length ? appeals.map(a => `
+  const tbody = document.getElementById("appealsBody");
+
+  tbody.innerHTML = appeals.length ? appeals.map(a => `
     <tr>
       <td>${a.username}</td>
       <td>${a.email || "—"}</td>
@@ -453,18 +453,40 @@ async function haPrompt(){
       <td>${new Date(a.createdAt || a.submittedAt).toLocaleDateString()}</td>
       <td><span class="status ${a.status}">${a.status}</span></td>
       <td>
-        <button class="btn view" onclick="viewAppeal('${a.id}')">View</button>
+        <button class="btn view"   onclick="viewAppeal('${a.id}')">View</button>
         <button class="btn accept" onclick="decideAppeal('${a.id}','accepted')">Accept</button>
-        <button class="btn deny" onclick="decideAppeal('${a.id}','denied')">Deny</button>
+        <button class="btn deny"   onclick="decideAppeal('${a.id}','denied')">Deny</button>
+        <button class="btn delete" onclick="deleteAppeal('${a.id}')">Delete</button>
       </td>
     </tr>
   `).join("") : `<tr><td colspan="6" style="opacity:.6;">No appeals submitted.</td></tr>`;
 }
 
+/* View full appeal in modal */
+async function viewAppeal(id){
+  const res = await fetch(API + "/appeals");
+  if(!res.ok) return;
 
-// APPEALS DECISION HANDLER
+  const appeals = await res.json();
+  const a = appeals.find(x => x.id === id);
+  if(!a) return;
 
-  async function decideAppeal(id, status){
+  document.getElementById("modalTitle").textContent = `Ban Appeal — ${a.username}`;
+  document.getElementById("modalContent").textContent =
+`ID: ${a.id}
+Username: ${a.username}
+Email: ${a.email || "—"}
+Status: ${a.status}
+Submitted: ${a.createdAt || a.submittedAt}
+
+Reason:
+${a.reason || "No reason provided"}
+`;
+  document.getElementById("modal").style.display = "flex";
+}
+
+/* Accept / Deny appeal */
+async function decideAppeal(id, status){
   if(!confirm(`Mark this appeal as ${status.toUpperCase()}?`)) return;
 
   const res = await fetch(`${API}/appeals/${id}/decision`, {
@@ -474,13 +496,29 @@ async function haPrompt(){
   });
 
   if(res.ok){
-    if(status === "accepted") await fetch(`${API}/appeals/${id}/unban`, { method:"POST" });
+    if(status === "accepted"){
+      await fetch(`${API}/appeals/${id}/unban`, { method:"POST" });
+    }
     alert("Decision saved.");
     loadAppeals();
+  }else{
+    alert("Failed to save decision.");
   }
 }
 
-  
+/* Delete appeal */
+async function deleteAppeal(id){
+  if(!confirm("❌ Permanently delete this appeal?")) return;
+
+  const res = await fetch(`${API}/appeals/${id}`, { method:"DELETE" });
+  if(res.ok){
+    alert("Appeal deleted.");
+    loadAppeals();
+  } else {
+    alert("Failed to delete appeal.");
+  }
+}
+
 /* ========== APPLICATIONS ========== */
 async function loadApps(){
   const res = await fetch(API + "/applications");
@@ -579,7 +617,6 @@ function renderRoleBadge(roleRaw){
   let cls = "role-user";
   let label = role;
 
-  // Support both new names and legacy short codes
   if(role === "Head Administrator" || role === "HA"){ cls = "role-ha"; label = "Head Administrator"; }
   else if(role === "Internal Affairs"){ cls = "role-ia"; }
   else if(role === "Administration"){ cls = "role-admin"; }
@@ -596,7 +633,6 @@ function renderRoleBadge(roleRaw){
 function buildRoleSelect(roleRaw, userId){
   let current = (roleRaw || "User").trim();
 
-  // Normalize legacy values
   if(current === "HA") current = "Head Administrator";
   else if(current.toLowerCase() === "staff") current = "Staff";
   else if(current.toLowerCase() === "user") current = "User";
@@ -724,24 +760,22 @@ function copyHwid(hwid){
   }
 }
 
-// FORUM RESTRICTION / MODERATION
 /* ========== FORUM USER MODERATION ========== */
-
-/* Load forum users into table */
 async function loadForumUsers(){
   try {
     const res = await fetch(`${API}/users`);
     const users = await res.json();
 
-    const staffRole = user.role || "User"; // logged-in staff rank
-    const isHA = staffRole === "Head Administrator"; // Only HA can ban users
+    const staffRole = user?.role || "User";
+    const isHA = staffRole === "Head Administrator";
 
-    forumUsers.innerHTML = "";
+    const tbody = document.getElementById("forumUsers");
+    tbody.innerHTML = "";
 
     users.forEach(u => {
-      const isTargetHA = u.role === "Head Administrator"; // Prevent banning HAs
+      const isTargetHA = u.role === "Head Administrator";
 
-      forumUsers.innerHTML += `
+      tbody.innerHTML += `
         <tr>
           <td>${u.username}</td>
           <td>${u.email}</td>
@@ -750,19 +784,16 @@ async function loadForumUsers(){
             ${u.restricted ? "Restricted" : "Allowed to Post"}
           </td>
           <td>
-            <!-- Restrict Button -->
-            <button class="btn deny" onclick="toggleRestrict('${u.id}', ${u.restricted}, '${u.role}')">
+            <button class="btn deny" onclick="toggleRestrict('${u.id}', ${!!u.restricted}, '${u.role}')">
               ${u.restricted ? "Unrestrict" : "Restrict Posting"}
             </button>
 
-            <!-- Ban Button: Only Head Administrator and cannot target another HA -->
             ${isHA && !isTargetHA ? `
               <button class="btn delete" onclick="banUser('${u.id}')">
                 Ban User
               </button>
             ` : ""}
 
-            <!-- View Profile -->
             <button class="btn view" onclick="location.href='profile.html?user=${u.username}'">
               View Profile
             </button>
@@ -772,12 +803,13 @@ async function loadForumUsers(){
     });
   } catch (err) {
     console.error("Forum users failed to load:", err);
-    forumUsers.innerHTML = `<tr><td colspan="5" style="color:red;">Failed to load forum users.</td></tr>`;
+    document.getElementById("forumUsers").innerHTML =
+      `<tr><td colspan="5" style="color:red;">Failed to load forum users.</td></tr>`;
   }
 }
 
 async function toggleRestrict(id, current, targetRole){
-  const staffRole = user.role || "User"; // logged-in staff rank
+  const staffRole = user?.role || "User";
 
   const protectedRanks = [
     "Junior Administration",
@@ -797,14 +829,13 @@ async function toggleRestrict(id, current, targetRole){
     method:"PATCH",
     headers:{ "Content-Type":"application/json" },
     body:JSON.stringify({
-      userId: user.id,        // 👈 REQUIRED BY BACKEND
+      userId: user.id,
       restricted: !current
     })
   });
 
   loadForumUsers();
 }
- 
 </script>
 
 </body>
