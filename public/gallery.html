@@ -641,17 +641,31 @@
       renderGallery();
     }
 
-    // Upload permissions: must be in a department OR staff
-    function userCanUpload(){
-      if(!user) return false;
-      // Adjust keys depending on how you store them in Mongo
-      // Examples:
-      //  - user.department: "pd", "fire", etc.
-      //  - user.isStaff: true/false
-      const hasDept = !!user.department;
-      const isStaff = !!user.isStaff || (Array.isArray(user.roles) && user.roles.includes("staff"));
-      return hasDept || isStaff;
-    }
+// Upload permissions: must be staff OR have a non-user role
+function userCanUpload() {
+  if (!user) return false;
+
+  // Your backend uses "role" for both staff & departments
+  const staffRoles = [
+    "Head Administrator",
+    "Internal Affairs",
+    "Administration",
+    "Junior Administration",
+    "Senior Staff",
+    "Staff",
+    "Staff In Training"
+  ];
+
+  // staff?
+  const isStaff = staffRoles.includes(user.role);
+
+  // department member?
+  // If role is NOT "user" and NOT staff, then this user belongs to a department
+  const isDepartmentMember = user.role && user.role !== "user" && !isStaff;
+
+  return isStaff || isDepartmentMember;
+}
+
 
     function setupUploadSection(){
       if(!user){
