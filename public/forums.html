@@ -349,7 +349,7 @@ const STAFF_ROLES = [
   "Staff In Training"
 ];
 
-const shoreUser = JSON.parse(localStorage.getItem("shoreUser") || "null");
+let shoreUser = JSON.parse(localStorage.getItem("shoreUser") || "null");
 let acceptedDepartments = [];
 let canPost = false;
 let authorMap = {};
@@ -429,6 +429,28 @@ async function loadAccess() {
     const isStaff = STAFF_ROLES.includes(shoreUser.role);
     canPost = isStaff || acceptedDepartments.length > 0;
 
+// 🔒 Check if this user is restricted from forums
+if (shoreUser.restricted === true) {
+  canPost = false;
+
+  accessSub.textContent = "Your posting privileges are restricted.";
+  accessSummary.textContent = "You are currently not allowed to create threads or replies.";
+  accessBadges.innerHTML = `<span class="badge-access no">Posting Disabled</span>`;
+
+  newThreadBox.style.display = "none";
+  noAccessBox.innerHTML = `
+    <strong>Posting Disabled</strong>
+    <p style="font-size:.88rem;opacity:.82;margin-top:4px;">
+      Your account has been restricted from posting by ShoreRP Staff.
+      You may still read public threads, but thread creation and replies are disabled.
+    </p>
+  `;
+  noAccessBox.style.display = "block";
+
+  return; // ⛔ stop further access processing
+}
+
+    
     // Sub header
     if (isStaff && acceptedDepartments.length > 0) {
       accessSub.textContent = "You are staff and a member of at least one department.";
@@ -675,8 +697,25 @@ function startAutoRefresh() {
   }, 10000); // 10s poll
 }
 
+async function refreshUser() {
+  if (!shoreUser) return;
+
+  try {
+    const res = await fetch(`${API}/users/${shoreUser.id}`);
+    if (!res.ok) return;
+
+    const fresh = await res.json();
+    localStorage.setItem("shoreUser", JSON.stringify(fresh));
+    shoreUser = fresh; // overwrite local copy so restriction is live
+  } catch (err) {
+    console.warn("Failed to refresh user:", err);
+  }
+}
+
+  
 /* ---------- BOOTSTRAP ---------- */
 (async function init() {
+  if (shoreUser) await refreshUser(); // 🔁 Instant restriction sync
   await loadUsers();
   await loadAccess();
   await loadThreads(currentCategory, false);
