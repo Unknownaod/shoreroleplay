@@ -630,8 +630,23 @@ function isUserStaff() {
   return STAFF_ROLES.includes(user.role);
 }
 
+/* Map any department string/code to a canonical id ("pd","sp","fire",...) */
+function mapDeptToId(raw) {
+  if (!raw) return null;
+  const n = String(raw).toLowerCase();
+
+  if (n === "pd"   || n.includes("police"))   return "pd";
+  if (n === "sd"   || n.includes("sheriff"))  return "sd";
+  if (n === "sp"   || n.includes("state"))    return "sp";
+  if (n === "fire" || n.includes("fire"))     return "fire";
+  if (n === "ems"  || n.includes("ems") || n.includes("medical")) return "ems";
+  if (n === "civ"  || n.includes("civilian") || n.includes("media")) return "civ";
+  if (n === "staff") return "staff";
+  return null;
+}
+
 /* ---------- FETCH USER'S ACCEPTED APPLICATIONS ---------- */
-let userDepartments = []; // dept IDs they are accepted into (e.g. "pd","fire")
+let userDepartments = []; // canonical dept IDs they are accepted into (e.g. "pd","sp")
 
 async function loadAcceptedDepartments() {
   userDepartments = [];
@@ -645,7 +660,8 @@ async function loadAcceptedDepartments() {
 
     userDepartments = list
       .filter(a => a && a.status === "accepted" && a.department)
-      .map(a => String(a.department).toLowerCase());
+      .map(a => mapDeptToId(a.department))
+      .filter(Boolean);
 
     userDepartments = [...new Set(userDepartments)];
   } catch (err) {
@@ -693,7 +709,7 @@ function setActiveDept(id) {
 /* ---------- UPLOAD PERMISSION ---------- */
 function userCanUploadHere() {
   if (!user) return false;
-  if (isUserStaff()) return true;
+  if (isUserStaff()) return true; // staff can always post
   return userDepartments.includes(activeDeptId);
 }
 
@@ -764,9 +780,7 @@ async function fetchGallery() {
 function renderGallery() {
   if (!galleryGridEl || !galleryCountEl) return;
 
-  const items = galleryData.filter(i =>
-    String(i?.department || "").toLowerCase() === activeDeptId
-  );
+  const items = galleryData.filter(item => mapDeptToId(item?.department) === activeDeptId);
 
   galleryGridEl.innerHTML = "";
 
@@ -778,10 +792,11 @@ function renderGallery() {
     items.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
     items.forEach(item => {
-      const deptMatch = departments.find(d => d.id === item.department);
-      const badge = deptMatch ? deptMatch.badge : "";
+      const deptId = mapDeptToId(item.department) || activeDeptId;
+      const dept   = departments.find(d => d.id === deptId);
+      const badge  = dept ? dept.badge : "";
       const caption = item.caption || "Untitled";
-      const author = item.author || "Unknown";
+      const author  = item.author || "Unknown";
 
       let dateLabel = "";
       if (item.createdAt) {
@@ -868,6 +883,8 @@ if (uploadFormEl) {
 (async () => {
   await loadAcceptedDepartments();
   if (userDepartments.length > 0) {
+    // If user has PD + SP, they'll default to the first accepted one,
+    // but they can switch tabs and post in any of them.
     activeDeptId = userDepartments[0];
   }
   renderTabs();
@@ -876,6 +893,7 @@ if (uploadFormEl) {
   fetchGallery();
 })();
 </script>
+
 
 </body>
 </html>
