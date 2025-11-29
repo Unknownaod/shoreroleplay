@@ -342,7 +342,7 @@ function logout(){
 /* Always show login box, but real access gated by staff password */
 document.getElementById("loginBox").style.display = "block";
 
-/* STAFF AUTH → /staff-auth */
+ /// STAFF AUTH 
 async function login(){
   const password = document.getElementById("staffPass").value.trim();
   const res = await fetch(API + "/staff-auth", {
@@ -354,11 +354,18 @@ async function login(){
   if(res.ok){
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("panel").style.display = "block";
+
+    // ⭐ ONLY SHOW BAN APPEALS TAB AFTER STAFF PANEL IS UNLOCKED
+    if (user.role === "Head Administrator") {
+      document.getElementById("appealsTab").style.display = "inline-block";
+    }
+
     loadApps();
-  }else{
+  } else {
     document.getElementById("error").textContent = "❌ Invalid Credential";
   }
 }
+
 
 /* ========== TABS ========== */
 function switchTab(tab){
@@ -403,11 +410,6 @@ document.querySelector(`.tab:nth-child(${
     loadApps();
   }
 }
-
-
-if (user.role === "Head Administrator") {
-  document.getElementById("appealsTab").style.display = "inline-block";
-}  
 
 /* ========== HA PASSWORD PROMPT → /ha-auth ========== */
 async function haPrompt(){
