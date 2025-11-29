@@ -65,80 +65,90 @@ main{
 }
 
 /* -------------------------------------------
-   HEAD ADMIN — BLACK BOX + PURPLE LETTERS + CYAN OUTLINE
-   ANGLED TEXT + REAL LIGHTNING
+   HEAD ADMIN — FINAL FORM
+   BLACK BOX + PURPLE TEXT + CYAN EDGE
+   ITALIC + BIGGER + VERTICAL LIGHTNING STRIKE
 ------------------------------------------- */
 .ha {
   position: relative;
   display: inline-block;
-  padding: 3px 12px 5px;
-  background: #000;                 /* PURE BLACK */
-  border-radius: 4px;
-  overflow: hidden;
-  transform: skewX(-6deg);          /* slight tilt */
-  text-transform: uppercase;
 
-  /* PURPLE TEXT WITH CYAN EDGE */
-  font-weight: 900;                 /* BOLDER TEXT */
-  font-size: .78rem;
-  letter-spacing: .6px;
-  color: #a843ff;                   /* heavy purple */
+  /* TEXT SPECS */
+  font-style: italic;            /* NEW — italic tilt */
+  font-weight: 1000;             /* ULTRA bold */
+  font-size: .92rem;             /* slightly bigger */
+  letter-spacing: .8px;
+
+  padding: 4px 14px 6px;
+  background: #000;              /* PURE VOID BLACK */
+  border-radius: 5px;
+  transform: skewX(-6deg);       /* angled badge still */
+  text-transform: uppercase;
+  overflow: hidden;
+
+  /* PURPLE TEXT WITH CYAN MICRO OUTLINE */
+  color: #b14dff;                /* powerful purple */
   text-shadow:
-    0 0 1px #00eaff,
-    0 0 3px #00eaff,
-    0 0 6px #00eaff;                /* micro cyan halo */
+    0 0 2px #00eaff,
+    0 0 5px #00eaff,
+    0 0 10px #00eaff;            /* neon cyan edge */
 }
 
-/* *********************************
-   REAL ELECTRIC LIGHTNING LAYER
-********************************* */
+/* ****************************************
+   VERTICAL LIGHTNING STRIKE (REALISTIC)
+**************************************** */
 .ha .bolt {
   position: absolute;
-  bottom: -2px;
-  left: -200%;
-  height: 200%;
-  width: 300%;
-  opacity: .75;
-  filter: drop-shadow(0 0 6px #00eaff) brightness(1.6);
-  animation: boltMove 1.8s linear infinite;
+  top: -220%;                    /* starts HIGH above */
+  left: 50%;
+  transform: translateX(-50%);
+  height: 300%;
+  width: 4px;
+
+  stroke: #00eaff;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 10px #00eaff);
+  opacity: .9;
+
+  animation: boltDrop 1.4s ease-in-out infinite;
   pointer-events: none;
   mix-blend-mode: screen;
 }
 
-/* Lightning Motion */
-@keyframes boltMove {
-  0%   { transform: translateX(-50%) skewX(-8deg); opacity: .4; }
-  30%  { opacity: 1; }
-  55%  { transform: translateX(20%) skewX(6deg); opacity: .55; }
-  100% { transform: translateX(150%) skewX(-12deg); opacity: .4; }
+/* Lightning falls DOWN like a real strike */
+@keyframes boltDrop {
+  0%   { transform: translate(-50%, -200%) scaleX(.9) skewX(-4deg); opacity: 0; }
+  10%  { opacity: 1; }
+  40%  { transform: translate(-50%, 0%) scaleX(1) skewX(4deg); }
+  60%  { opacity: .9; }
+  80%  { opacity: .4; }
+  100% { transform: translate(-50%, 200%) scaleX(.7) skewX(-6deg); opacity: 0; }
 }
 
-/* OCCASIONAL FLASH POP EFFECT */
+/* Flash pulse after lightning hits */
 .ha::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,255,255,.12);
+  background: rgba(0,255,255,.18);
   opacity: 0;
   pointer-events: none;
-  animation: flashPop 2.8s infinite;
+  animation: flashPop 2.1s infinite;
 }
 
 @keyframes flashPop {
-  0%, 88%, 100% { opacity: 0; }
-  89% { opacity: .25; }
-  90% { opacity: 0; } /* micro flash like real electricity */
+  0%, 86%, 100% { opacity: 0; }
+  87% { opacity: .28; }
+  88% { opacity: 0; }
 }
 
-/* Remove inherited staff badge padding from HA */
+/* Correct inherited staff badge padding */
 .ha.staff-badge {
   padding: 3px 12px 5px !important;
   border-radius: 4px !important;
   background: #000 !important;
   border: none !important;
 }
-
-
 
 /* OTHER ROLES (leave as-is) */
 .ia{background:#ff5050}
@@ -280,11 +290,26 @@ if (u.role === "Head Administrator") {
   sub.innerHTML = `
     Staff Member —
     <span class="staff-badge ha">
-      ${u.role}
-      <svg class="bolt" width="180" height="35" viewBox="0 0 180 35" preserveAspectRatio="none">
-        <polyline points="0,20 20,12 35,25 55,5 75,18 95,8 115,28 135,12 155,22 180,10"
-          fill="none" stroke="#00eaff" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round" />
+      <span class="ha-text">${u.role}</span>
+
+      <!-- ⚡ VERTICAL LIGHTNING STRIKE -->
+      <svg class="bolt" width="8" height="200" viewBox="0 0 8 200" preserveAspectRatio="none">
+        <polyline 
+          points="
+            4,0
+            2,16
+            5,32
+            3,55
+            7,78
+            4,102
+            6,128
+            3,150
+            7,172
+            4,200
+          "
+          fill="none" stroke="#00eaff" stroke-width="2.4"
+          stroke-linecap="round" stroke-linejoin="round"
+        />
       </svg>
     </span>
   `;
@@ -296,6 +321,7 @@ if (u.role === "Head Administrator") {
 } else {
   sub.textContent = "Shore Roleplay Member";
 }
+
 
 
 
