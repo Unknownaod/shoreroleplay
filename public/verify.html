@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shore Roleplay | Email Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- GOOGLE FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:"Inter",sans-serif; }
+    body {
+      background:#070b12 url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+      color:#d7dde7;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      padding:20px;
+    }
+
+    #box {
+      width:100%;
+      max-width:600px;
+      background:#0d1119;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      box-shadow:0 0 35px rgba(0,0,0,.55);
+      padding:45px 40px;
+      text-align:center;
+      animation:fade 0.4s ease-in-out;
+    }
+
+    @keyframes fade { from{opacity:0;transform:translateY(15px);} to{opacity:1;transform:translateY(0);} }
+
+    img.logo { width:165px; margin-bottom:25px; filter:drop-shadow(0 0 12px rgba(78,163,255,.55)); }
+    h1 { font-size:28px; margin-bottom:12px; }
+    p { opacity:.85; line-height:1.6; }
+
+    .status-good {
+      color:#27ae60;
+      border-left:4px solid #27ae60;
+      background:rgba(39,174,96,.15);
+      padding:16px;
+      margin:24px 0;
+      border-radius:6px;
+      font-size:15px;
+    }
+
+    .status-bad {
+      color:#e74c3c;
+      border-left:4px solid #e74c3c;
+      background:rgba(231,76,60,.15);
+      padding:16px;
+      margin:24px 0;
+      border-radius:6px;
+      font-size:15px;
+    }
+
+    a.btn {
+      display:inline-block;
+      margin-top:25px;
+      padding:16px 42px;
+      font-size:16px;
+      font-weight:700;
+      color:white;
+      text-decoration:none;
+      border-radius:8px;
+      background:#4EA3FF;
+      transition:.25s;
+    }
+    a.btn:hover { opacity:.85; }
+  </style>
+</head>
+<body>
+
+<div id="box">
+  <img class="logo" src="https://i.imgur.com/P15LI6g.png">
+
+  <h1>Verifying Your Account...</h1>
+  <p>Please wait while we validate your email token.</p>
+
+  <div id="status" style="margin-top:30px;font-size:15px;opacity:.75;">Contacting server...</div>
+</div>
+
+<script>
+const API = "https://shoreroleplay.onrender.com";
+const params = new URLSearchParams(window.location.search);
+const token = params.get("token");
+const box = document.getElementById("box");
+const status = document.getElementById("status");
+
+if (!token) {
+  status.outerHTML = `<div class="status-bad">Invalid verification link.</div>`;
+} else {
+  fetch(`${API}/users/verify/${token}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        box.innerHTML = `
+          <img class="logo" src="https://i.imgur.com/P15LI6g.png">
+          <h1 style="color:#27ae60">Account Verified</h1>
+          <div class="status-good">Your email has been successfully verified!</div>
+          <p>Your account is now active. You can now log in and access the Shore Roleplay systems.</p>
+          <a class="btn" href="login.html">Proceed to Login</a>
+        `;
+      } else {
+        status.outerHTML = `
+          <div class="status-bad">
+            ${data.error || "Verification failed. Token invalid or expired."}
+          </div>
+        `;
+      }
+    })
+    .catch(() => {
+      status.outerHTML = `<div class="status-bad">Server error. Please try again later.</div>`;
+    });
+}
+</script>
+
+</body>
+</html>
