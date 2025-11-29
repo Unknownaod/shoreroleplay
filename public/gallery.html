@@ -558,7 +558,7 @@
     </section>
   </main>
 
-  <script>
+<script>
 const API = "https://shoreroleplay.onrender.com";
 
 /* ========== LOGIN STATE HANDLER ========== */
@@ -631,21 +631,25 @@ function isUserStaff() {
 }
 
 /* ---------- FETCH USER'S ACCEPTED APPLICATIONS ---------- */
-let userDepartments = []; // dept IDs they are accepted into
+let userDepartments = []; // dept IDs they are accepted into (e.g. "pd","fire")
 
 async function loadAcceptedDepartments() {
+  userDepartments = [];
   if (!user) return;
 
   try {
-    const res = await fetch(`${API}/applications?userId=${user.id}`);
+    const res = await fetch(`${API}/applications?userId=${encodeURIComponent(user.id)}`);
+    if (!res.ok) throw new Error("Failed to load applications");
     const apps = await res.json();
+    const list = Array.isArray(apps) ? apps : [];
 
-    userDepartments = apps
-      .filter(a => a.status === "accepted" && a.department)
-      .map(a => a.department.toLowerCase());
+    userDepartments = list
+      .filter(a => a && a.status === "accepted" && a.department)
+      .map(a => String(a.department).toLowerCase());
 
     userDepartments = [...new Set(userDepartments)];
-  } catch {
+  } catch (err) {
+    console.error("loadAcceptedDepartments error:", err);
     userDepartments = [];
   }
 }
@@ -654,6 +658,7 @@ async function loadAcceptedDepartments() {
 let activeDeptId = departments[0].id;
 
 function renderTabs() {
+  if (!deptTabsEl) return;
   deptTabsEl.innerHTML = "";
   departments.forEach(d => {
     const btn = document.createElement("button");
@@ -667,11 +672,20 @@ function renderTabs() {
 
 function setActiveDept(id) {
   activeDeptId = id;
-  [...deptTabsEl.querySelectorAll(".tab-btn")].forEach(btn =>
-    btn.classList.toggle("active", btn.dataset.deptId === id)
-  );
-  const dept = departments.find(d => d.id === id);
-  deptSummaryEl.textContent = `${dept.name} • Public Media Wall`;
+
+  if (deptTabsEl) {
+    [...deptTabsEl.querySelectorAll(".tab-btn")].forEach(btn =>
+      btn.classList.toggle("active", btn.dataset.deptId === id)
+    );
+  }
+
+  if (deptSummaryEl) {
+    const dept = departments.find(d => d.id === id);
+    deptSummaryEl.textContent = dept
+      ? `${dept.name} • Public Media Wall`
+      : "Public Media Wall";
+  }
+
   renderGallery();
   setupUploadSection();
 }
@@ -685,46 +699,75 @@ function userCanUploadHere() {
 
 /* ---------- UPLOAD SECTION ---------- */
 function setupUploadSection() {
+  if (!uploadNoticeEl || !uploadFormEl) return;
+
   if (!user) {
     uploadNoticeEl.style.display = "flex";
     uploadFormEl.style.display = "none";
-    uploadNoticeTextEl.textContent = "You must be logged in to post.";
+    if (uploadNoticeTextEl) {
+      uploadNoticeTextEl.textContent = "You must be logged in to post.";
+    }
     return;
   }
 
   if (!userCanUploadHere()) {
     uploadNoticeEl.style.display = "flex";
     uploadFormEl.style.display = "none";
-    uploadNoticeTextEl.textContent = "You must be accepted into this department to post here.";
+    if (uploadNoticeTextEl) {
+      uploadNoticeTextEl.textContent = "You must be accepted into this department to post here.";
+    }
     return;
   }
 
   uploadNoticeEl.style.display = "none";
   uploadFormEl.style.display = "block";
 
-  uploadDeptSelect.innerHTML = "";
-  (isUserStaff() ? departments : departments.filter(d => userDepartments.includes(d.id)))
-    .forEach(d => uploadDeptSelect.append(new Option(d.name, d.id)));
+  if (uploadDeptSelect) {
+    uploadDeptSelect.innerHTML = "";
 
-  uploadDeptSelect.disabled = !isUserStaff();
-  uploadMetaEl.textContent = `Posting as ${user.username}`;
+    const optionsSource = isUserStaff()
+      ? departments
+      : departments.filter(d => userDepartments.includes(d.id));
+
+    optionsSource.forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d.id;
+      opt.textContent = d.name;
+      uploadDeptSelect.appendChild(opt);
+    });
+
+    uploadDeptSelect.disabled = !isUserStaff();
+  }
+
+  if (uploadMetaEl) {
+    uploadMetaEl.textContent = `Posting as ${user.username}`;
+  }
 }
 
 /* ---------- GALLERY ---------- */
 let galleryData = [];
 
 async function fetchGallery() {
+  galleryData = [];
   try {
     const res = await fetch(`${API}/gallery`);
-    galleryData = await res.json();
-  } catch {
+    if (!res.ok) throw new Error("Failed to load gallery");
+    const data = await res.json();
+    galleryData = Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : []);
+  } catch (err) {
+    console.error("fetchGallery error:", err);
     galleryData = [];
   }
   renderGallery();
 }
 
 function renderGallery() {
-  const items = galleryData.filter(i => (i.department || "").toLowerCase() === activeDeptId);
+  if (!galleryGridEl || !galleryCountEl) return;
+
+  const items = galleryData.filter(i =>
+    String(i?.department || "").toLowerCase() === activeDeptId
+  );
+
   galleryGridEl.innerHTML = "";
 
   if (!items.length) {
@@ -732,74 +775,107 @@ function renderGallery() {
       <div class="empty-state">No photos yet for this department.</div>
     `;
   } else {
-    items.sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0));
+    items.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
     items.forEach(item => {
+      const deptMatch = departments.find(d => d.id === item.department);
+      const badge = deptMatch ? deptMatch.badge : "";
+      const caption = item.caption || "Untitled";
+      const author = item.author || "Unknown";
+
+      let dateLabel = "";
+      if (item.createdAt) {
+        const d = new Date(item.createdAt);
+        if (!isNaN(d.getTime())) {
+          dateLabel = d.toLocaleDateString();
+        }
+      }
+
       galleryGridEl.innerHTML += `
         <article class="gallery-item">
           <div class="gallery-img-wrap">
             <img src="${item.imageUrl}" onerror="this.src='https://i.imgur.com/u7H5RkP.png';">
-            <span class="gallery-chip">${departments.find(d => d.id === item.department)?.badge||""}</span>
+            <span class="gallery-chip">${badge}</span>
           </div>
           <div class="gallery-body">
-            <div class="gallery-caption">${item.caption || "Untitled"}</div>
+            <div class="gallery-caption">${caption}</div>
             <div class="gallery-meta-line">
-              <span>${item.author || "Unknown"}</span>
-              <span>${new Date(item.createdAt).toLocaleDateString()}</span>
+              <span>${author}</span>
+              <span>${dateLabel}</span>
             </div>
           </div>
         </article>`;
     });
   }
 
-  galleryCountEl.textContent = `${items.length} photo${items.length===1?"":"s"} in this department.`;
+  galleryCountEl.textContent =
+    `${items.length} photo${items.length === 1 ? "" : "s"} in this department.`;
 }
 
 /* ---------- UPLOAD HANDLER ---------- */
-uploadFormEl.addEventListener("submit", async e => {
-  e.preventDefault();
-  if (!userCanUploadHere()) return alert("You are not accepted in this department.");
+if (uploadFormEl) {
+  uploadFormEl.addEventListener("submit", async e => {
+    e.preventDefault();
 
-  const payload = {
-    department: uploadDeptSelect.value,
-    imageUrl: uploadUrlInput.value.trim(),
-    caption: uploadCaptionInput.value.trim(),
-    author: user.username
-  };
+    if (!userCanUploadHere()) {
+      alert("You are not accepted in this department.");
+      return;
+    }
 
-  if (!payload.imageUrl.startsWith("http")) return alert("Enter a valid image URL.");
+    if (!uploadDeptSelect || !uploadUrlInput || !uploadCaptionInput || !uploadBtn || !uploadMetaEl) {
+      console.error("Upload elements missing");
+      return;
+    }
 
-  uploadBtn.disabled = true;
-  uploadMetaEl.textContent = "Posting…";
+    const payload = {
+      department: uploadDeptSelect.value,
+      imageUrl: uploadUrlInput.value.trim(),
+      caption: uploadCaptionInput.value.trim(),
+      author: user.username
+    };
 
-  try {
-    const res = await fetch(`${API}/gallery`, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify(payload)
-    });
+    if (!payload.imageUrl || !payload.imageUrl.startsWith("http")) {
+      alert("Enter a valid image URL.");
+      return;
+    }
 
-    if (!res.ok) throw new Error();
-    uploadMetaEl.textContent = "Photo posted!";
-    uploadUrlInput.value = "";
-    uploadCaptionInput.value = "";
-    await fetchGallery();
-  } catch {
-    uploadMetaEl.textContent = "Upload failed.";
-  }
+    uploadBtn.disabled = true;
+    uploadMetaEl.textContent = "Posting…";
 
-  uploadBtn.disabled = false;
-});
+    try {
+      const res = await fetch(`${API}/gallery`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+      uploadMetaEl.textContent = "Photo posted!";
+      uploadUrlInput.value = "";
+      uploadCaptionInput.value = "";
+      await fetchGallery();
+    } catch (err) {
+      console.error("upload error:", err);
+      uploadMetaEl.textContent = "Upload failed.";
+      alert("Failed to upload photo. Check console / backend logs.");
+    } finally {
+      uploadBtn.disabled = false;
+    }
+  });
+}
 
 /* ---------- INIT ---------- */
 (async () => {
   await loadAcceptedDepartments();
-  if (userDepartments.length > 0) activeDeptId = userDepartments[0];
+  if (userDepartments.length > 0) {
+    activeDeptId = userDepartments[0];
+  }
   renderTabs();
   setActiveDept(activeDeptId);
   setupUploadSection();
   fetchGallery();
 })();
+</script>
 
-  </script>
 </body>
 </html>
