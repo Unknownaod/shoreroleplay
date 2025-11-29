@@ -67,70 +67,80 @@ main{
 /* ------------------------------
    HEAD ADMINISTRATOR TAG
    ------------------------------ */
-/* HEAD ADMINISTRATOR — PURPLE ENERGY BADGE */
 .ha {
   position: relative;
   display: inline-block;
-  padding: 8px 16px;
+  padding: 8px 18px;
   font-weight: 700;
   font-size: .85rem;
-  color: #8efaff; /* cyan inner glow text */
-  background: linear-gradient(145deg, #1b002b, #33004d);
-  border-radius: 10px;
-  border: 2px solid #56f3ff; /* cyan outline */
-  text-shadow:
-    0 0 6px #00faff,
-    0 0 14px #00eaff,
-    0 0 32px #00eaff; /* cyan glow around letters */
+  letter-spacing: .4px;
+  border-radius: 12px;
 
+  /* TEXT */
+  color: #affcff; /* cyan glow text */
+  text-shadow:
+    0 0 4px #00eaff,
+    0 0 8px #00eaff,
+    0 0 18px #00eaff;
+
+  /* PURPLE BADGE BACKGROUND */
+  background: linear-gradient(145deg, #200037, #3c0070);
+
+  /* CYAN BORDER */
+  border: 2px solid #43f3ff;
+
+  /* OUTER + INNER GLOW */
   box-shadow:
-    0 0 12px rgba(87,0,255,.6),
-    0 0 26px rgba(87,0,255,.4),
-    inset 0 0 14px rgba(58,0,128,.6); /* purple interior glow */
+    0 0 8px rgba(0,255,255,.7),
+    0 0 18px rgba(0,255,255,.6),
+    inset 0 0 18px rgba(115,0,255,.45);
 
   overflow: hidden;
-  animation: haPulse 2.8s ease-in-out infinite;
+  animation: haPulse 2.4s ease-in-out infinite;
 }
 
-/* Purple shimmer wave */
+/* PURPLE ENERGY WAVE */
 .ha::before {
   content: "";
   position: absolute;
-  top: 0;left: -120%;
-  width: 200%;
-  height: 100%;
+  inset: 0;
+  left: -150%;
+  width: 250%;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(173,0,255,.5) 50%,
+    rgba(193,0,255,.45) 50%,
     transparent 100%
   );
-  filter: blur(6px);
-  animation: haWave 4.4s linear infinite;
+  filter: blur(10px);
+  animation: haWave 3.8s linear infinite;
   pointer-events: none;
 }
 
-/* Cyan outline flicker pulse */
+/* BORDER / GLOW PULSE */
 @keyframes haPulse {
   0% {
     border-color: #00eaff;
     box-shadow:
-      0 0 8px #8e2dfc,
-      0 0 18px #5d00b9 inset;
+      0 0 8px rgba(0,255,255,.7),
+      0 0 22px rgba(0,255,255,.5),
+      inset 0 0 14px rgba(80,0,180,.55);
   }
   100% {
-    border-color: #82feff;
+    border-color: #8cfdff;
     box-shadow:
-      0 0 16px #c867ff,
-      0 0 32px #7a00ff inset;
+      0 0 14px rgba(0,255,255,.9),
+      0 0 32px rgba(0,255,255,.6),
+      inset 0 0 24px rgba(150,0,255,.55);
   }
 }
 
-/* Purple shimmer movement */
+/* WAVE MOVEMENT */
 @keyframes haWave {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(50%); }
+  0% { transform: translateX(-70%); }
+  100% { transform: translateX(70%); }
 }
+
 
 
 /* OTHER ROLES (leave as-is) */
