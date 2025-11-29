@@ -64,56 +64,85 @@ main{
   margin-left:6px;
 }
 
-/* ===============================
-   HEAD ADMIN BADGE — FINAL VERSION
-=============================== */
+/* ================================================
+   HEAD ADMIN BADGE — FINAL BUILD
+   • Small black badge
+   • Thick purple text
+   • Sharp cyan outline (NOT glow)
+   • Italic + bold
+   • MULTIPLE forked white lightning strikes
+   • All bolts contained INSIDE badge
+================================================ */
 .ha {
   position: relative;
-  background: #000;
-  padding: 2px 8px;          /* SMALL BOX NOW */
-  border-radius: 3px;
   display: inline-block;
+
+  /* SIZE + LOOK */
+  padding: 2px 10px 3px;
+  background: #000;
+  border-radius: 4px;
   transform: skewX(-6deg);
-  font-style: italic;
-  font-weight: 900;
-  font-size: .85rem;
-  letter-spacing: .6px;
   text-transform: uppercase;
 
-  /* PURE PURPLE TEXT + CYAN OUTLINE ONLY */
-  color: #bb46ff;
+  /* TEXT STYLE */
+  font-style: italic;
+  font-weight: 1000;
+  font-size: .90rem;
+  letter-spacing: .9px;
+  color: #b14dff; /* deep purple */
+
+  /* CYAN EDGE — NOT A GLOW */
   text-shadow:
     -1px 0 #00eaff,
      1px 0 #00eaff,
      0 -1px #00eaff,
-     0 1px #00eaff; /* no glow — outline only */
+     0  1px #00eaff; /* razor outline */
+  
+  overflow: hidden; /* keeps lightning inside */
 }
 
-/* VERTICAL BOLT */
-.ha .bolt {
+/* ================================================
+   MULTI-BOLT SYSTEM
+================================================ */
+.ha svg {
   position: absolute;
-  top: -180%;             /* starts above the box */
-  left: 50%;
-  transform: translateX(-50%);
-  height: 260%;
-  width: 18px;            /* TINY — no box expansion */
-  stroke: white;
-  fill: none;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 6px white);
+  top: 0;
+  height: 100%;
+  width: 10px;
 
-  animation: boltFall 1.2s linear infinite;
+  stroke: #ffffff;               /* WHITE lightning */
+  stroke-width: 2.3;
+  filter: drop-shadow(0 0 5px #ffffff);
+  opacity: .9;
   pointer-events: none;
-  mix-blend-mode: screen;
+  mix-blend-mode: screen;        /* blends like real electricity */
 }
 
-/* Vertical electric movement */
-@keyframes boltFall {
-  0%   { transform: translate(-50%, -200%) }
-  20%  { opacity: 1 }
-  60%  { opacity: .7 }
-  100% { transform: translate(-50%, 200%); opacity: 0 }
+/* LEFT BOLT */
+.ha .bolt-1 { left: 25%; animation: strike1 .75s ease-in infinite; }
+/* CENTER */
+.ha .bolt-2 { left: 50%; animation: strike2 .95s ease-out infinite; }
+/* RIGHT */
+.ha .bolt-3 { left: 75%; animation: strike3 .85s ease-in-out infinite; }
+
+/* Bolt Animations */
+@keyframes strike1 {
+  0%   { transform: translateY(-120%); opacity: 0; }
+  25%  { opacity: 1; }
+  60%  { transform: translateY(0); }
+  100% { transform: translateY(120%); opacity: 0; }
+}
+@keyframes strike2 {
+  0%   { transform: translateY(-140%); opacity: 0; }
+  30%  { opacity: 1; }
+  65%  { transform: translateY(0); }
+  100% { transform: translateY(140%); opacity: 0; }
+}
+@keyframes strike3 {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  20%  { opacity: 1; }
+  55%  { transform: translateY(0); }
+  100% { transform: translateY(100%); opacity: 0; }
 }
 
 
@@ -258,13 +287,22 @@ if (u.role === "Head Administrator") {
   sub.innerHTML = `
     Staff Member —
     <span class="ha">
-      ${u.role}
+      <span class="ha-text">${u.role}</span>
 
-      <!-- ⚡ VERTICAL MULTI-STRIKE -->
-      <svg class="bolt">
-        <polyline points="6,0 6,40 4,65 6,90 3,120 6,160" />
-        <polyline points="12,0 10,50 14,80 11,130 15,170" />
-        <polyline points="2,0 3,60 1,100 4,150" />
+      <!-- ⚡ VERTICAL MULTI-STRIKE (FINAL) -->
+      <svg class="bolt bolt-1" viewBox="0 0 20 200" preserveAspectRatio="none">
+        <polyline points="10,0 8,35 12,70 9,110 13,150 10,200" />
+        <polyline points="10,70 4,95 8,130" />
+      </svg>
+
+      <svg class="bolt bolt-2" viewBox="0 0 20 200" preserveAspectRatio="none">
+        <polyline points="10,0 12,45 7,90 14,135 9,185 10,200" />
+        <polyline points="10,90 16,115 12,145" />
+      </svg>
+
+      <svg class="bolt bolt-3" viewBox="0 0 20 200" preserveAspectRatio="none">
+        <polyline points="10,0 9,30 13,75 8,120 14,165 10,200" />
+        <polyline points="10,75 16,100 11,135" />
       </svg>
     </span>
   `;
@@ -273,6 +311,7 @@ if (u.role === "Head Administrator") {
 } else {
   sub.textContent = "Shore Roleplay Member";
 }
+
 
 
 
