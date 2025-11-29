@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Shore Roleplay | Account Banned</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:"Inter",sans-serif;
+      background:url("https://i.imgur.com/vbt5BPF.jpeg") center/cover fixed;
+      color:#fff;text-align:center;
+      display:flex;justify-content:center;align-items:center;
+      height:100vh;overflow:hidden;
+    }
+    .wrap{
+      background:rgba(0,0,0,.78);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter:blur(18px);
+      box-shadow:0 0 45px rgba(0,0,0,.75);
+      max-width:540px;width:90%;
+      padding:40px 36px;border-radius:14px;
+      animation:fadeIn .7s ease forwards;
+    }
+    h1{
+      font-size:2.1rem;font-weight:700;
+      text-shadow:0 0 18px rgba(255,0,0,.45);
+      margin-bottom:10px;color:#ff4b4b;
+    }
+    p{opacity:.85;font-size:1rem;line-height:1.45;margin-top:12px}
+    .badge{
+      display:inline-block;
+      background:rgba(255,0,0,.08);
+      border:1px solid rgba(255,0,0,.4);
+      color:#ff4b4b;font-weight:600;
+      padding:6px 14px;border-radius:999px;
+      margin-top:14px;font-size:.85rem;
+    }
+    .btn{
+      margin-top:26px;
+      padding:10px 20px;
+      border-radius:8px;border:none;
+      background:#4ea3ff;color:#fff;
+      font-size:.9rem;font-weight:600;cursor:pointer;
+      transition:.2s;
+    }
+    .btn:hover{filter:brightness(1.05)}
+    .footer{
+      margin-top:28px;opacity:.45;
+      font-size:.82rem;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>Account Banned</h1>
+  <span class="badge">Access Denied</span>
+
+  <p>Your Shore Roleplay account has been banned. You can no longer access the
+  website, create posts, or interact with any services tied to your account.</p>
+
+  <p>If you believe this was a mistake, or would like to request a review of this action,
+  you may submit a ban appeal.</p>
+
+  <button class="btn" onclick="location.href='appeal.html'">Submit Appeal</button>
+
+  <div class="footer">
+    © 2025 Shore Roleplay — Enforcement Division
+  </div>
+</div>
+
+</body>
+</html>
