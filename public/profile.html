@@ -64,30 +64,31 @@ main{
   margin-left:6px;
 }
 
-/* ------------------------------------
-   HEAD ADMIN — FINAL BADGE
-   Compact black badge + white text
-   3 vertical lightning strikes
------------------------------------- */
+/* HA BADGE WITH WHITE OUTLINE */
 .ha {
   position: relative;
   display: inline-block;
 
   background: #000;              /* solid black badge */
-  padding: 3px 12px 4px;         /* perfect badge height */
+  padding: 3px 12px 4px;
   margin-left: 6px;
   border-radius: 3px;
+
+  border: 2px solid #ffffff;     /* ⬅️ NEW WHITE OUTLINE */
+  box-shadow:
+    0 0 4px rgba(255,255,255,.45); /* soft light bleed */
+
   transform: skewX(-6deg);
   overflow: hidden;
-  z-index: 2;                    /* above lightning */
+  z-index: 2;
 
   font-style: italic;
   font-weight: 900;
   color: #ffffff;                /* white text */
-  font-size: .84rem;             /* same scale as other badges */
+  font-size: .84rem;
   letter-spacing: .7px;
   text-transform: uppercase;
-  line-height: 1;                /* fixes clipping */
+  line-height: 1;
 }
 
 /* ------------------------------------
