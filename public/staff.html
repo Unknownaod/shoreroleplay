@@ -321,6 +321,7 @@ footer{text-align:center;margin-top:65px;opacity:.45;font-size:.85rem}
 <footer>© Shore Roleplay</footer>
 
 <script>
+<script>
 const API = "https://shoreroleplay.onrender.com";
 let currentTab = 'pending';
 let haUnlocked = false;
@@ -337,11 +338,29 @@ const ROLE_OPTIONS = [
   "Head Administrator"
 ];
 
-/* ========== USER NAV STATE ========== */
+/* ========== LOAD USER SESSION ========== */
 const user = JSON.parse(localStorage.getItem("shoreUser"));
 const box = document.getElementById("userControls");
 
-if(!user){
+/* ---------- STAFF ROLE ENFORCEMENT GATE ---------- */
+const STAFF_ROLES = [
+  "Staff In Training",
+  "Staff",
+  "Senior Staff",
+  "Junior Administration",
+  "Administration",
+  "Internal Affairs",
+  "Head Administrator"
+];
+
+if (!user || !STAFF_ROLES.includes(user.role)) {
+  alert("🚫 Staff role required.");
+  location.href = "index.html";
+  throw new Error("Unauthorized access");
+}
+
+/* ---------- USER NAV DISPLAY ---------- */
+if (!user) {
   box.innerHTML = `
     <button class="user-btn" onclick="location.href='login.html'">Login</button>
     <button class="user-btn logout-btn" onclick="location.href='register.html'">Register</button>
@@ -360,7 +379,7 @@ function logout(){
   location.reload();
 }
 
-/* Always show login box, but real access is gated by staff password */
+/* ---------- STAFF PASSWORD LOGIN PROMPT ---------- */
 document.getElementById("loginBox").style.display = "block";
 
 /* STAFF AUTH → /staff-auth */
