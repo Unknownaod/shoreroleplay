@@ -628,17 +628,27 @@ async function decide(id, status){
 
 
 /* DELETE APPLICATION → /applications/:id */
-async function removeApp(id){
-  if(!confirm("Are you sure you want to permanently delete this application?")) return;
+async function deleteApplication(id) {
+  if (!confirm("Delete this application?")) return;
 
-  const res = await fetch(`${API}/applications/${id}`, { method:"DELETE" });
-  if(res.ok){
-    alert("Application deleted.");
-    loadApps();
+  const staff = JSON.parse(localStorage.getItem("shoreUser"));
+  if (!staff) return alert("Not logged in");
+
+  const res = await fetch(`${API}/applications/${id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: staff.id }) // REQUIRED
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    alert("Application deleted");
+    location.reload();
   } else {
-    alert("Delete failed.");
+    alert(data.error || "Failed to delete");
   }
 }
+
 
 /* ========== HA / USERS SECTION ========== */
 
