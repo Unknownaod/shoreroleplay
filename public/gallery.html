@@ -588,30 +588,30 @@ function logout() {
 
 /* ========== DEPARTMENT DEFINITIONS ========== */
 const departments = [
-  { id:"pd",   name:"Police Department",  badge:"PD"   },
-  { id:"sd",   name:"Sheriff's Office",   badge:"SO"   },
-  { id:"sp",   name:"State Patrol",       badge:"SP"   },
-  { id:"fire", name:"Fire & Rescue",      badge:"FIRE" },
-  { id:"ems",  name:"EMS",                badge:"EMS"  },
-  { id:"civ",  name:"Civilian Media",     badge:"CIV"  },
-  { id:"staff",name:"Staff & Media Team", badge:"STAFF"}
+  { id: "pd",   name: "Police Department",  badge: "PD"    },
+  { id: "sd",   name: "Sheriff's Office",   badge: "SO"    },
+  { id: "sp",   name: "State Patrol",       badge: "SP"    },
+  { id: "fire", name: "Fire & Rescue",      badge: "FIRE"  },
+  { id: "ems",  name: "EMS",                badge: "EMS"   },
+  { id: "civ",  name: "Civilian Media",     badge: "CIV"   },
+  { id: "staff",name: "Staff & Media Team", badge: "STAFF" }
 ];
 
 /* DOM references */
-const deptTabsEl = document.getElementById("deptTabs");
-const deptSummaryEl = document.getElementById("deptSummary");
-const galleryGridEl = document.getElementById("galleryGrid");
-const galleryCountEl = document.getElementById("galleryCount");
-const uploadNoticeEl = document.getElementById("uploadNotice");
-const uploadNoticeTextEl = document.getElementById("uploadNoticeText");
-const uploadFormEl = document.getElementById("uploadForm");
-const uploadDeptSelect = document.getElementById("uploadDept");
-const uploadUrlInput = document.getElementById("uploadUrl");
-const uploadCaptionInput = document.getElementById("uploadCaption");
-const uploadMetaEl = document.getElementById("uploadMeta");
-const uploadBtn = document.getElementById("uploadBtn");
+const deptTabsEl          = document.getElementById("deptTabs");
+const deptSummaryEl       = document.getElementById("deptSummary");
+const galleryGridEl       = document.getElementById("galleryGrid");
+const galleryCountEl      = document.getElementById("galleryCount");
+const uploadNoticeEl      = document.getElementById("uploadNotice");
+const uploadNoticeTextEl  = document.getElementById("uploadNoticeText");
+const uploadFormEl        = document.getElementById("uploadForm");
+const uploadDeptSelect    = document.getElementById("uploadDept");
+const uploadUrlInput      = document.getElementById("uploadUrl");
+const uploadCaptionInput  = document.getElementById("uploadCaption");
+const uploadMetaEl        = document.getElementById("uploadMeta");
+const uploadBtn           = document.getElementById("uploadBtn");
 
-/* STAFF ROLE DEFINITIONS */
+/* ========== STAFF ROLE DEFINITIONS ========== */
 const STAFF_ROLES = [
   "Head Administrator",
   "Internal Affairs",
@@ -622,10 +622,10 @@ const STAFF_ROLES = [
   "Staff In Training"
 ];
 
-/* Detect staff member */
+/* Proper staff detection */
 function isUserStaff() {
   if (!user) return false;
-  if (user.isStaff === true) return true;
+  if (user.isStaff === true) return true; // legacy flag
 
   if (Array.isArray(user.roles)) {
     return user.roles.some(r => STAFF_ROLES.includes(r));
@@ -634,28 +634,36 @@ function isUserStaff() {
   return STAFF_ROLES.includes(user.role);
 }
 
-/* Multi-department resolution */
+/* Department resolution (supports multi-department users, codes + names) */
 function getUserDepartmentIdsFromApi() {
   if (!user || !user.department) return [];
 
   let depts = user.department;
+
+  // Allow CSV string or single string
   if (typeof depts === "string") {
-    depts = depts.split(",").map(s => s.trim());
+    depts = depts.split(",").map(s => s.trim()).filter(Boolean);
   }
+
   if (!Array.isArray(depts)) return [];
 
-  const ids = [];
+  const deptIds = [];
+
   depts.forEach(d => {
-    const n = d.toLowerCase();
-    if (n.includes("police")) ids.push("pd");
-    else if (n.includes("sheriff")) ids.push("sd");
-    else if (n.includes("state")) ids.push("sp");
-    else if (n.includes("fire")) ids.push("fire");
-    else if (n.includes("ems") || n.includes("medical")) ids.push("ems");
-    else if (n.includes("civilian") || n.includes("media")) ids.push("civ");
+    if (!d) return;
+    const n = String(d).toLowerCase();
+
+    // Support codes and names
+    if (n === "pd" || n.includes("police"))              deptIds.push("pd");
+    else if (n === "sd" || n.includes("sheriff"))        deptIds.push("sd");
+    else if (n === "sp" || n.includes("state"))          deptIds.push("sp");
+    else if (n === "fire" || n.includes("fire & rescue") || n.includes("fire/ems") || n.includes("fire ")) deptIds.push("fire");
+    else if (n === "ems" || n.includes("ems") || n.includes("medical")) deptIds.push("ems");
+    else if (n === "civ" || n.includes("civilian") || n.includes("media")) deptIds.push("civ");
+    else if (n === "staff")                             deptIds.push("staff");
   });
 
-  return [...new Set(ids)];
+  return [...new Set(deptIds)]; // unique
 }
 
 /* DEFAULT TAB SELECTION */
@@ -663,196 +671,313 @@ let activeDeptId = departments[0].id;
 
 if (user && !isUserStaff() && user.department) {
   const owned = getUserDepartmentIdsFromApi();
-  if (owned.length > 0) activeDeptId = owned[0];
+  if (owned.length > 0) {
+    activeDeptId = owned[0]; // first dept the user belongs to
+  }
 }
 
-/* ========== GALLERY DATA ========== */
+/* ========== GALLERY DATA STORAGE ========== */
 let galleryData = [];
 
 /* Render department tabs */
 function renderTabs() {
+  if (!deptTabsEl) return;
   deptTabsEl.innerHTML = "";
   departments.forEach(dept => {
     const btn = document.createElement("button");
     btn.className = "tab-btn" + (dept.id === activeDeptId ? " active" : "");
     btn.dataset.deptId = dept.id;
-    btn.innerHTML = `${dept.name}<span class="tab-badge">${dept.badge}</span>`;
+    btn.innerHTML = `
+      ${dept.name}
+      <span class="tab-badge">${dept.badge}</span>
+    `;
     btn.addEventListener("click", () => setActiveDept(dept.id));
     deptTabsEl.appendChild(btn);
   });
 }
 
-/* Switch department */
+/* Activate selected department tab */
 function setActiveDept(id) {
   activeDeptId = id;
 
-  [...deptTabsEl.querySelectorAll(".tab-btn")].forEach(btn =>
-    btn.classList.toggle("active", btn.dataset.deptId === id)
-  );
+  if (deptTabsEl) {
+    Array.from(deptTabsEl.querySelectorAll(".tab-btn")).forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.deptId === id);
+    });
+  }
 
   const dept = departments.find(d => d.id === id);
-  deptSummaryEl.textContent = `${dept.name} • Public photo feed`;
+  if (dept && deptSummaryEl) {
+    deptSummaryEl.textContent = `${dept.name} • Public photo feed`;
+  }
 
   renderGallery();
   setupUploadSection();
 }
 
-/* PERMISSION CHECK */
+/* Multi-department aware upload permission */
 function userCanUpload() {
   if (!user) return false;
   if (isUserStaff()) return true;
 
-  const owned = getUserDepartmentIdsFromApi();
-  return owned.includes(activeDeptId);
+  const userDepts = getUserDepartmentIdsFromApi();
+  if (!userDepts.length) return false;
+
+  return userDepts.includes(activeDeptId);
 }
 
-/* Upload section logic */
+/* Upload UI control (multi-department version) */
 function setupUploadSection() {
+  if (!uploadNoticeEl || !uploadFormEl) return;
+
   if (!user) {
     uploadNoticeEl.style.display = "flex";
-    uploadFormEl.style.display = "none";
-    uploadNoticeTextEl.textContent = "You must be logged in to upload.";
+    uploadFormEl.style.display   = "none";
+    if (uploadNoticeTextEl) {
+      uploadNoticeTextEl.textContent =
+        "You must be logged in with a department or staff account to upload photos.";
+    }
     return;
   }
 
-  const staff = isUserStaff();
-  const owned = getUserDepartmentIdsFromApi();
+  const staff    = isUserStaff();
+  const userDepts = getUserDepartmentIdsFromApi();
 
-  if (!staff && owned.length === 0) {
+  // No dept assigned & not staff
+  if (!staff && userDepts.length === 0) {
     uploadNoticeEl.style.display = "flex";
-    uploadFormEl.style.display = "none";
-    uploadNoticeTextEl.textContent = "Your account is not assigned to a department.";
+    uploadFormEl.style.display   = "none";
+    if (uploadNoticeTextEl) {
+      uploadNoticeTextEl.textContent =
+        "Your account is not linked to any department or staff role.";
+    }
     return;
   }
 
-  if (!staff && !owned.includes(activeDeptId)) {
+  // Civilians trying to upload in a department they don't belong to
+  if (!staff && !userDepts.includes(activeDeptId)) {
     uploadNoticeEl.style.display = "flex";
-    uploadFormEl.style.display = "none";
-    uploadNoticeTextEl.innerHTML =
-      `You belong to <strong>${owned.join(", ")}</strong>. Switch to your department tab.`;
+    uploadFormEl.style.display   = "none";
+
+    const deptNames = userDepts
+      .map(id => departments.find(d => d.id === id)?.name || id)
+      .join(", ");
+
+    if (uploadNoticeTextEl) {
+      uploadNoticeTextEl.innerHTML =
+        `You belong to <strong>${deptNames}</strong>.<br>Switch to one of your departments to upload photos.`;
+    }
     return;
   }
 
+  /* Allowed */
   uploadNoticeEl.style.display = "none";
-  uploadFormEl.style.display = "block";
+  uploadFormEl.style.display   = "block";
+
+  if (!uploadDeptSelect) return;
   uploadDeptSelect.innerHTML = "";
 
+  // STAFF → show all departments
   if (staff) {
-    departments.forEach(d => uploadDeptSelect.add(new Option(d.name, d.id)));
-    uploadDeptSelect.disabled = false;
-  } else if (owned.length > 1) {
-    owned.forEach(id => {
-      const d = departments.find(dep => dep.id === id);
-      uploadDeptSelect.add(new Option(d.name, d.id));
+    departments.forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d.id;
+      opt.textContent = d.name;
+      uploadDeptSelect.appendChild(opt);
     });
     uploadDeptSelect.disabled = false;
-  } else {
-    const id = owned[0];
+  }
+  // MULTI-DEPT USER → show only their departments
+  else if (userDepts.length > 1) {
+    userDepts.forEach(id => {
+      const d = departments.find(dep => dep.id === id);
+      if (!d) return;
+      const opt = document.createElement("option");
+      opt.value = d.id;
+      opt.textContent = d.name;
+      uploadDeptSelect.appendChild(opt);
+    });
+    uploadDeptSelect.disabled = false;
+  }
+  // SINGLE-DEPT USER → lock to one dept
+  else {
+    const id = userDepts[0];
     const d = departments.find(dep => dep.id === id);
-    uploadDeptSelect.add(new Option(d.name, d.id));
-    uploadDeptSelect.value = id;
+    if (d) {
+      const opt = document.createElement("option");
+      opt.value = d.id;
+      opt.textContent = d.name;
+      uploadDeptSelect.appendChild(opt);
+      uploadDeptSelect.value = id;
+    }
     uploadDeptSelect.disabled = true;
   }
 
-  uploadMetaEl.textContent = `Posting as ${user.username}`;
+  if (uploadMetaEl) {
+    uploadMetaEl.textContent = `Posting as ${user.username}`;
+  }
 }
 
-/* Render gallery */
+/* Render gallery for an active department */
 function renderGallery() {
-  const items = galleryData.filter(i =>
-    i.department === activeDeptId || i.dept === activeDeptId || i.deptId === activeDeptId
-  );
+  if (!galleryGridEl || !galleryCountEl) return;
+
+  const deptId = activeDeptId;
+
+  const items = galleryData.filter(item => {
+    const rawDept = item.department || item.dept || item.deptId || "";
+    const n = String(rawDept).toLowerCase();
+
+    // Accept id or name from backend
+    if (rawDept === deptId) return true;
+
+    // Map names / codes to id like we do for user
+    if (deptId === "pd"   && (n === "pd"   || n.includes("police")))   return true;
+    if (deptId === "sd"   && (n === "sd"   || n.includes("sheriff")))  return true;
+    if (deptId === "sp"   && (n === "sp"   || n.includes("state")))    return true;
+    if (deptId === "fire" && (n === "fire" || n.includes("fire & rescue") || n.includes("fire/ems"))) return true;
+    if (deptId === "ems"  && (n === "ems"  || n.includes("ems") || n.includes("medical"))) return true;
+    if (deptId === "civ"  && (n === "civ"  || n.includes("civilian") || n.includes("media"))) return true;
+    if (deptId === "staff"&& (n === "staff")) return true;
+
+    return false;
+  });
 
   galleryGridEl.innerHTML = "";
 
   if (!items.length) {
     galleryGridEl.innerHTML = `
-      <div class="empty-state">No photos for this department yet.</div>`;
+      <div class="empty-state">
+        No photos have been shared for this department yet.<br/>
+        If you're a member of this department or staff, be the first to post!
+      </div>`;
   } else {
     items.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
     items.forEach(item => {
-      galleryGridEl.innerHTML += `
-        <article class="gallery-item">
-          <div class="gallery-img-wrap">
-            <img src="${item.imageUrl}" onerror="this.src='https://i.imgur.com/u7H5RkP.png';">
-            <span class="gallery-chip">${(departments.find(d => d.id === item.department) || {}).badge || ""}</span>
+      const rawDept = item.department || item.dept || item.deptId || deptId;
+      const dept    = departments.find(d => d.id === rawDept) || departments.find(d => d.id === deptId) || { badge: "" };
+
+      const caption = item.caption || "Untitled shot";
+      const author  = item.author  || "Unknown";
+      const dateStr = formatShortDate(item.createdAt);
+
+      const card = document.createElement("article");
+      card.className = "gallery-item";
+      card.innerHTML = `
+        <div class="gallery-img-wrap">
+          <img src="${item.imageUrl}" alt="${caption.replace(/"/g,"&quot;")}"
+               onerror="this.src='https://i.imgur.com/u7H5RkP.png';" />
+          <span class="gallery-chip">${dept.badge}</span>
+        </div>
+        <div class="gallery-body">
+          <div class="gallery-caption" title="${caption.replace(/"/g,"&quot;")}">
+            ${caption}
           </div>
-          <div class="gallery-body">
-            <div class="gallery-caption">${item.caption || "Untitled"}</div>
-            <div class="gallery-meta-line">
-              <span>${item.author || "Unknown"}</span>
-              <span>${formatShortDate(item.createdAt)}</span>
-            </div>
+          <div class="gallery-meta-line">
+            <span>${author}</span>
+            <span>${dateStr}</span>
           </div>
-        </article>`;
+        </div>
+      `;
+      galleryGridEl.appendChild(card);
     });
   }
 
   galleryCountEl.textContent = `${items.length} photo${items.length === 1 ? "" : "s"} in this department.`;
 }
 
-/* Date formatter */
+/* Date formatting */
 function formatShortDate(iso) {
   if (!iso) return "";
   const d = new Date(iso);
-  return isNaN(d) ? "" : d.toLocaleDateString(undefined, { month:"short", day:"numeric" });
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-/* Fetch gallery */
+/* Fetch gallery entries */
 async function fetchGallery() {
   try {
-    const res = await fetch(`${API}/gallery`);
+    const res = await fetch(API + "/gallery");
+    if (!res.ok) throw new Error("Failed to load gallery");
     const data = await res.json();
-    galleryData = Array.isArray(data) ? data : (data.items || []);
-  } catch {
+    if (Array.isArray(data)) {
+      galleryData = data;
+    } else if (Array.isArray(data.items)) {
+      galleryData = data.items;
+    } else {
+      galleryData = [];
+    }
+  } catch (err) {
+    console.error(err);
     galleryData = [];
   }
   renderGallery();
 }
 
 /* Upload handler */
-uploadFormEl.addEventListener("submit", async e => {
-  e.preventDefault();
-  if (!userCanUpload()) return alert("You cannot upload here.");
+if (uploadFormEl) {
+  uploadFormEl.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const payload = {
-    department: uploadDeptSelect.value,
-    imageUrl: uploadUrlInput.value.trim(),
-    caption: uploadCaptionInput.value.trim(),
-    author: user.username
-  };
+    if (!userCanUpload()) {
+      alert("You are not allowed to upload photos.");
+      return;
+    }
 
-  if (!payload.imageUrl.startsWith("http"))
-    return alert("Invalid image URL.");
+    const department = uploadDeptSelect ? uploadDeptSelect.value : activeDeptId;
+    const imageUrl   = uploadUrlInput.value.trim();
+    const caption    = uploadCaptionInput.value.trim();
 
-  uploadBtn.disabled = true;
-  uploadMetaEl.textContent = "Uploading...";
+    if (!imageUrl) {
+      alert("Please enter an image URL.");
+      return;
+    }
+    if (!imageUrl.startsWith("http")) {
+      alert("Invalid image URL.");
+      return;
+    }
 
-  try {
-    const res = await fetch(`${API}/gallery`, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify(payload)
-    });
+    if (uploadBtn) uploadBtn.disabled = true;
+    if (uploadMetaEl) uploadMetaEl.textContent = "Uploading…";
 
-    if (!res.ok) throw new Error();
+    try {
+      const payload = {
+        department,
+        imageUrl,
+        caption,
+        author: user.username
+      };
 
-    uploadMetaEl.textContent = "Photo posted.";
-    uploadUrlInput.value = "";
-    uploadCaptionInput.value = "";
-    await fetchGallery();
-  } catch {
-    uploadMetaEl.textContent = "Upload failed.";
-  }
+      const res = await fetch(API + "/gallery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-  uploadBtn.disabled = false;
-});
+      if (!res.ok) throw new Error("Upload failed");
+
+      if (uploadMetaEl) uploadMetaEl.textContent = "Photo posted successfully.";
+      uploadUrlInput.value = "";
+      uploadCaptionInput.value = "";
+
+      await fetchGallery();
+    } catch (err) {
+      console.error(err);
+      if (uploadMetaEl) uploadMetaEl.textContent = "Failed to upload. Try again.";
+      alert("Failed to upload photo. Check the console / backend logs.");
+    } finally {
+      if (uploadBtn) uploadBtn.disabled = false;
+    }
+  });
+}
 
 /* INIT */
 renderTabs();
 setActiveDept(activeDeptId);
 setupUploadSection();
 fetchGallery();
+
   </script>
 </body>
 </html>
