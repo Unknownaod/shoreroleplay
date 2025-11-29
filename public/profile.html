@@ -143,102 +143,134 @@ footer{text-align:center;margin-top:50px;opacity:.6;padding:20px;font-size:.9rem
 <footer>© 2025 Shore Roleplay — All Rights Reserved</footer>
 
 <script>
-const API="https://shoreroleplay.onrender.com";
-const params=new URLSearchParams(window.location.search);
-const profileUsername=params.get("user");
-if(!profileUsername) location.href="index.html";
+const API = "https://shoreroleplay.onrender.com";
+const params = new URLSearchParams(window.location.search);
+const profileUsername = params.get("user");
+if (!profileUsername) location.href = "index.html";
 
 /* STAFF ROLE COLORS */
-const roleColor={
-  "Head Administrator":"ha",
-  "Internal Affairs":"ia",
-  "Administration":"adm",
-  "Junior Administration":"jadm",
-  "Senior Staff":"sstaff",
-  "Staff":"staff",
-  "Staff In Training":"sit"
+const roleColor = {
+  "Head Administrator": "ha",
+  "Internal Affairs": "ia",
+  "Administration": "adm",
+  "Junior Administration": "jadm",
+  "Senior Staff": "sstaff",
+  "Staff": "staff",
+  "Staff In Training": "sit",
 };
 
 /* DEPT ICONS */
-const deptIcons={
-  "Police Department":"https://i.imgur.com/3Uhtndq.png",
-  "State Police":"https://i.imgur.com/24jUZlT.png",
-  "Sheriff's Office":"https://i.imgur.com/3Uhtndq.png",
-  "Fire Department":"https://i.imgur.com/cgD0S1f.png",
-  "Communications":"https://i.imgur.com/Saa1GSc.png",
-  "Civilian Operations":"https://i.imgur.com/bh07jkF.png"
+const deptIcons = {
+  "Police Department": "https://i.imgur.com/3Uhtndq.png",
+  "State Police": "https://i.imgur.com/24jUZlT.png",
+  "Sheriff's Office": "https://i.imgur.com/3Uhtndq.png",
+  "Fire Department": "https://i.imgur.com/cgD0S1f.png",
+  "Communications": "https://i.imgur.com/Saa1GSc.png",
+  "Civilian Operations": "https://i.imgur.com/bh07jkF.png",
 };
 
-const ADMIN_ROLES=["Head Administrator","Internal Affairs","Administration"];
+const ADMIN_ROLES = [
+  "Head Administrator",
+  "Internal Affairs",
+  "Administration",
+];
 
-async function loadProfile(){
-  const users=await fetch(API+"/users").then(r=>r.json());
-  const u=users.find(x=>x.username.toLowerCase()===profileUsername.toLowerCase());
-  if(!u){document.getElementById("username").textContent="User Not Found";return;}
+/* ============================================
+   LOAD PROFILE
+============================================ */
+async function loadProfile() {
+  const users = await fetch(`${API}/users`).then((r) => r.json());
+  const u = users.find(
+    (x) => x.username.toLowerCase() === profileUsername.toLowerCase()
+  );
 
-  /* username */
-  document.getElementById("username").textContent=u.username;
+  if (!u) {
+    document.getElementById("username").textContent = "User Not Found";
+    return;
+  }
+
+  /* USERNAME */
+  document.getElementById("username").textContent = u.username;
 
   /* STAFF BADGE OR NORMAL */
-  const sub=document.getElementById("subtitle");
-  if(u.role!=="user"){
-    sub.innerHTML=`Staff Member — <span class="staff-badge ${roleColor[u.role]}">${u.role}</span>`;
-  }else sub.textContent="Shore Roleplay Member";
+  const sub = document.getElementById("subtitle");
+  if (u.role !== "user") {
+    sub.innerHTML = `Staff Member — <span class="staff-badge ${roleColor[u.role]}">${u.role}</span>`;
+  } else {
+    sub.textContent = "Shore Roleplay Member";
+  }
 
   /* BIO */
-  document.getElementById("bio").textContent=u.bio||"";
+  document.getElementById("bio").textContent = u.bio || "";
 
   /* PROFILE PICTURE */
-  const pfp=document.getElementById("pfp");
-  if(u.pfp){
-    pfp.innerHTML=`<img src="${u.pfp}">`;
+  const pfp = document.getElementById("pfp");
+  if (u.pfp) {
+    pfp.innerHTML = `<img src="${u.pfp}">`;
   } else {
-    /* initial avatar */
-    const letter=u.username[0].toUpperCase();
-    pfp.textContent=letter;
+    const letter = u.username[0].toUpperCase();
+    pfp.textContent = letter;
   }
 
   /* ACCOUNT INFO */
-  document.getElementById("infoBox").innerHTML=`
+  document.getElementById("infoBox").innerHTML = `
     <strong>Username:</strong> ${u.username}<br>
     <strong>Role:</strong> ${u.role}<br>
     <strong>Joined:</strong> ${new Date(u.createdAt).toLocaleDateString()}
   `;
 
-  /* APPLICATIONS */
-  const apps=await fetch(API+"/applications").then(r=>r.json());
-  const myApps=apps.filter(a=>a.username.toLowerCase()===profileUsername.toLowerCase());
-  const appsList=document.getElementById("appsList");
-  myApps.forEach(app=>{
-    appsList.innerHTML+=`
+  /* ============================================
+     APPLICATIONS - FIXED ENDPOINT
+  ============================================= */
+  const apps = await fetch(`${API}/applications/user/${u.email}`).then((r) =>
+    r.json()
+  );
+  const appsList = document.getElementById("appsList");
+
+  apps.forEach((app) => {
+    appsList.innerHTML += `
       <div class="app-card">
-        <strong>${app.department}</strong> — ${new Date(app.submittedAt).toLocaleDateString()}
+        <strong>${app.department}</strong> — ${new Date(
+          app.submittedAt
+        ).toLocaleDateString()}
         <div class="badge ${app.status}">${app.status.toUpperCase()}</div>
       </div>`;
   });
 
-  /* DEPARTMENTS */
-  const dept=document.getElementById("deptList");
+  /* ============================================
+     DEPARTMENTS BASED ON ACCEPTED APPLICATIONS
+  ============================================= */
+  const dept = document.getElementById("deptList");
 
-  if(ADMIN_ROLES.includes(u.role)){
-    Object.keys(deptIcons).forEach(d=>{
-      dept.innerHTML+=`
+  if (ADMIN_ROLES.includes(u.role)) {
+    // Staff see all departments
+    Object.keys(deptIcons).forEach((d) => {
+      dept.innerHTML += `
       <div class="dept">
-        <img src="${deptIcons[d]}"><div><strong>${d}</strong><br>Administrative Access</div>
+        <img src="${deptIcons[d]}">
+        <div><strong>${d}</strong><br>Administrative Access</div>
       </div>`;
     });
   } else {
-    const accepted=myApps.filter(a=>a.status==="accepted");
-    if(!accepted.length) dept.innerHTML="<p>No accepted departments.</p>";
-    accepted.forEach(app=>{
-      dept.innerHTML+=`
+    // Regular users see their accepted departments
+    const accepted = apps.filter((a) => a.status === "accepted");
+
+    if (!accepted.length) {
+      dept.innerHTML = "<p>No accepted departments.</p>";
+    }
+
+    accepted.forEach((app) => {
+      dept.innerHTML += `
       <div class="dept">
-        <img src="${deptIcons[app.department]}"><div><strong>${app.department}</strong><br>Active Department Member</div>
+        <img src="${deptIcons[app.department]}">
+        <div><strong>${app.department}</strong><br>Active Department Member</div>
       </div>`;
     });
   }
 }
+
 loadProfile();
+
 </script>
 
 </body>
