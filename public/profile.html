@@ -65,67 +65,61 @@ main{
 }
 
 /* -------------------------------------------
-   HEAD ADMINISTRATOR — FINAL VERSION
-   SMALL BOX • PURPLE TEXT • CYAN EDGE
-   ITALIC • MULTI VERTICAL LIGHTNING STRIKES
+   HEAD ADMINISTRATOR — CLEAN VERSION
+   WHITE TEXT • NO CYAN WRAP • BLACK BOX
+   MULTI VERTICAL WHITE LIGHTNING
 ------------------------------------------- */
 .ha {
   position: relative;
-  display: inline-flex;        /* SHRINK to text size */
+  display: inline-flex;        /* auto-size to text */
   align-items: center;
   justify-content: center;
-  padding: 2px 8px;            /* SMALL TIGHT BOX */
+  padding: 2px 8px;            /* small badge */
   background: #000;            /* pure black */
   border-radius: 3px;
   overflow: hidden;
-  transform: skewX(-6deg);     /* angled badge */
+  transform: skewX(-6deg);
   text-transform: uppercase;
 }
 
-/* TEXT INSIDE */
+/* HEAD ADMIN TEXT — NOW WHITE, NO EDGE */
 .ha-text {
   font-style: italic;
-  font-weight: 1000;           /* ULTRA bold */
-  font-size: .90rem;           /* larger without box growing */
+  font-weight: 1000;           /* still bold */
+  font-size: .90rem;
   letter-spacing: .8px;
-  color: #b14dff;              /* deep purple */
-  transform: skewX(6deg);      /* counter skew for readable text */
-
-  /* CYAN MICRO EDGE - NOT A GLOW */
-  text-shadow:
-    1px 0 #00eaff,
-    -1px 0 #00eaff,
-    0 1px #00eaff,
-    0 -1px #00eaff;
+  color: #ffffff;              /* PURE WHITE */
+  transform: skewX(6deg);      /* counter tilt to readable */
+  text-shadow: none !important; /* REMOVE CYAN WRAP COMPLETELY */
 }
 
 /* -------------------------------------------
-   MULTI STRIKE LIGHTNING
+   MULTIPLE WHITE LIGHTNING STRIKES
 ------------------------------------------- */
 .ha .bolt {
   position: absolute;
-  top: -240%;                  /* start above box */
-  left: 50%;                   /* center */
-  width: 10px;
-  height: 400%;                /* long travel */
+  top: -240%;
+  left: 50%;
+  width: 14px;
+  height: 400%;
   transform: translateX(-50%);
   pointer-events: none;
   mix-blend-mode: screen;
   animation: boltDrop 1.8s ease-in-out infinite;
 }
 
-/* Each polyline is a separate lightning path */
+/* pure white lightning lines */
 .ha .bolt polyline {
   fill: none;
-  stroke: #ffffff;             /* PURE WHITE LIGHTNING */
-  stroke-width: 2;
+  stroke: #ffffff;             /* WHITE lightning */
+  stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 6px #00eaff); /* cyan energy aura */
-  opacity: .9;
+  filter: drop-shadow(0 0 6px #ffffff); /* WHITE glow only */
+  opacity: .95;
 }
 
-/* FALLING STRIKE MOTION */
+/* vertical lightning fall */
 @keyframes boltDrop {
   0%   { transform: translate(-50%, -200%); opacity: 0; }
   15%  { opacity: 1; }
@@ -134,14 +128,12 @@ main{
   100% { transform: translate(-50%, 200%); opacity: 0; }
 }
 
-/* -------------------------------------------
-   SMALL ELECTRIC FLASH POP
-------------------------------------------- */
+/* tiny flash — white now */
 .ha::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,255,255,.15);
+  background: rgba(255,255,255,.18);
   opacity: 0;
   pointer-events: none;
   animation: flashPop 2.4s infinite;
@@ -149,9 +141,10 @@ main{
 
 @keyframes flashPop {
   0%, 87%, 100% { opacity: 0; }
-  88% { opacity: .25; }
+  88% { opacity: .22; }
   89% { opacity: 0; }
 }
+
 
 
 /* -------------------------------------------
