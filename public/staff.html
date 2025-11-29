@@ -436,15 +436,15 @@ async function haPrompt(){
 
   /// APPEALS FUNCTION
 
-  async function loadAppeals(){
+ async function loadAppeals(){
   const res = await fetch(API + "/appeals");
   const appeals = await res.json();
   appealsBody.innerHTML = appeals.length ? appeals.map(a => `
     <tr>
       <td>${a.username}</td>
-      <td>${a.email}</td>
+      <td>${a.email || "—"}</td>
       <td>${a.reason}</td>
-      <td>${new Date(a.submittedAt).toLocaleDateString()}</td>
+      <td>${new Date(a.createdAt || a.submittedAt).toLocaleDateString()}</td>
       <td><span class="status ${a.status}">${a.status}</span></td>
       <td>
         <button class="btn view" onclick="viewAppeal('${a.id}')">View</button>
@@ -454,6 +454,7 @@ async function haPrompt(){
     </tr>
   `).join("") : `<tr><td colspan="6" style="opacity:.6;">No appeals submitted.</td></tr>`;
 }
+
 
 // APPEALS DECISION HANDLER
 
