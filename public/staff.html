@@ -690,11 +690,9 @@ async function loadForumUsers(){
   }
 }
 
-/* Toggle posting ability → /users/:id/restrict */
 async function toggleRestrict(id, current, targetRole){
   const staffRole = user.role || "User"; // logged-in staff rank
 
-  // Protected ranks — cannot be restricted except by Head Administrator
   const protectedRanks = [
     "Junior Administration",
     "Administration",
@@ -712,13 +710,15 @@ async function toggleRestrict(id, current, targetRole){
   await fetch(`${API}/users/${id}/restrict`, {
     method:"PATCH",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ restricted: !current })
+    body:JSON.stringify({
+      userId: user.id,        // 👈 REQUIRED BY BACKEND
+      restricted: !current
+    })
   });
 
   loadForumUsers();
 }
-
-  
+ 
 </script>
 
 </body>
