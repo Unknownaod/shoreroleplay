@@ -69,12 +69,12 @@ main{
   position: relative;
   display: inline-block;
 
-  background: #000;            /* black badge box */
-  padding: 3px 12px 4px;       /* tighter */
+  background: #000;
+  padding: 0px 10px 0px;   /* ↓ less height, same width */
   margin-left: 6px;
   border-radius: 3px;
   transform: skewX(-6deg);
-  overflow: hidden;            /* keeps lightning inside */
+  overflow: hidden;
   z-index: 2;
 
   font-style: italic;
@@ -83,8 +83,10 @@ main{
   font-size: .82rem;
   letter-spacing: .7px;
   text-transform: uppercase;
-  line-height: 1.05;           /* fixes vertical alignment */
+
+  line-height: .72; /* ↓ compress text vertically */
 }
+
 
 /* LIGHTNING STRIKE AREA (spread horizontally) */
 .ha svg.bolt {
