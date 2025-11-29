@@ -64,67 +64,64 @@ main{
   margin-left:6px;
 }
 
-/* HEAD ADMIN — compact badge, white text, 3 vertical bolts */
+/* HEAD ADMIN BADGE — compact, white text, 3 down strikes */
 .ha {
   position: relative;
   display: inline-block;
-  padding: 2px 10px;
-  margin-left: 6px;
 
-  background: #000;
+  background: #000;            /* black badge box */
+  padding: 3px 12px 4px;       /* tighter */
+  margin-left: 6px;
   border-radius: 3px;
   transform: skewX(-6deg);
+  overflow: hidden;            /* keeps lightning inside */
+  z-index: 2;
 
   font-style: italic;
   font-weight: 900;
-  color: #fff;
-  font-size: .78rem;
-  letter-spacing: .6px;
+  color: #ffffff;
+  font-size: .82rem;
+  letter-spacing: .7px;
   text-transform: uppercase;
-
-  line-height: 1.1;
-  overflow: hidden;       /* 🔥 prevents overlap into username */
-  z-index: 2;             /* stays below username text */
+  line-height: 1.05;           /* fixes vertical alignment */
 }
 
+/* LIGHTNING STRIKE AREA */
 .ha svg.bolt {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 14px;            /* narrow lightning area */
-  height: 100%;           /* stays inside the box */
-  overflow: hidden;
-  z-index: 1;
+  top: -100%;                  /* start above box */
+  left: 50%;
+  width: 12px;
+  height: 260%;                /* drops fully inside badge */
+  transform: translateX(-50%);
   pointer-events: none;
+  z-index: 1;                  /* behind text */
+  opacity: .9;
 }
 
-/* Bolt stroke style */
+/* LIGHTNING LINES */
 .ha svg.bolt polyline {
   fill: none;
-  stroke: #ffffff;        /* PURE WHITE lightning */
+  stroke: #ffffff;             /* pure white lightning */
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
   filter: drop-shadow(0 0 6px #ffffff);
-  animation: strike 1.4s linear infinite;
+  animation: strikeDown 1.4s linear infinite;
 }
 
-/* bolt animation */
-@keyframes strike {
+/* DOWNWARD MOTION */
+@keyframes strikeDown {
   0%   { transform: translateY(-120%); opacity: 0; }
-  10%  { opacity: 1; }
+  12%  { opacity: 1; }
   40%  { transform: translateY(10%); }
-  60%  { opacity: .7; }
-  100% { transform: translateY(120%); opacity: 0; }
+  65%  { opacity: .7; }
+  100% { transform: translateY(130%); opacity: 0; }
 }
 
-/* Second and third bolt staggered for realism */
-.ha svg.bolt:nth-child(2) polyline {
-  animation-delay: .35s;
-}
-.ha svg.bolt:nth-child(3) polyline {
-  animation-delay: .7s;
-}
+/* bolt offset timing */
+.ha svg.bolt:nth-child(2) polyline { animation-delay: .25s; }
+.ha svg.bolt:nth-child(3) polyline { animation-delay: .55s; }
 
 
 
@@ -272,9 +269,8 @@ if (u.role === "Head Administrator") {
 <span class="ha">
   ${u.role}
 
-  <!-- 3 lightning strikes -->
   <svg class="bolt" viewBox="0 0 14 80">
-    <polyline points="7,0 6,18 8,34 5,50 9,72" />
+    <polyline points="7,0 6,18 9,36 5,52 8,70" />
   </svg>
 
   <svg class="bolt" viewBox="0 0 14 80">
