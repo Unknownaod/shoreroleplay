@@ -65,90 +65,88 @@ main{
 }
 
 /* -------------------------------------------
-   HEAD ADMIN — FINAL FORM
-   BLACK BOX + PURPLE TEXT + CYAN EDGE
-   ITALIC + BIGGER + VERTICAL LIGHTNING STRIKE
+   HEAD ADMIN — ELECTRIC AUTHORITY EDITION
+   Small badge box • BIG text • sharp cyan outline • multi-bolt lightning
 ------------------------------------------- */
 .ha {
   position: relative;
   display: inline-block;
 
-  /* TEXT SPECS */
-  font-style: italic;            /* NEW — italic tilt */
-  font-weight: 1000;             /* ULTRA bold */
-  font-size: .92rem;             /* slightly bigger */
-  letter-spacing: .8px;
-
-  padding: 4px 14px 6px;
-  background: #000;              /* PURE VOID BLACK */
-  border-radius: 5px;
-  transform: skewX(-6deg);       /* angled badge still */
+  /* TIGHT BADGE BOX */
+  padding: 2px 10px 4px;
+  background: #000;                  /* pure black box */
+  border-radius: 4px;
   text-transform: uppercase;
   overflow: hidden;
+  transform: skewX(-6deg);
 
-  /* PURPLE TEXT WITH CYAN MICRO OUTLINE */
-  color: #b14dff;                /* powerful purple */
+  /* TEXT — BIG, PURPLE, NO GLOW! CYAN OUTLINE ONLY */
+  font-style: italic;
+  font-weight: 1000;
+  font-size: 1.05rem;                 /* larger text */
+  letter-spacing: 1px;
+  color: #9e3eff;                     /* royal purple */
+
+  /* SHARP CYAN EDGE (NOT GLOW) */
   text-shadow:
-    0 0 2px #00eaff,
-    0 0 5px #00eaff,
-    0 0 10px #00eaff;            /* neon cyan edge */
+    -1px 0 #00eaff,
+     1px 0 #00eaff,
+     0 -1px #00eaff,
+     0  1px #00eaff;                  /* crisp cyan wrap */
 }
 
-/* ****************************************
-   VERTICAL LIGHTNING STRIKE (REALISTIC)
+/* ***************************************
+   MULTI-BOLT WHITE LIGHTNING STRIKES
 **************************************** */
-.ha .bolt {
+.ha svg.bolt {
   position: absolute;
-  top: -220%;                    /* starts HIGH above */
+  top: -220%;
   left: 50%;
   transform: translateX(-50%);
   height: 300%;
-  width: 4px;
-
-  stroke: #00eaff;
-  stroke-width: 3;
-  filter: drop-shadow(0 0 10px #00eaff);
+  width: 200%;
+  stroke: #ffffff;                    /* WHITE lightning */
+  stroke-width: 2.6;
   opacity: .9;
-
-  animation: boltDrop 1.4s ease-in-out infinite;
-  pointer-events: none;
+  filter: drop-shadow(0 0 6px #ffffff);
   mix-blend-mode: screen;
+  pointer-events: none;
+  animation: boltCluster 1.7s linear infinite;
 }
 
-/* Lightning falls DOWN like a real strike */
-@keyframes boltDrop {
-  0%   { transform: translate(-50%, -200%) scaleX(.9) skewX(-4deg); opacity: 0; }
-  10%  { opacity: 1; }
-  40%  { transform: translate(-50%, 0%) scaleX(1) skewX(4deg); }
-  60%  { opacity: .9; }
-  80%  { opacity: .4; }
-  100% { transform: translate(-50%, 200%) scaleX(.7) skewX(-6deg); opacity: 0; }
+/* bolt movement */
+@keyframes boltCluster {
+  0%   { transform: translate(-50%, -200%); opacity: 0; }
+  8%   { opacity: 1; }
+  40%  { transform: translate(-50%, 10%); }
+  70%  { opacity: .6; }
+  100% { transform: translate(-50%, 220%); opacity: 0; }
 }
 
-/* Flash pulse after lightning hits */
+/* IMPACT FLASH */
 .ha::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,255,255,.18);
+  background: rgba(255,255,255,.18);
   opacity: 0;
-  pointer-events: none;
-  animation: flashPop 2.1s infinite;
+  animation: haFlash 2.2s infinite;
 }
 
-@keyframes flashPop {
-  0%, 86%, 100% { opacity: 0; }
-  87% { opacity: .28; }
-  88% { opacity: 0; }
+@keyframes haFlash {
+  0%, 85%, 100% { opacity: 0; }
+  86% { opacity: .25; }
+  87% { opacity: 0; }
 }
 
-/* Correct inherited staff badge padding */
+/* Remove inherited padding */
 .ha.staff-badge {
-  padding: 3px 12px 5px !important;
+  padding: 2px 10px 4px !important;
   border-radius: 4px !important;
   background: #000 !important;
   border: none !important;
 }
+
 
 /* OTHER ROLES (leave as-is) */
 .ia{background:#ff5050}
@@ -289,32 +287,19 @@ const sub = document.getElementById("subtitle");
 if (u.role === "Head Administrator") {
   sub.innerHTML = `
     Staff Member —
-    <span class="staff-badge ha">
-      <span class="ha-text">${u.role}</span>
+    <span class="ha">
+      ${u.role}
 
-      <!-- ⚡ VERTICAL LIGHTNING STRIKE -->
-      <svg class="bolt" width="8" height="200" viewBox="0 0 8 200" preserveAspectRatio="none">
-        <polyline 
-          points="
-            4,0
-            2,16
-            5,32
-            3,55
-            7,78
-            4,102
-            6,128
-            3,150
-            7,172
-            4,200
-          "
-          fill="none" stroke="#00eaff" stroke-width="2.4"
-          stroke-linecap="round" stroke-linejoin="round"
-        />
+      <!-- ⚡ MULTI-BOLT VERTICAL WHITE LIGHTNING -->
+      <svg class="bolt" viewBox="0 0 120 400" preserveAspectRatio="none">
+        <polyline points="60,0 52,80 70,140 48,220 75,300 60,400" />
+        <polyline points="60,120 30,180 50,240" />
+        <polyline points="60,200 90,260 70,320" />
       </svg>
+
     </span>
   `;
 } else if (u.role !== "user") {
-  // All OTHER staff roles use the normal badge
   sub.innerHTML = `
     Staff Member — <span class="staff-badge ${roleColor[u.role]}">${u.role}</span>
   `;
