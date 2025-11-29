@@ -64,64 +64,63 @@ main{
   margin-left:6px;
 }
 
-/* ===============================
-   HEAD ADMINISTRATOR TAG (1:1)
-   =============================== */
+/* ==========================================
+   HEAD ADMIN — BLACK BOX + PURPLE TEXT + CYAN OUTLINE + LIGHTNING WAVE
+========================================== */
 .ha {
   position: relative;
   display: inline-block;
-
-  /* SMALL BLACK CONTAINER */
-  background: #000;
   padding: 2px 10px;
-  border-radius: 4px;
-
-  /* PURE PURPLE TEXT */
-  color: #c37bff;
-  font-weight: 700;
   font-size: .72rem;
-  text-shadow: none; /* clean text */
+  font-weight: 800;
+  background: #000;           /* PURE BLACK BOX */
+  border-radius: 4px;
   overflow: hidden;
+  text-transform: uppercase;
 
-  /* no borders, no glow */
-  border: none;
-  box-shadow: none;
+  /* HEAVY PURPLE TEXT + CYAN STROKE */
+  color: #b94dff;             /* main purple */
+  text-shadow:
+      0 0 2px #00eaff,
+      0 0 4px #00eaff;        /* thin cyan wrap around letters */
 }
 
-/* ---------------------------------
-   SHIMMER WAVE INSIDE THE TEXT
----------------------------------- */
+/* ==========================================
+   THUNDER / LIGHTNING WAVE INSIDE BADGE
+========================================== */
 .ha::before {
-  content: "Head Administrator"; /* same text */
+  content: "";
   position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
+  top: 50%; left: -150%;
+  width: 300%;
+  height: 60%;
+  transform: translateY(-50%);
 
-  color: #ffffff; /* light streak color */
-  clip-path: inset(0 0 0 0);
-  mix-blend-mode: lighten; /* blend correctly */
-  opacity: 0.55;
+  /* JAGGED ELECTRIC LIGHTNING */
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,255,255,.0) 0px,
+      rgba(0,255,255,.8) 6px,
+      rgba(0,255,255,0) 12px,
+      rgba(255,255,255,.9) 16px,
+      rgba(0,255,255,0) 22px
+    );
 
-  background: linear-gradient(
-    115deg,
-    transparent 0%,
-    rgba(255,255,255,0.5) 50%,
-    transparent 100%
-  );
-
-  /* animate the wave through the letters */
-  background-size: 200% 200%;
-  animation: haWave 3s linear infinite;
+  filter: blur(2.5px) brightness(1.8); /* glowing lightning look */
+  mix-blend-mode: screen;              /* blends into purple text */
+  opacity: .45;
+  animation: haLightning 2.4s linear infinite;
   pointer-events: none;
 }
 
-/* ---------------------------------
-   WAVE MOVEMENT
----------------------------------- */
-@keyframes haWave {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* ==========================================
+   LIGHTNING WAVE MOTION
+========================================== */
+@keyframes haLightning {
+  0%   { transform: translate(-150%, -50%) skewX(-18deg); }
+  50%  { transform: translate(0%, -50%) skewX(8deg); }
+  100% { transform: translate(150%, -50%) skewX(-12deg); }
 }
 
 
