@@ -628,16 +628,16 @@ async function decide(id, status){
 
 
 /* DELETE APPLICATION → /applications/:id */
-async function deleteApplication(id) {
-  if (!confirm("Delete this application?")) return;
-
+async function removeApp(id) {
   const staff = JSON.parse(localStorage.getItem("shoreUser"));
   if (!staff) return alert("Not logged in");
+
+  if (!confirm("Delete this application?")) return;
 
   const res = await fetch(`${API}/applications/${id}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId: staff.id }) // REQUIRED
+    body: JSON.stringify({ userId: staff.id }) // staff required
   });
 
   const data = await res.json();
