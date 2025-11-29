@@ -630,9 +630,9 @@ function isUserStaff() {
   return STAFF_ROLES.includes(user.role);
 }
 
-/* Map any department string/code to a canonical id ("pd","sp","fire",...) */
-function mapDeptToId(raw) {
-  if (!raw) return null;
+/* ---------- DEPARTMENT NORMALIZER (APPS + GALLERY) ---------- */
+function normalizeDeptId(raw) {
+  if (!raw) return "";
   const n = String(raw).toLowerCase();
 
   if (n === "pd"   || n.includes("police"))   return "pd";
@@ -642,11 +642,12 @@ function mapDeptToId(raw) {
   if (n === "ems"  || n.includes("ems") || n.includes("medical")) return "ems";
   if (n === "civ"  || n.includes("civilian") || n.includes("media")) return "civ";
   if (n === "staff") return "staff";
-  return null;
+
+  return n; // fallback
 }
 
 /* ---------- FETCH USER'S ACCEPTED APPLICATIONS ---------- */
-let userDepartments = []; // canonical dept IDs they are accepted into (e.g. "pd","sp")
+let userDepartments = []; // dept IDs they are accepted into
 
 async function loadAcceptedDepartments() {
   userDepartments = [];
@@ -660,7 +661,7 @@ async function loadAcceptedDepartments() {
 
     userDepartments = list
       .filter(a => a && a.status === "accepted" && a.department)
-      .map(a => mapDeptToId(a.department))
+      .map(a => normalizeDeptId(a.department))
       .filter(Boolean);
 
     userDepartments = [...new Set(userDepartments)];
@@ -695,11 +696,9 @@ function setActiveDept(id) {
     );
   }
 
-  if (deptSummaryEl) {
-    const dept = departments.find(d => d.id === id);
-    deptSummaryEl.textContent = dept
-      ? `${dept.name} • Public Media Wall`
-      : "Public Media Wall";
+  const dept = departments.find(d => d.id === id);
+  if (deptSummaryEl && dept) {
+    deptSummaryEl.textContent = `${dept.name} • Public Media Wall`;
   }
 
   renderGallery();
@@ -709,7 +708,7 @@ function setActiveDept(id) {
 /* ---------- UPLOAD PERMISSION ---------- */
 function userCanUploadHere() {
   if (!user) return false;
-  if (isUserStaff()) return true; // staff can always post
+  if (isUserStaff()) return true;
   return userDepartments.includes(activeDeptId);
 }
 
@@ -780,7 +779,9 @@ async function fetchGallery() {
 function renderGallery() {
   if (!galleryGridEl || !galleryCountEl) return;
 
-  const items = galleryData.filter(item => mapDeptToId(item?.department) === activeDeptId);
+  const items = galleryData.filter(i =>
+    normalizeDeptId(i && i.department) === activeDeptId
+  );
 
   galleryGridEl.innerHTML = "";
 
@@ -792,7 +793,7 @@ function renderGallery() {
     items.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
     items.forEach(item => {
-      const deptId = mapDeptToId(item.department) || activeDeptId;
+      const deptId = normalizeDeptId(item.department);
       const dept   = departments.find(d => d.id === deptId);
       const badge  = dept ? dept.badge : "";
       const caption = item.caption || "Untitled";
@@ -823,8 +824,7 @@ function renderGallery() {
     });
   }
 
-  galleryCountEl.textContent =
-    `${items.length} photo${items.length === 1 ? "" : "s"} in this department.`;
+  galleryCountEl.textContent = `${items.length} photo${items.length===1?"":"s"} in this department.`;
 }
 
 /* ---------- UPLOAD HANDLER ---------- */
@@ -859,9 +859,9 @@ if (uploadFormEl) {
 
     try {
       const res = await fetch(`${API}/gallery`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(payload)
       });
 
       if (!res.ok) throw new Error("Upload failed");
@@ -882,17 +882,14 @@ if (uploadFormEl) {
 /* ---------- INIT ---------- */
 (async () => {
   await loadAcceptedDepartments();
-  if (userDepartments.length > 0) {
-    // If user has PD + SP, they'll default to the first accepted one,
-    // but they can switch tabs and post in any of them.
-    activeDeptId = userDepartments[0];
-  }
+  if (userDepartments.length > 0) activeDeptId = userDepartments[0];
   renderTabs();
   setActiveDept(activeDeptId);
   setupUploadSection();
   fetchGallery();
 })();
 </script>
+
 
 
 </body>
