@@ -601,26 +601,31 @@ function closeModal(){
 }
 
 /* DECISION → /applications/:id/decision */
-async function decide(id,status){
+async function decide(id, status){
   if(!confirm(`Confirm marking this application as ${status.toUpperCase()}?`)) return;
 
-fetch(`${API}/applications/${id}/decision`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    decision: decisionType, // "accepted" or "denied"
-    reason: decisionReason || ""
-  })
-});
+  // Optional reason prompt
+  const reason = prompt("Reason for this decision (optional):") || "";
 
+  const res = await fetch(`${API}/applications/${id}/decision`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      decision: status, // <-- status is already "accepted" or "denied"
+      reason: reason
+    })
+  });
+
+  const data = await res.json();
 
   if(res.ok){
-    alert("Decision saved and applicant notified.");
-    loadApps();
+    alert(`Application ${status}.`);
+    loadApps(); // refresh
   } else {
-    alert("Failed to update decision.");
+    alert("Failed to update decision: " + (data.error || "Unknown error"));
   }
 }
+
 
 /* DELETE APPLICATION → /applications/:id */
 async function removeApp(id){
