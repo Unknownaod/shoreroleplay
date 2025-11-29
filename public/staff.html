@@ -372,44 +372,48 @@ function switchTab(tab){
   currentTab = tab;
 
   // Highlight correct tab
-document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-document.querySelector(`.tab:nth-child(${
-  tab==='pending' ? 1 :
-  tab==='all' ? 2 :
-  tab==='forums' ? 3 :
-  tab==='ha' ? 4 : 5
-})`).classList.add("active");
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelector(`.tab:nth-child(${
+    tab==='pending' ? 1 :
+    tab==='all' ? 2 :
+    tab==='forums' ? 3 :
+    tab==='ha' ? 4 :
+    5
+  })`).classList.add("active");
 
-  // Sections
-  const appsSection   = document.getElementById("appsSection");
-  const forumsSection = document.getElementById("forumsSection");
-  const haSection     = document.getElementById("haSection");
-  const appealsSection = document.getElementById("appealsSection");
-  // Show/hide based on selected tab
-  appsSection.style.display   = (tab === "pending" || tab === "all") ? "block" : "none";
-  forumsSection.style.display = (tab === "forums") ? "block" : "none";
-  haSection.style.display     = (tab === "ha") ? "block" : "none";
+  // Get sections
+  const appsSection     = document.getElementById("appsSection");
+  const forumsSection   = document.getElementById("forumsSection");
+  const haSection       = document.getElementById("haSection");
+  const appealsSection  = document.getElementById("appealsSection"); // 👈 REQUIRED
+
+  // Toggle visibility
+  appsSection.style.display    = (tab === "pending" || tab === "all") ? "block" : "none";
+  forumsSection.style.display  = (tab === "forums") ? "block" : "none";
+  haSection.style.display      = (tab === "ha") ? "block" : "none";
+  appealsSection.style.display = (tab === "appeals") ? "block" : "none"; // 👈 REQUIRED
 
   // Load correct data
   if(tab === "ha"){
     if(!haUnlocked) haPrompt();
     else loadUsers();
-  } 
+  }
   else if(tab === "forums"){
     loadForumUsers();
-  } 
-  else if(tab === "appeals"){
-  if(user.role !== "Head Administrator"){
-    alert("🚫 Only Head Administration may review appeals.");
-    switchTab("pending");
-    return;
   }
-  loadAppeals();
-}  
+  else if(tab === "appeals"){
+    if(user.role !== "Head Administrator"){
+      alert("🚫 Only Head Administration may review appeals.");
+      switchTab("pending");
+      return;
+    }
+    loadAppeals(); // 👈 FINALLY VISIBLE
+  }
   else {
     loadApps();
   }
 }
+
 
 /* ========== HA PASSWORD PROMPT → /ha-auth ========== */
 async function haPrompt(){
